@@ -27,8 +27,8 @@ func NewCell(r rune, comb ...rune) (c *Cell) {
 }
 
 // NewCellString 返回一个带有给定字符串内容的新单元格。这是一个便捷函数，
-// 使用给定内容初始化新单元格。单元格的宽度通过 [runewidth.StringWidth] 根据内容确定。
-// 这只会使用字符串中的第一个组合符文。如果字符串为空，将返回宽度为 0 的空单元格。
+// 使用给定内容初始化新单元格。单元格的宽度通过 [uniseg.FirstGraphemeClusterInString] 根据内容确定。
+// 这只会使用字符串中的第一个字形集群。如果字符串为空，将返回宽度为 0 的空单元格。
 func NewCellString(s string) (c *Cell) {
 	c = new(Cell)
 	for i, r := range s {
