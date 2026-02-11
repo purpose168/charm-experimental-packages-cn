@@ -37,6 +37,8 @@ PACKAGES := \
 	exp/strings \
 	exp/teatest \
 	exp/teatest/v2 \
+  exp/charmtone \
+  exp/toner \
 	input \
 	json \
 	sshkey \
@@ -156,9 +158,6 @@ reinit:
 		echo "\n\n重新初始化 $$pkg 包的模块..."; \
 		cd $(ROOT_DIR)/$$pkg && \
 		if [ -f "go.mod" ]; then \
-			backup_name="go.mod.backup.$(shell date +%Y%m%d%H%M%S)"; \
-			echo "备份当前 go.mod 文件为 $$backup_name..."; \
-			cp go.mod $$backup_name; \
 			echo "删除 go.mod 和 go.sum 文件..."; \
 			rm -f go.mod go.sum; \
 			echo "重新初始化模块..."; \
