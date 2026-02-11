@@ -12,10 +12,10 @@ github.com/lucasb-eyer/go-colorful v1.3.0 h1:2/yBRLdWBZKrf7gB40FoiKfAWYQ0lqNcbuQ
 github.com/lucasb-eyer/go-colorful v1.3.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-runewidth v0.0.19 h1:v++JhqYnZuu5jSKrk9RbgF5v4CGUjqRfBm05byFGLdw=
 github.com/mattn/go-runewidth v0.0.19/go.mod h1:XBkDxAl56ILZc9knddidhrOlY5R/pDhgLpndooCuJAs=
-github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211133633-39549eed6c22 h1:PLcSCmq5Ac78q2nxE2KGfbo9KvQXgBpRI14pivCjlx0=
-github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211133633-39549eed6c22/go.mod h1:dJ8LCI1PfamaqMFsG91zJcb0FuMrzp5GbWEygjnrL3c=
-github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211133633-39549eed6c22 h1:JVyIz/1s5xD85/3ZaGoHKgMDmDn6qQPoW5ff/p+kfoQ=
-github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211133633-39549eed6c22/go.mod h1:51CHDN6dxae1qg+dazz8uIeCFcV2LB26LsTJoedl9HE=
+github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211145611-af659c6d76ce h1:DfvP6uKdDNfg0CIWNjJuNpO7yFogJ0ffCznM4HB6n/8=
+github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211145611-af659c6d76ce/go.mod h1:dJ8LCI1PfamaqMFsG91zJcb0FuMrzp5GbWEygjnrL3c=
+github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211145611-af659c6d76ce h1:z/CyJQeajUgDIPQfvRV0g72wLh8yqadA5V9RrVX0u/A=
+github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211145611-af659c6d76ce/go.mod h1:1Jz2SxlkgfYmcn1Wkz9Ndx2TKc8DUVl6OUa51QaP/d0=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
 github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
 github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e h1:JVG44RsyaB9T2KIHavMF/ppJZNG9ZpyihvCd0w101no=

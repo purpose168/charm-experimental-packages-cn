@@ -1,10 +1,10 @@
 github.com/creack/pty v1.1.24 h1:bJrF4RRfyJnbTJqzRLHzcGaZK1NeM5kTC9jGgovnR1s=
 github.com/creack/pty v1.1.24/go.mod h1:08sCNb52WyoAwi2QDyzUCTgcvVFhUzewun7wtTfvcwE=
-github.com/purpose168/charm-experimental-packages-cn/conpty v0.0.0-20260211133633-39549eed6c22 h1:OUNta4Xf/fE7eBt6ISzMNZajiBzICy5KbnSPP/mjcZI=
-github.com/purpose168/charm-experimental-packages-cn/conpty v0.0.0-20260211133633-39549eed6c22/go.mod h1:EuaUrCDOFm0JKT0OlXm6tN4jfhQ0fIGPInHdnb8UYZY=
-github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211133633-39549eed6c22 h1:JVyIz/1s5xD85/3ZaGoHKgMDmDn6qQPoW5ff/p+kfoQ=
-github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211133633-39549eed6c22/go.mod h1:51CHDN6dxae1qg+dazz8uIeCFcV2LB26LsTJoedl9HE=
-github.com/purpose168/charm-experimental-packages-cn/termios v0.0.0-20260211133633-39549eed6c22 h1:8AuFbThx/9ws321DMWM77xrxQU5eBi0qEdXJRNwXcRI=
-github.com/purpose168/charm-experimental-packages-cn/termios v0.0.0-20260211133633-39549eed6c22/go.mod h1:xia6oOt+f9mcjL+nLAyhB41/MCUTz5jq4cRzCvPZuN0=
+github.com/purpose168/charm-experimental-packages-cn/conpty v0.0.0-20260211145611-af659c6d76ce h1:463OWdGMixG/Y9k2eb4go0mlFUaoNF8tYQJ1HUcSaI4=
+github.com/purpose168/charm-experimental-packages-cn/conpty v0.0.0-20260211145611-af659c6d76ce/go.mod h1:99rXCZBadRWxb6gKgjmPAmDJvWbCBTNsawOkot5i5AQ=
+github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211145611-af659c6d76ce h1:z/CyJQeajUgDIPQfvRV0g72wLh8yqadA5V9RrVX0u/A=
+github.com/purpose168/charm-experimental-packages-cn/term v0.0.0-20260211145611-af659c6d76ce/go.mod h1:1Jz2SxlkgfYmcn1Wkz9Ndx2TKc8DUVl6OUa51QaP/d0=
+github.com/purpose168/charm-experimental-packages-cn/termios v0.0.0-20260211145611-af659c6d76ce h1:Jw6aT8oTg6WVCodI5gw/eZ+Qc0N2xLDAgFI4feP5MFg=
+github.com/purpose168/charm-experimental-packages-cn/termios v0.0.0-20260211145611-af659c6d76ce/go.mod h1:i2SPtWW9I58zl4nqENztZe7CMnjvyR+p4vWrU8B/XWw=
 golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
 golang.org/x/sys v0.41.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=

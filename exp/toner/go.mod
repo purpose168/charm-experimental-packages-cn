@@ -3,8 +3,8 @@ module github.com/purpose168/charm-experimental-packages-cn/exp/toner
 go 1.24.2
 
 require (
-	github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211133633-39549eed6c22
-	github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211133633-39549eed6c22
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211145611-af659c6d76ce
+	github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211145611-af659c6d76ce
 )
 
 require (

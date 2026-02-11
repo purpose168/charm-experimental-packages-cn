@@ -6,7 +6,7 @@ github.com/lucasb-eyer/go-colorful v1.3.0 h1:2/yBRLdWBZKrf7gB40FoiKfAWYQ0lqNcbuQ
 github.com/lucasb-eyer/go-colorful v1.3.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/mattn/go-runewidth v0.0.19 h1:v++JhqYnZuu5jSKrk9RbgF5v4CGUjqRfBm05byFGLdw=
 github.com/mattn/go-runewidth v0.0.19/go.mod h1:XBkDxAl56ILZc9knddidhrOlY5R/pDhgLpndooCuJAs=
-github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211133633-39549eed6c22 h1:PLcSCmq5Ac78q2nxE2KGfbo9KvQXgBpRI14pivCjlx0=
-github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211133633-39549eed6c22/go.mod h1:dJ8LCI1PfamaqMFsG91zJcb0FuMrzp5GbWEygjnrL3c=
-github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211133633-39549eed6c22 h1:6vlNY2Ux+Ai4Y/YTHsL4qzRisITwQaOic/BRnpA1Phg=
-github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211133633-39549eed6c22/go.mod h1:+B+CDy0CuB88labWSckuFtBkk/kUxJiUE23qaMw+9/c=
+github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211145611-af659c6d76ce h1:DfvP6uKdDNfg0CIWNjJuNpO7yFogJ0ffCznM4HB6n/8=
+github.com/purpose168/charm-experimental-packages-cn/ansi v0.0.0-20260211145611-af659c6d76ce/go.mod h1:dJ8LCI1PfamaqMFsG91zJcb0FuMrzp5GbWEygjnrL3c=
+github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211145611-af659c6d76ce h1:KpWHWdATYOXhA9UjitGpUEZyYKF7qo8wicOlxh5W11Q=
+github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20260211145611-af659c6d76ce/go.mod h1:GCmZ7eEWwlS9QuUlL2+a1EPug1KYsPGUv2ecaYKx6aM=

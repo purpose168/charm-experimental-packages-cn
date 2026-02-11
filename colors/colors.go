@@ -1,7 +1,7 @@
 // colors 包提供颜色定义和工具函数
 package colors
 
-import lipgloss "github.com/purpose168/lipgloss-cn"
+import "github.com/purpose168/lipgloss-cn"
 
 //nolint:revive
 var (

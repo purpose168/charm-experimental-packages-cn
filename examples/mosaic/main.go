@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/purpose168/charm-experimental-packages-cn/mosaic"
-	lipgloss "github.com/purpose168/lipgloss-cn"
+	lipgloss "github.com/purpose168/lipgloss-cn/v2"
 )
 
 func main() {

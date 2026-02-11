@@ -167,7 +167,11 @@ reinit:
 			$(GO) mod tidy; \
 			echo "$$pkg 包的模块重新初始化完成..."; \
 		else \
-			echo "$$pkg 包没有 go.mod 文件，跳过..."; \
+			module_path="github.com/purpose168/charm-experimental-packages-cn/$$pkg"; \
+			$(GO) mod init $$module_path; \
+			echo "运行 go mod tidy 重新添加依赖..."; \
+			$(GO) mod tidy; \
+			echo "$$pkg 包的模块重新初始化完成..."; \
 		fi; \
 	 done
 
