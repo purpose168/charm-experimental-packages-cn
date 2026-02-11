@@ -6,31 +6,31 @@ import (
 	"strconv"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/vt"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/vt"
 )
 
-// Modes represents terminal modes.
+// Modes 表示终端模式。
 type Modes struct {
 	ANSI map[ansi.ANSIMode]ansi.ModeSetting `json:"ansi" yaml:"ansi"`
 	DEC  map[ansi.DECMode]ansi.ModeSetting  `json:"dec" yaml:"dec"`
 }
 
-// Position represents a position in the terminal.
+// Position 表示终端中的一个位置。
 type Position struct {
 	X int `json:"x" yaml:"x"`
 	Y int `json:"y" yaml:"y"`
 }
 
-// Color represents a terminal color, which can be one of the following:
-// - An ANSI 16 color (0-15) of type [ansi.BasicColor].
-// - An ANSI 256 color (0-255) of type [ansi.IndexedColor].
-// - Or any other 24-bit color that implements [color.Color].
+// Color 表示终端颜色，可以是以下之一：
+// - 类型为 [ansi.BasicColor] 的 ANSI 16 色（0-15）。
+// - 类型为 [ansi.IndexedColor] 的 ANSI 256 色（0-255）。
+// - 或任何其他实现了 [color.Color] 的 24 位颜色。
 type Color struct {
 	Color color.Color `json:"color,omitempty" yaml:"color,omitempty"`
 }
 
-// MarshalText implements the [encoding.TextMarshaler] interface for Color.
+// MarshalText 为 Color 实现 [encoding.TextMarshaler] 接口。
 func (c Color) MarshalText() ([]byte, error) {
 	switch col := c.Color.(type) {
 	case nil:
@@ -45,7 +45,7 @@ func (c Color) MarshalText() ([]byte, error) {
 	}
 }
 
-// UnmarshalText implements the [encoding.TextUnmarshaler] interface for Color.
+// UnmarshalText 为 Color 实现 [encoding.TextUnmarshaler] 接口。
 func (c *Color) UnmarshalText(text []byte) error {
 	s := string(text)
 	if s == "" {
@@ -69,7 +69,7 @@ func (c *Color) UnmarshalText(text []byte) error {
 	return nil
 }
 
-// Cursor represents the cursor state.
+// Cursor 表示光标的状态。
 type Cursor struct {
 	Position Position       `json:"position," yaml:"position"`
 	Visible  bool           `json:"visible" yaml:"visible"`
@@ -78,7 +78,7 @@ type Cursor struct {
 	Blink    bool           `json:"blink" yaml:"blink"`
 }
 
-// Style represents the Style of a cell.
+// Style 表示单元格的样式。
 type Style struct {
 	Fg             Color        `json:"fg,omitzero" yaml:"fg,omitzero"`
 	Bg             Color        `json:"bg,omitzero" yaml:"bg,omitzero"`
@@ -87,31 +87,28 @@ type Style struct {
 	Attrs          byte         `json:"attrs,omitempty" yaml:"attrs,omitempty"`
 }
 
-// Link represents a hyperlink in the terminal screen.
+// Link 表示终端屏幕中的超链接。
 type Link struct {
 	URL    string `json:"url,omitempty" yaml:"url,omitempty"`
 	Params string `json:"params,omitempty" yaml:"params,omitempty"`
 }
 
-// Cell represents a single cell in the terminal screen.
+// Cell 表示终端屏幕中的单个单元格。
 type Cell struct {
-	// Content is the [Cell]'s content, which consists of a single grapheme
-	// cluster. Most of the time, this will be a single rune as well, but it
-	// can also be a combination of runes that form a grapheme cluster.
+	// Content 是单元格的内容，由单个字形簇组成。大多数情况下，这也是单个符文，但也可以是形成字形簇的多个符文的组合。
 	Content string `json:"content,omitempty" yaml:"content,omitempty"`
 
-	// The style of the cell. Nil style means no style. Zero value prints a
-	// reset sequence.
+	// Style 是单元格的样式。零值表示重置序列。
 	Style Style `json:"style,omitzero" yaml:"style,omitzero"`
 
-	// Link is the hyperlink of the cell.
+	// Link 是单元格的超链接。
 	Link Link `json:"link,omitzero" yaml:"link,omitzero"`
 
-	// Width is the mono-spaced width of the grapheme cluster.
+	// Width 是字形簇的等宽宽度。
 	Width int `json:"width,omitzero" yaml:"width,omitzero"`
 }
 
-// Snapshot represents a snapshot of the terminal state at a given moment.
+// Snapshot 表示给定时刻的终端状态快照。
 type Snapshot struct {
 	Modes     Modes    `json:"modes" yaml:"modes"`
 	Title     string   `json:"title" yaml:"title"`

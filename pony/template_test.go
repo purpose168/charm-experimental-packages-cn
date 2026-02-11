@@ -4,7 +4,7 @@ import (
 	"testing"
 	"text/template"
 
-	"github.com/charmbracelet/x/exp/golden"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
 func TestTemplateVariables(t *testing.T) {

@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
-	"github.com/charmbracelet/x/exp/charmtone"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/charmtone"
 )
 
 func renderGuide() {
-	// Find the longest key name.
+	// 找到最长的键名。
 	var widestKeyName int
 	for _, k := range charmtone.Keys() {
 		if w := lipgloss.Width(k.String()); w > widestKeyName {
@@ -21,7 +21,7 @@ func renderGuide() {
 		}
 	}
 
-	// Styles.
+	// 样式。
 	hasDarkBG := lipgloss.HasDarkBackground(os.Stdin, os.Stdout)
 	lightDark := lipgloss.LightDark(hasDarkBG)
 	logo := lipgloss.NewStyle().
@@ -62,16 +62,16 @@ func renderGuide() {
 
 	var b strings.Builder
 
-	// Render title and description.
+	// 渲染标题和描述。
 	fmt.Fprintf(
 		&b,
 		"\n  %s %s %s\n\n",
 		logo.String(),
 		title.Render("CharmTone"),
-		subdued.Render("• Formula Guide"),
+		subdued.Render("• 配色指南"),
 	)
 
-	// Render a swatch and its metadata.
+	// 渲染色板及其元数据。
 	renderSwatch := func(w io.Writer, k charmtone.Key) {
 		mark := " "
 		switch {
@@ -91,7 +91,7 @@ func renderGuide() {
 		)
 	}
 
-	// Render main color block.
+	// 渲染主色块。
 	for i := charmtone.Cumin; i < charmtone.Pepper; i++ {
 		k := charmtone.Keys()[i]
 		renderSwatch(&b, k)
@@ -102,7 +102,7 @@ func renderGuide() {
 		}
 	}
 
-	// Get total block width so far.
+	// 获取到目前为止的总块宽度。
 	var totalWidth int
 	for l := range SplitSeq(b.String(), "\n") {
 		if w := lipgloss.Width(l); w > totalWidth {
@@ -110,7 +110,7 @@ func renderGuide() {
 		}
 	}
 
-	// Grayscale block.
+	// 灰度块。
 	var grays strings.Builder
 	for i := charmtone.Pepper; i <= charmtone.Butter; i++ {
 		k := charmtone.Keys()[i]
@@ -120,7 +120,7 @@ func renderGuide() {
 		}
 	}
 
-	// Get width of grayscale block.
+	// 获取灰度块的宽度。
 	var grayWidth int
 	for l := range SplitSeq(grays.String(), "\n") {
 		if w := lipgloss.Width(l); w > grayWidth {
@@ -130,16 +130,16 @@ func renderGuide() {
 
 	fmt.Fprint(&b, "\n")
 
-	// Build legend.
+	// 构建图例。
 	legendBlock := legend.Render(
 		strings.Join([]string{
-			primaryMark.String() + subdued.Render(" Primary"),
-			secondaryMark.String() + subdued.Render(" Secondary"),
-			tertiaryMark.String() + subdued.Render(" Tertiary"),
+			primaryMark.String() + subdued.Render(" 主色"),
+			secondaryMark.String() + subdued.Render(" 次色"),
+			tertiaryMark.String() + subdued.Render(" 第三色"),
 		}, "  "),
 	)
 
-	// Build gradients.
+	// 构建渐变。
 	var grads strings.Builder
 	gap := "  "
 	gapWidth := lipgloss.Width(gap)
@@ -156,7 +156,7 @@ func renderGuide() {
 		s := subdued.
 			Foreground(charmtone.Squid)
 
-		// Gradient:
+		// 渐变：
 		// Hazy -> Blush, Bok -> Zest
 		left := blendKeys(halfWidth, charmtone.Hazy, charmtone.Blush)
 		left += "\n" + block.Render(s.Render("Hazy")+rightArrowMark.String()+s.Render("Blush"))
@@ -164,7 +164,7 @@ func renderGuide() {
 		right += "\n" + block.Render(s.Render("Bok")+rightArrowMark.String()+s.Render("Zest"))
 		fmt.Fprint(&grads, "\n", lipgloss.JoinHorizontal(lipgloss.Top, gap, left, right))
 
-		// Gradient:
+		// 渐变：
 		// Uni -> Coral -> Tuna -> Violet -> Malibu -> Turtle
 		block = block.Width(fullWidth)
 		buf := strings.Builder{}
@@ -185,15 +185,15 @@ func renderGuide() {
 		fmt.Fprint(&grads, "\n\n", lipgloss.JoinHorizontal(lipgloss.Top, gap, buf.String()))
 	}
 
-	// Join Greys and legend.
+	// 连接灰度和图例。
 	fmt.Fprint(&b, lipgloss.JoinHorizontal(lipgloss.Top, grays.String(), " ", grads.String()))
 
 	fmt.Fprint(&b, "\n\n", legendBlock, "\n\n")
 
-	// Flush.
+	// 输出。
 	_, err := lipgloss.Print(b.String())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error printing: %v\n", err)
+		fmt.Fprintf(os.Stderr, "打印错误: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -211,11 +211,10 @@ func blendKeys(size int, keys ...charmtone.Key) string {
 	return w.String()
 }
 
-// SplitSeq returns an iterator over the substrings of string separated by a separator.
+// SplitSeq 返回一个由分隔符分隔的字符串子串的迭代器。
 //
-// This is a Go 1.23 compatible version of strings.Split. Once we're
-// supporting Go 1.24 this can be removed in favor of the strings.SplitSeq in
-// the standard library.
+// 这是 strings.Split 的 Go 1.23 兼容版本。一旦我们支持 Go 1.24，
+// 就可以删除它，转而使用标准库中的 strings.SplitSeq。
 func SplitSeq(s, sep string) iter.Seq[string] {
 	return func(yield func(string) bool) {
 		if sep == "" {

@@ -2,13 +2,11 @@ package ansi
 
 import "unsafe"
 
-// Params represents a list of packed parameters.
+// Params 表示一组打包的参数。
 type Params []Param
 
-// Param returns the parameter at the given index and if it is part of a
-// sub-parameters. It falls back to the default value if the parameter is
-// missing. If the index is out of bounds, it returns the default value and
-// false.
+// Param 返回指定索引处的参数，以及它是否属于子参数的一部分。
+// 如果参数缺失，则返回默认值。如果索引超出范围，则返回默认值和 false。
 func (p Params) Param(i, def int) (int, bool, bool) {
 	if i < 0 || i >= len(p) {
 		return def, false, false
@@ -16,45 +14,44 @@ func (p Params) Param(i, def int) (int, bool, bool) {
 	return p[i].Param(def), p[i].HasMore(), true
 }
 
-// ForEach iterates over the parameters and calls the given function for each
-// parameter. If a parameter is part of a sub-parameter, it will be called with
-// hasMore set to true.
-// Use def to set a default value for missing parameters.
+// ForEach 遍历参数并为每个参数调用给定的函数。
+// 如果参数是子参数的一部分，则调用时 hasMore 会设置为 true。
+// 使用 def 为缺失的参数设置默认值。
 func (p Params) ForEach(def int, f func(i, param int, hasMore bool)) {
 	for i := range p {
 		f(i, p[i].Param(def), p[i].HasMore())
 	}
 }
 
-// ToParams converts a list of integers to a list of parameters.
+// ToParams 将整数列表转换为参数列表。
 func ToParams(params []int) Params {
 	return unsafe.Slice((*Param)(unsafe.Pointer(&params[0])), len(params))
 }
 
-// Handler handles actions performed by the parser.
-// It is used to handle ANSI escape sequences, control characters, and runes.
+// Handler 处理解析器执行的操作。
+// 用于处理 ANSI 转义序列、控制字符和符文。
 type Handler struct {
-	// Print is called when a printable rune is encountered.
+	// Print 在遇到可打印符文时被调用。
 	Print func(r rune)
-	// Execute is called when a control character is encountered.
+	// Execute 在遇到控制字符时被调用。
 	Execute func(b byte)
-	// HandleCsi is called when a CSI sequence is encountered.
+	// HandleCsi 在遇到 CSI 序列时被调用。
 	HandleCsi func(cmd Cmd, params Params)
-	// HandleEsc is called when an ESC sequence is encountered.
+	// HandleEsc 在遇到 ESC 序列时被调用。
 	HandleEsc func(cmd Cmd)
-	// HandleDcs is called when a DCS sequence is encountered.
+	// HandleDcs 在遇到 DCS 序列时被调用。
 	HandleDcs func(cmd Cmd, params Params, data []byte)
-	// HandleOsc is called when an OSC sequence is encountered.
+	// HandleOsc 在遇到 OSC 序列时被调用。
 	HandleOsc func(cmd int, data []byte)
-	// HandlePm is called when a PM sequence is encountered.
+	// HandlePm 在遇到 PM 序列时被调用。
 	HandlePm func(data []byte)
-	// HandleApc is called when an APC sequence is encountered.
+	// HandleApc 在遇到 APC 序列时被调用。
 	HandleApc func(data []byte)
-	// HandleSos is called when a SOS sequence is encountered.
+	// HandleSos 在遇到 SOS 序列时被调用。
 	HandleSos func(data []byte)
 }
 
-// SetHandler sets the handler for the parser.
+// SetHandler 为解析器设置处理器。
 func (p *Parser) SetHandler(h Handler) {
 	p.handler = h
 }

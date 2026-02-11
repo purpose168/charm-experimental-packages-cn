@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/powernap
+module github.com/purpose168/charm-experimental-packages-cn/powernap
 
 go 1.24
 

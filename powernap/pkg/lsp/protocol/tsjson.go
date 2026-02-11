@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Code generated for LSP. DO NOT EDIT.
+// 为 LSP 生成的代码。请勿编辑。
 
 package protocol
 
-// Code generated from protocol/metaModel.json at ref release/protocol/3.17.6-next.9 (hash c94395b5da53729e6dff931293b051009ccaaaa4).
+// 代码从 protocol/metaModel.json 生成，参考版本 release/protocol/3.17.6-next.9（哈希值 c94395b5da53729e6dff931293b051009ccaaaa4）。
 // https://github.com/microsoft/vscode-languageserver-node/blob/release/protocol/3.17.6-next.9/protocol/metaModel.json
-// LSP metaData.version = 3.17.0.
+// LSP metaData.version = 3.17.0。
 
 import "bytes"
 import "encoding/json"
 
 import "fmt"
 
-// UnmarshalError indicates that a JSON value did not conform to
-// one of the expected cases of an LSP union type.
+// UnmarshalError 表示 JSON 值不符合 LSP 联合类型的预期情况之一。
 type UnmarshalError struct {
 	msg string
 }

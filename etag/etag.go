@@ -1,5 +1,4 @@
-// Package etag provides utilities for generating and handling ETag headers in
-// HTTP requests and responses.
+// Package etag 提供用于在 HTTP 请求和响应中生成和处理 ETag 头部的工具。
 package etag
 
 import (
@@ -9,14 +8,13 @@ import (
 	"strings"
 )
 
-// Of returns the etag for the given data.
+// Of 返回给定数据的 etag。
 func Of(data []byte) string {
 	hash := sha256.Sum256(data)
 	return fmt.Sprintf(`%x`, hash[:16])
 }
 
-// Request sets the `If-None-Match` header in the given request, appropriately
-// quoting the etag value.
+// Request 在给定的请求中设置 `If-None-Match` 头部，适当地引用 etag 值。
 func Request(req *http.Request, etag string) {
 	if etag == "" {
 		return
@@ -24,8 +22,7 @@ func Request(req *http.Request, etag string) {
 	req.Header.Add("If-None-Match", fmt.Sprintf(`"%s"`, etag))
 }
 
-// Response sets the `ETag` header in the given response writer, appropriately
-// quoting the etag value.
+// Response 在给定的响应写入器中设置 `ETag` 头部，适当地引用 etag 值。
 func Response(w http.ResponseWriter, etag string) {
 	if etag == "" {
 		return
@@ -33,8 +30,7 @@ func Response(w http.ResponseWriter, etag string) {
 	w.Header().Set("ETag", fmt.Sprintf(`"%s"`, etag))
 }
 
-// Matches checks if the given request has `If-None-Match` header matching the
-// given etag.
+// Matches 检查给定的请求是否有与给定 etag 匹配的 `If-None-Match` 头部。
 func Matches(r *http.Request, etag string) bool {
 	header := r.Header.Get("If-None-Match")
 	if header == "" || etag == "" {
@@ -43,6 +39,7 @@ func Matches(r *http.Request, etag string) bool {
 	return unquote(header) == unquote(etag)
 }
 
+// unquote 移除字符串两端的引号。
 func unquote(s string) string {
 	return strings.TrimSuffix(strings.TrimPrefix(s, `"`), `"`)
 }

@@ -4,8 +4,7 @@ import (
 	"strings"
 )
 
-// ContainsAnyOf returns whether the given string contains any of the following
-// strings.
+// ContainsAnyOf 返回给定字符串是否包含以下任何一个字符串。
 func ContainsAnyOf(str string, args ...string) bool {
 	for _, arg := range args {
 		if strings.Contains(str, arg) {

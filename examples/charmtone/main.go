@@ -1,5 +1,4 @@
-// Package main is a simple command line tool for rendering the CharmTone color
-// palette.
+// Package main 是一个用于渲染 CharmTone 调色板的简单命令行工具。
 package main
 
 import (
@@ -9,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/fang"
-	"github.com/charmbracelet/x/exp/charmtone"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/charmtone"
 	"github.com/spf13/cobra"
 )
 
@@ -22,8 +21,8 @@ const (
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "charmtone",
-		Short: "CharmTone color palette tool",
-		Long:  "A command line tool for rendering the CharmTone color palette in various formats",
+		Short: "CharmTone 调色板工具",
+		Long:  "一个用于以各种格式渲染 CharmTone 调色板的命令行工具",
 		Run: func(_ *cobra.Command, _ []string) {
 			renderGuide()
 		},
@@ -31,8 +30,8 @@ func main() {
 
 	cssCmd := &cobra.Command{
 		Use:   "css",
-		Short: "Generate CSS variables",
-		Long:  "Generate CSS custom properties (variables) for the CharmTone color palette",
+		Short: "生成 CSS 变量",
+		Long:  "为 CharmTone 调色板生成 CSS 自定义属性（变量）",
 		Run: func(_ *cobra.Command, _ []string) {
 			renderCSS()
 		},
@@ -40,8 +39,8 @@ func main() {
 
 	scssCmd := &cobra.Command{
 		Use:   "scss",
-		Short: "Print as SCSS variables",
-		Long:  "Print SCSS variables for the CharmTone color palette",
+		Short: "以 SCSS 变量形式打印",
+		Long:  "打印 CharmTone 调色板的 SCSS 变量",
 		Run: func(_ *cobra.Command, _ []string) {
 			renderSCSS()
 		},
@@ -49,8 +48,8 @@ func main() {
 
 	vimCmd := &cobra.Command{
 		Use:   "vim",
-		Short: "Generate Vim colorscheme",
-		Long:  "Generate Vim colorscheme using the CharmTone color palette",
+		Short: "生成 Vim 配色方案",
+		Long:  "使用 CharmTone 调色板生成 Vim 配色方案",
 		Run: func(_ *cobra.Command, _ []string) {
 			renderVim()
 		},
@@ -58,7 +57,7 @@ func main() {
 
 	rootCmd.AddCommand(cssCmd, scssCmd, vimCmd)
 
-	// Use Fang to execute the command with enhanced styling and features
+	// 使用 Fang 执行命令，提供增强的样式和功能
 	if err := fang.Execute(context.Background(), rootCmd); err != nil {
 		os.Exit(1)
 	}

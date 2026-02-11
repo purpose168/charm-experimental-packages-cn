@@ -3,14 +3,16 @@ package vt
 import (
 	"io"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
+// handleMode 处理模式设置参数，根据 set 标志决定是设置还是重置模式。
+// isAnsi 标志指示是否为 ANSI 模式。
 func (e *Emulator) handleMode(params ansi.Params, set, isAnsi bool) {
 	for _, p := range params {
 		param := p.Param(-1)
 		if param == -1 {
-			// Missing parameter, ignore
+			// 缺少参数，忽略
 			continue
 		}
 
@@ -21,7 +23,7 @@ func (e *Emulator) handleMode(params ansi.Params, set, isAnsi bool) {
 
 		setting := e.modes[mode]
 		if setting == ansi.ModePermanentlyReset || setting == ansi.ModePermanentlySet {
-			// Permanently set modes are ignored.
+			// 永久设置的模式被忽略。
 			continue
 		}
 
@@ -34,10 +36,10 @@ func (e *Emulator) handleMode(params ansi.Params, set, isAnsi bool) {
 	}
 }
 
-// setAltScreenMode sets the alternate screen mode.
+// setAltScreenMode 设置交替屏幕模式。
 func (e *Emulator) setAltScreenMode(on bool) {
 	if (on && e.scr == &e.scrs[1]) || (!on && e.scr == &e.scrs[0]) {
-		// Already in alternate screen mode, or normal screen, do nothing.
+		// 已经在交替屏幕模式或正常屏幕，不执行任何操作。
 		return
 	}
 	if on {
@@ -57,17 +59,17 @@ func (e *Emulator) setAltScreenMode(on bool) {
 	}
 }
 
-// saveCursor saves the cursor position.
+// saveCursor 保存光标位置。
 func (e *Emulator) saveCursor() {
 	e.scr.SaveCursor()
 }
 
-// restoreCursor restores the cursor position.
+// restoreCursor 恢复光标位置。
 func (e *Emulator) restoreCursor() {
 	e.scr.RestoreCursor()
 }
 
-// setMode sets the mode to the given value.
+// setMode 将模式设置为给定值。
 func (e *Emulator) setMode(mode ansi.Mode, setting ansi.ModeSetting) {
 	e.logf("setting mode %T(%v) to %v", mode, mode, setting)
 	e.modes[mode] = setting
@@ -82,10 +84,10 @@ func (e *Emulator) setMode(mode ansi.Mode, setting ansi.ModeSetting) {
 		} else {
 			e.restoreCursor()
 		}
-	case ansi.AltScreenSaveCursorMode: // Alternate Screen Save Cursor (1047 & 1048)
-		// Save primary screen cursor position
-		// Switch to alternate screen
-		// Doesn't support scrollback
+	case ansi.AltScreenSaveCursorMode: // 交替屏幕保存光标 (1047 & 1048)
+		// 保存主屏幕光标位置
+		// 切换到交替屏幕
+		// 不支持滚动回退
 		if setting.IsSet() {
 			e.saveCursor()
 		}
@@ -106,7 +108,7 @@ func (e *Emulator) setMode(mode ansi.Mode, setting ansi.ModeSetting) {
 	}
 }
 
-// isModeSet returns true if the mode is set.
+// isModeSet 如果模式已设置，则返回 true。
 func (e *Emulator) isModeSet(mode ansi.Mode) bool {
 	m, ok := e.modes[mode]
 	return ok && m.IsSet()

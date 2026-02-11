@@ -1,9 +1,9 @@
-// Package ordered provides utility functions for ordered types.
+// Package ordered 为有序类型提供实用函数。
 package ordered
 
 import "cmp"
 
-// Clamp returns a value clamped between the given low and high values.
+// Clamp 返回一个夹在给定的最小值和最大值之间的值。
 func Clamp[T cmp.Ordered](n, low, high T) T {
 	if low > high {
 		low, high = high, low
@@ -11,8 +11,7 @@ func Clamp[T cmp.Ordered](n, low, high T) T {
 	return min(high, max(low, n))
 }
 
-// First returns the first non-default value of a fixed number of
-// arguments of [cmp.Ordered] types.
+// First 返回固定数量的 [cmp.Ordered] 类型参数中的第一个非默认值。
 func First[T cmp.Ordered](x T, y ...T) T {
 	var empty T
 	if x != empty {

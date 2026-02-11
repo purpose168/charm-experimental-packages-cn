@@ -4,8 +4,8 @@ import (
 	"sync"
 )
 
-// ComponentFactory is a function that creates an Element from props and children.
-// Custom components should implement this signature.
+// ComponentFactory 是一个从属性和子元素创建 Element 的函数。
+// 自定义组件应该实现此签名。
 type ComponentFactory func(props Props, children []Element) Element
 
 var (
@@ -13,10 +13,10 @@ var (
 	registryMu sync.RWMutex
 )
 
-// Register registers a custom component with the given name.
-// The factory function will be called to create instances of the component.
+// Register 使用给定名称注册自定义组件。
+// 工厂函数将被调用来创建组件实例。
 //
-// Example:
+// 示例：
 //
 //	pony.Register("badge", func(props Props, children []Element) Element {
 //	    return &Badge{
@@ -30,15 +30,15 @@ func Register(name string, factory ComponentFactory) {
 	registry[name] = factory
 }
 
-// Unregister removes a registered component.
+// Unregister 移除已注册的组件。
 func Unregister(name string) {
 	registryMu.Lock()
 	defer registryMu.Unlock()
 	delete(registry, name)
 }
 
-// GetComponent retrieves a component factory by name.
-// Returns nil if the component is not registered.
+// GetComponent 通过名称检索组件工厂。
+// 如果组件未注册，返回 nil。
 func GetComponent(name string) (ComponentFactory, bool) {
 	registryMu.RLock()
 	defer registryMu.RUnlock()
@@ -46,7 +46,7 @@ func GetComponent(name string) (ComponentFactory, bool) {
 	return factory, ok
 }
 
-// RegisteredComponents returns a list of all registered component names.
+// RegisteredComponents 返回所有已注册组件名称的列表。
 func RegisteredComponents() []string {
 	registryMu.RLock()
 	defer registryMu.RUnlock()
@@ -58,8 +58,8 @@ func RegisteredComponents() []string {
 	return names
 }
 
-// ClearRegistry removes all registered components.
-// Useful for testing.
+// ClearRegistry 移除所有已注册的组件。
+// 对测试很有用。
 func ClearRegistry() {
 	registryMu.Lock()
 	defer registryMu.Unlock()

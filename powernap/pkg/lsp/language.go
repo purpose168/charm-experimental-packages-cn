@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/x/powernap/pkg/lsp/protocol"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp/protocol"
 )
 
-// DetectLanguage detects the language of a given file path.
+// DetectLanguage 检测给定文件路径的语言。
 func DetectLanguage(path string) protocol.LanguageKind {
 	base := strings.ToLower(filepath.Base(path))
 	switch base {

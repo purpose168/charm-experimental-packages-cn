@@ -1,4 +1,4 @@
-// Package kitty provides Kitty terminal graphics protocol functionality.
+// Package kitty 提供 Kitty 终端图形协议功能。
 package kitty
 
 import (
@@ -10,27 +10,24 @@ import (
 	"io"
 )
 
-// Decoder is a decoder for the Kitty graphics protocol. It supports decoding
-// images in the 24-bit [RGB], 32-bit [RGBA], and [PNG] formats. It can also
-// decompress data using zlib.
-// The default format is 32-bit [RGBA].
+// Decoder 是 Kitty 图形协议的解码器。它支持解码 24 位 [RGB]、32 位 [RGBA] 和 [PNG] 格式的图像。
+// 它还可以使用 zlib 解压缩数据。
+// 默认格式是 32 位 [RGBA]。
 type Decoder struct {
-	// Uses zlib decompression.
+	// 使用 zlib 解压缩。
 	Decompress bool
 
-	// Can be one of [RGB], [RGBA], or [PNG].
+	// 可以是 [RGB]、[RGBA] 或 [PNG] 之一。
 	Format int
 
-	// Width of the image in pixels. This can be omitted if the image is [PNG]
-	// formatted.
+	// 图像宽度（以像素为单位）。如果图像是 [PNG] 格式，则可以省略。
 	Width int
 
-	// Height of the image in pixels. This can be omitted if the image is [PNG]
-	// formatted.
+	// 图像高度（以像素为单位）。如果图像是 [PNG] 格式，则可以省略。
 	Height int
 }
 
-// Decode decodes the image data from r in the specified format.
+// Decode 从 r 中以指定格式解码图像数据。
 func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	if d.Decompress {
 		zr, err := zlib.NewReader(r)
@@ -58,7 +55,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	}
 }
 
-// decodeRGBA decodes the image data in 32-bit RGBA or 24-bit RGB formats.
+// decodeRGBA 解码 32 位 RGBA 或 24 位 RGB 格式的图像数据。
 func (d *Decoder) decodeRGBA(r io.Reader, alpha bool) (image.Image, error) {
 	m := image.NewRGBA(image.Rect(0, 0, d.Width, d.Height))
 

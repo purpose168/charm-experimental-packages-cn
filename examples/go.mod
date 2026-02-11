@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/examples
+module github.com/purpose168/charm-experimental-packages-cn/examples
 
 go 1.24.2
 
@@ -9,12 +9,12 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.1
 	github.com/charmbracelet/fang v0.4.4
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/charmbracelet/x/ansi v0.11.6
-	github.com/charmbracelet/x/cellbuf v0.0.15
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20250603201427-c31516f43444
-	github.com/charmbracelet/x/exp/toner v0.0.0-20250602202920-5fecc56e9a94
-	github.com/charmbracelet/x/input v0.3.7
-	github.com/charmbracelet/x/mosaic v0.0.0-20250313150240-c09addb0e197
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.6
+	github.com/purpose168/charm-experimental-packages-cn/cellbuf v0.0.15
+	github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20250603201427-c31516f43444
+	github.com/purpose168/charm-experimental-packages-cn/exp/toner v0.0.0-20250602202920-5fecc56e9a94
+	github.com/purpose168/charm-experimental-packages-cn/input v0.3.7
+	github.com/purpose168/charm-experimental-packages-cn/mosaic v0.0.0-20250313150240-c09addb0e197
 	github.com/creack/pty v1.1.24
 	github.com/lucasb-eyer/go-colorful v1.3.0
 	github.com/spf13/cobra v1.10.2
@@ -24,8 +24,8 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20251106190538-99ea45596692 // indirect
-	github.com/charmbracelet/x/termios v0.1.1 // indirect
-	github.com/charmbracelet/x/windows v0.2.2 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/termios v0.1.1 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.9.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.5.0 // indirect
@@ -43,7 +43,7 @@ require (
 )
 
 require (
-	github.com/charmbracelet/x/term v0.2.2
+	github.com/purpose168/charm-experimental-packages-cn/term v0.2.2
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/rivo/uniseg v0.4.7
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect

@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea/v2"
-	"github.com/charmbracelet/x/exp/teatest/v2"
+	tea "github.com/purpose168/bubbletea-cn/v2"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/teatest/v2"
 )
 
+// TestAppSendToOtherProgram 测试向其他程序发送消息的功能
 func TestAppSendToOtherProgram(t *testing.T) {
 	m1 := &connectedModel{
 		name: "m1",
@@ -43,18 +44,20 @@ func TestAppSendToOtherProgram(t *testing.T) {
 	out2 := readBts(t, tm2.FinalOutput(t, teatest.WithFinalTimeout(time.Second)))
 
 	if string(out1) != string(out2) {
-		t.Errorf("output of both models should be the same, got:\n%v\nand:\n%v\n", string(out1), string(out2))
+		t.Errorf("两个模型的输出应该相同，得到:\n%v\n和:\n%v\n", string(out1), string(out2))
 	}
 
 	teatest.RequireEqualOutput(t, out1)
 }
 
+// connectedModel 是一个可以与其他程序通信的模型
 type connectedModel struct {
 	name     string
 	programs []interface{ Send(tea.Msg) }
 	msgs     []string
 }
 
+// ping 是一个表示 ping 消息的类型
 type ping string
 
 func (m *connectedModel) Init() tea.Cmd {
@@ -71,12 +74,12 @@ func (m *connectedModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			for _, p := range m.programs {
 				p.Send(send)
 			}
-			fmt.Printf("sent ping %q to others\n", send)
+			fmt.Printf("向其他程序发送 ping %q\n", send)
 		case "q":
 			return m, tea.Quit
 		}
 	case ping:
-		fmt.Printf("rcvd ping %q on %s\n", msg, m.name)
+		fmt.Printf("在 %s 上收到 ping %q\n", m.name, msg)
 		m.msgs = append(m.msgs, string(msg))
 	}
 	return m, nil

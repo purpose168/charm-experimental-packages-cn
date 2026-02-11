@@ -8,62 +8,53 @@
   </picture>
 </p>
 
-This repository contains experimental packages with no promises of
-backwards compatibility. Once they mature here, they might be moved
-into other repositories.
+本仓库包含实验性包，不保证向后兼容性。一旦这些包在此处成熟，它们可能会被移动到其他仓库。
 
-Currently the following packages are available:
+目前提供以下包：
 
-- [`ansi`](./ansi): ANSI escape sequence parser and definitions • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/ansi)
-- [`cellbuf`](./cellbuf): Cell-based terminal display parser • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/cellbuf)
-- [`charmtone`](./exp/charmtone): Charm color palette utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/charmtone)
-- [`colors`](./colors): Color utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/colors)
-- [`conpty`](./conpty): Windows Console Pseudo-terminal library • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/conpty)
-- [`editor`](./editor): open files in text editors • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/editor)
-- [`errors`](./errors): `errors.Join` in older Go versions • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/errors)
-- [`etag`](./etag): HTTP ETag generation utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/etag)
-- [`gitignore`](./gitignore): Gitignore pattern matching • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/gitignore)
-- [`golden`](./exp/golden): verify golden file equality • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/golden)
-- [`higherorder`](./exp/higherorder): generic higher order functions • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/higherorder)
-- [`input`](./input): terminal event input handler and driver • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/input)
-- [`json`](./json): JSON parsing using generics • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/json)
-- [`maps`](./exp/maps): generic maps utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/maps)
-- [`mosaic`](./mosaic): Image to terminal rendering • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/mosaic)
-- [`open`](./exp/open): open a file/URL using `open`, `xdg-open`, etc • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/open)
-- [`ordered`](./exp/ordered): generic `min`, `max`, and `clamp` functions for ordered types • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/ordered)
-- [`pony`](./pony): Declarative terminal UI markup language • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/pony)
-- [`powernap`](./powernap): LSP client utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/powernap)
-- [`slice`](./exp/slice): generic slice utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/slice)
-- [`sshkey`](./sshkey): open and parse SSH keys, asks for passphrases when needed • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/sshkey)
-- [`strings`](./exp/strings): utilities for working with strings • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/strings)
-- [`teatest`](./exp/teatest): a library for testing [Bubble Tea](https://github.com/charmbracelet/bubbletea) programs • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/teatest)
-- [`term`](./term): terminal utilities and helpers • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/term)
-- [`termios`](./termios): Termios unified API and library • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/termios)
-- [`toner`](./exp/toner): Color toning utilities • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/exp/toner)
-- [`vcr`](./vcr): HTTP recording and playback for testing • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/vcr)
-- [`vt`](./vt): Virtual terminal emulator • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/vt)
-- [`wcwidth`](./wcwidth): Wide character width calculation • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/wcwidth)
-- [`windows`](./windows): Windows API used at Charmbracelet • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/windows)
-- [`xpty`](./xpty): cross-platform PTY interface • [Docs](https://pkg.go.dev/github.com/charmbracelet/x/xpty)
+- [`ansi`](./ansi)：ANSI 转义序列解析器和定义 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/ansi)
+- [`cellbuf`](./cellbuf)：基于单元格的终端显示解析器 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/cellbuf)
+- [`charmtone`](./exp/charmtone)：Charm 调色板工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/charmtone)
+- [`colors`](./colors)：颜色工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/colors)
+- [`conpty`](./conpty)：Windows 控制台伪终端库 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/conpty)
+- [`editor`](./editor)：在文本编辑器中打开文件 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/editor)
+- [`errors`](./errors)：旧版 Go 中的 `errors.Join` • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/errors)
+- [`etag`](./etag)：HTTP ETag 生成工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/etag)
+- [`gitignore`](./gitignore)：Gitignore 模式匹配 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/gitignore)
+- [`golden`](./exp/golden)：验证黄金文件相等性 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/golden)
+- [`higherorder`](./exp/higherorder)：泛型高阶函数 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/higherorder)
+- [`input`](./input)：终端事件输入处理器和驱动 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/input)
+- [`json`](./json)：使用泛型的 JSON 解析 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/json)
+- [`maps`](./exp/maps)：泛型映射工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/maps)
+- [`mosaic`](./mosaic)：图像到终端的渲染 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/mosaic)
+- [`open`](./exp/open)：使用 `open`、`xdg-open` 等打开文件/URL • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/open)
+- [`ordered`](./exp/ordered)：有序类型的泛型 `min`、`max` 和 `clamp` 函数 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/ordered)
+- [`pony`](./pony)：声明式终端 UI 标记语言 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/pony)
+- [`powernap`](./powernap)：LSP 客户端工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/powernap)
+- [`slice`](./exp/slice)：泛型切片工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/slice)
+- [`sshkey`](./sshkey)：打开和解析 SSH 密钥，在需要时询问密码 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/sshkey)
+- [`strings`](./exp/strings)：处理字符串的工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/strings)
+- [`teatest`](./exp/teatest)：用于测试 [Bubble Tea](https://github.com/charmbracelet/bubbletea) 程序的库 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/teatest)
+- [`term`](./term)：终端工具和辅助函数 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/term)
+- [`termios`](./termios)：Termios 统一 API 和库 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/termios)
+- [`toner`](./exp/toner)：颜色调色工具 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/exp/toner)
+- [`vcr`](./vcr)：用于测试的 HTTP 记录和回放 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/vcr)
+- [`vt`](./vt)：虚拟终端模拟器 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/vt)
+- [`wcwidth`](./wcwidth)：宽字符宽度计算 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/wcwidth)
+- [`windows`](./windows)：Charmbracelet 使用的 Windows API • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/windows)
+- [`xpty`](./xpty)：跨平台 PTY 接口 • [文档](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/xpty)
 
 [docbadge]: https://godoc.org/github.com/golang/gddo?status.svg
 
-## Feedback
+## 反馈
 
-We'd love to hear your thoughts on this project. Feel free to drop us a note!
+我们很想听听你对这个项目的想法。随时给我们留言！
 
 - [Twitter](https://twitter.com/charmcli)
 - [The Fediverse](https://mastodon.social/@charmcli)
 - [Discord](https://charm.sh/chat)
 
-## License
+## 许可证
 
-[MIT](https://github.com/charmbracelet/x/raw/main/LICENSE)
+[MIT](https://github.com/purpose168/charm-experimental-packages-cn/raw/main/LICENSE)
 
----
-
-Part of [Charm](https://charm.sh).
-
-<a href="https://charm.sh/"><img alt="The Charm logo" src="https://stuff.charm.sh/charm-badge.jpg" width="400"></a>
-
-Charm热爱开源 • Charm loves open source • نحنُ نحب المصادر المفتوحة

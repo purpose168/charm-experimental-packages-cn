@@ -1,12 +1,12 @@
 package ansi
 
-// SelectGraphicRendition (SGR) is a command that sets display attributes.
+// SelectGraphicRendition (SGR) 是一个设置显示属性的命令。
 //
-// Default is 0.
+// 默认值为 0。
 //
 //	CSI Ps ; Ps ... m
 //
-// See: https://vt100.net/docs/vt510-rm/SGR.html
+// 参见：https://vt100.net/docs/vt510-rm/SGR.html
 func SelectGraphicRendition(ps ...Attr) string {
 	if len(ps) == 0 {
 		return ResetStyle
@@ -15,7 +15,7 @@ func SelectGraphicRendition(ps ...Attr) string {
 	return NewStyle(ps...).String()
 }
 
-// SGR is an alias for [SelectGraphicRendition].
+// SGR 是 [SelectGraphicRendition] 的别名。
 func SGR(ps ...Attr) string {
 	return SelectGraphicRendition(ps...)
 }

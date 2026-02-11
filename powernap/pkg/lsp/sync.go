@@ -6,17 +6,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/charmbracelet/x/powernap/pkg/lsp/protocol"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp/protocol"
 )
 
-// TextDocumentSyncManager manages text document synchronization with the language server.
+// TextDocumentSyncManager 管理与语言服务器的文本文档同步。
 type TextDocumentSyncManager struct {
 	client    *Client
 	documents map[string]*Document
 	syncKind  protocol.TextDocumentSyncKind
 }
 
-// Document represents an open text document.
+// Document 表示一个打开的文本文档。
 type Document struct {
 	URI        string
 	LanguageID string
@@ -24,7 +24,7 @@ type Document struct {
 	Content    string
 }
 
-// NewTextDocumentSyncManager creates a new text document sync manager.
+// NewTextDocumentSyncManager 创建一个新的文本文档同步管理器。
 func NewTextDocumentSyncManager(client *Client) *TextDocumentSyncManager {
 	syncKind := protocol.Full // Default to full sync
 
@@ -50,7 +50,7 @@ func NewTextDocumentSyncManager(client *Client) *TextDocumentSyncManager {
 	}
 }
 
-// Open opens a new text document.
+// Open 打开一个新的文本文档。
 func (m *TextDocumentSyncManager) Open(uri, languageID, content string) error {
 	if _, exists := m.documents[uri]; exists {
 		return fmt.Errorf("document already open: %s", uri)
@@ -68,7 +68,7 @@ func (m *TextDocumentSyncManager) Open(uri, languageID, content string) error {
 	return m.client.NotifyDidOpenTextDocument(m.client.ctx, uri, languageID, doc.Version, content)
 }
 
-// Change applies changes to an open document.
+// Change 对打开的文档应用更改。
 func (m *TextDocumentSyncManager) Change(uri string, changes []protocol.TextDocumentContentChangeEvent) error {
 	doc, exists := m.documents[uri]
 	if !exists {
@@ -99,7 +99,7 @@ func (m *TextDocumentSyncManager) Change(uri string, changes []protocol.TextDocu
 	return m.client.NotifyDidChangeTextDocument(m.client.ctx, uri, doc.Version, changes)
 }
 
-// Close closes a text document.
+// Close 关闭一个文本文档。
 func (m *TextDocumentSyncManager) Close(uri string) error {
 	if _, exists := m.documents[uri]; !exists {
 		return fmt.Errorf("document not open: %s", uri)
@@ -117,7 +117,7 @@ func (m *TextDocumentSyncManager) Close(uri string) error {
 	return m.client.conn.Notify(m.client.ctx, MethodTextDocumentDidClose, params) //nolint:wrapcheck
 }
 
-// Save notifies the server that a document was saved.
+// Save 通知服务器文档已保存。
 func (m *TextDocumentSyncManager) Save(uri string, includeText bool) error {
 	doc, exists := m.documents[uri]
 	if !exists {
@@ -137,7 +137,7 @@ func (m *TextDocumentSyncManager) Save(uri string, includeText bool) error {
 	return m.client.conn.Notify(m.client.ctx, MethodTextDocumentDidSave, params) //nolint:wrapcheck
 }
 
-// GetDocument returns the document for the given URI.
+// GetDocument 返回给定 URI 的文档。
 func (m *TextDocumentSyncManager) GetDocument(uri string) (*Document, bool) {
 	doc, exists := m.documents[uri]
 	return doc, exists
@@ -151,7 +151,7 @@ func (m *TextDocumentSyncManager) applyFullDocumentChange(doc *Document, change 
 	doc.Content = full.Text
 }
 
-// applyIncrementalChange applies an incremental change to a document.
+// applyIncrementalChange 对文档应用增量更改。
 func (m *TextDocumentSyncManager) applyIncrementalChange(doc *Document, change protocol.TextDocumentContentChangeEvent) error {
 	partial, ok := change.Value.(protocol.TextDocumentContentChangePartial)
 	if !ok {
@@ -195,7 +195,7 @@ func (m *TextDocumentSyncManager) applyIncrementalChange(doc *Document, change p
 	return nil
 }
 
-// CreateFullDocumentChange creates a change event for full document sync.
+// CreateFullDocumentChange 为完整文档同步创建更改事件。
 func CreateFullDocumentChange(content string) []protocol.TextDocumentContentChangeEvent {
 	return []protocol.TextDocumentContentChangeEvent{
 		{
@@ -206,7 +206,7 @@ func CreateFullDocumentChange(content string) []protocol.TextDocumentContentChan
 	}
 }
 
-// OpenFile opens a new text document from a file path.
+// OpenFile 从文件路径打开一个新的文本文档。
 func (m *TextDocumentSyncManager) OpenFile(filePath, content string) error {
 	// Convert to absolute path
 	absPath, err := filepath.Abs(filePath)
@@ -222,14 +222,14 @@ func (m *TextDocumentSyncManager) OpenFile(filePath, content string) error {
 	return m.Open(uri, languageID, content)
 }
 
-// FilePathToURI converts a file path to a file URI.
+// FilePathToURI 将文件路径转换为文件 URI。
 //
-// Deprecated: use [protocol.URIFromPath].
+// 已弃用：使用 [protocol.URIFromPath]。
 func FilePathToURI(path string) string {
 	return string(protocol.URIFromPath(path))
 }
 
-// URIToFilePath converts a file URI to a file path.
+// URIToFilePath 将文件 URI 转换为文件路径。
 func URIToFilePath(uri string) string {
 	// Remove file:// prefix
 	path := strings.TrimPrefix(uri, "file://")

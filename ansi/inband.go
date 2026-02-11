@@ -2,11 +2,11 @@ package ansi
 
 import "fmt"
 
-// InBandResize encodes an in-band terminal resize event sequence.
+// InBandResize 编码一个带内终端调整大小事件序列。
 //
 //	CSI 48 ; height_cells ; widht_cells ; height_pixels ; width_pixels t
 //
-// See https://gist.github.com/rockorager/e695fb2924d36b2bcf1fff4a3704bd83
+// 参见 https://gist.github.com/rockorager/e695fb2924d36b2bcf1fff4a3704bd83
 func InBandResize(heightCells, widthCells, heightPixels, widthPixels int) string {
 	if heightCells < 0 {
 		heightCells = 0

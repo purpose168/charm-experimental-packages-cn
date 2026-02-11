@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 	// gosixel "github.com/mattn/go-sixel"
 )
 
@@ -36,7 +36,7 @@ func writeSixelGraphics(w io.Writer, m image.Image) error {
 
 	data := bytes.NewBuffer(nil)
 	if err := e.Encode(data, m); err != nil {
-		return fmt.Errorf("failed to encode sixel image: %w", err)
+		return fmt.Errorf("编码 sixel 图像失败: %w", err)
 	}
 
 	_, err := io.WriteString(w, ansi.SixelGraphics(0, 1, 0, data.Bytes()))

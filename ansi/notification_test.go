@@ -2,24 +2,26 @@ package ansi
 
 import "testing"
 
+// TestNotify 测试Notify函数
+
 func TestNotify(t *testing.T) {
 	tests := []struct {
-		name string
-		s    string
-		want string
+		name string // 测试用例名称
+		s    string // 输入字符串
+		want string // 期望结果
 	}{
 		{
-			name: "basic",
+			name: "基本",
 			s:    "Hello, World!",
 			want: "\x1b]9;Hello, World!\x07",
 		},
 		{
-			name: "empty",
+			name: "空字符串",
 			s:    "",
 			want: "\x1b]9;\x07",
 		},
 		{
-			name: "special characters",
+			name: "特殊字符",
 			s:    "Line1\nLine2\tTabbed",
 			want: "\x1b]9;Line1\nLine2\tTabbed\x07",
 		},
@@ -33,27 +35,29 @@ func TestNotify(t *testing.T) {
 	}
 }
 
+// TestDesktopNotification 测试DesktopNotification函数
+
 func TestDesktopNotification(t *testing.T) {
 	tests := []struct {
-		name     string
-		payload  string
-		metadata []string
-		want     string
+		name     string   // 测试用例名称
+		payload  string   // 通知内容
+		metadata []string // 元数据
+		want     string   // 期望结果
 	}{
 		{
-			name:     "basic",
+			name:     "基本",
 			payload:  "Task Completed",
 			metadata: []string{},
 			want:     "\x1b]99;;Task Completed\x07",
 		},
 		{
-			name:     "with metadata",
+			name:     "带元数据",
 			payload:  "New Message",
 			metadata: []string{"i=1", "a=focus"},
 			want:     "\x1b]99;i=1:a=focus;New Message\x07",
 		},
 		{
-			name:     "empty payload",
+			name:     "空内容",
 			payload:  "",
 			metadata: []string{"i=2"},
 			want:     "\x1b]99;i=2;\x07",

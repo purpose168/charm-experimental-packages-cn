@@ -5,21 +5,21 @@ import (
 	"strings"
 )
 
-// Event represents a terminal event.
+// Event 表示终端事件。
 type Event any
 
-// UnknownEvent represents an unknown event.
+// UnknownEvent 表示未知事件。
 type UnknownEvent string
 
-// String returns a string representation of the unknown event.
+// String 返回未知事件的字符串表示形式。
 func (e UnknownEvent) String() string {
 	return fmt.Sprintf("%q", string(e))
 }
 
-// MultiEvent represents multiple messages event.
+// MultiEvent 表示多个消息事件。
 type MultiEvent []Event
 
-// String returns a string representation of the multiple messages event.
+// String 返回多个消息事件的字符串表示形式。
 func (e MultiEvent) String() string {
 	var sb strings.Builder
 	for _, ev := range e {
@@ -28,17 +28,15 @@ func (e MultiEvent) String() string {
 	return sb.String()
 }
 
-// WindowSizeEvent is used to report the terminal size. Note that Windows does
-// not have support for reporting resizes via SIGWINCH signals and relies on
-// the Windows Console API to report window size changes.
+// WindowSizeEvent 用于报告终端大小。请注意，Windows 不支持通过 SIGWINCH 信号报告大小调整，
+// 而是依赖 Windows 控制台 API 来报告窗口大小变化。
 type WindowSizeEvent struct {
 	Width  int
 	Height int
 }
 
-// WindowOpEvent is a window operation (XTWINOPS) report event. This is used to
-// report various window operations such as reporting the window size or cell
-// size.
+// WindowOpEvent 是窗口操作（XTWINOPS）报告事件。这用于报告各种窗口操作，
+// 如报告窗口大小或单元格大小。
 type WindowOpEvent struct {
 	Op   int
 	Args []int

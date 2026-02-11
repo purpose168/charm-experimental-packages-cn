@@ -4,14 +4,14 @@ import (
 	"unicode/utf8"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// handlePrint handles printable characters.
+// handlePrint 处理可打印字符。
 func (e *Emulator) handlePrint(r rune) {
 	if r >= ansi.SP && r < ansi.DEL {
 		if len(e.grapheme) > 0 {
-			// If we have a grapheme buffer, flush it before handling the ASCII character.
+			// 如果我们有字形缓冲区，在处理ASCII字符之前先刷新它。
 			e.flushGrapheme()
 		}
 		e.handleGrapheme(string(r), 1)
@@ -20,16 +20,14 @@ func (e *Emulator) handlePrint(r rune) {
 	}
 }
 
-// flushGrapheme flushes the current grapheme buffer, if any, and handles the
-// grapheme as a single unit.
+// flushGrapheme 刷新当前字形缓冲区（如果有），并将字形作为单个单元处理。
 func (e *Emulator) flushGrapheme() {
 	if len(e.grapheme) == 0 {
 		return
 	}
 
-	// XXX: We always use [ansi.GraphemeWidth] here to report accurate widths
-	// and it's up to the caller to decide how to handle Unicode vs non-Unicode
-	// modes.
+	// XXX: 我们在这里始终使用 [ansi.GraphemeWidth] 来报告准确的宽度，
+	// 由调用者决定如何处理 Unicode 与非 Unicode 模式。
 	method := ansi.GraphemeWidth
 	graphemes := string(e.grapheme)
 	for len(graphemes) > 0 {
@@ -37,10 +35,10 @@ func (e *Emulator) flushGrapheme() {
 		e.handleGrapheme(cluster, width)
 		graphemes = graphemes[len(cluster):]
 	}
-	e.grapheme = e.grapheme[:0] // Reset the grapheme buffer.
+	e.grapheme = e.grapheme[:0] // 重置字形缓冲区。
 }
 
-// handleGrapheme handles UTF-8 graphemes.
+// handleGrapheme 处理 UTF-8 字形。
 func (e *Emulator) handleGrapheme(content string, width int) {
 	awm := e.isModeSet(ansi.ModeAutoWrap)
 	cell := uv.Cell{
@@ -52,15 +50,14 @@ func (e *Emulator) handleGrapheme(content string, width int) {
 
 	x, y := e.scr.CursorPosition()
 	if e.atPhantom && awm {
-		// moves cursor down similar to [Terminal.linefeed] except it doesn't
-		// respects [ansi.LNM] mode.
-		// This will reset the phantom state i.e. pending wrap state.
+		// 将光标向下移动，类似于 [Terminal.linefeed]，但不尊重 [ansi.LNM] 模式。
+		// 这将重置幻影状态，即待换行状态。
 		e.index()
 		_, y = e.scr.CursorPosition()
 		x = 0
 	}
 
-	// Handle character set mappings
+	// 处理字符集映射
 	if len(content) == 1 { //nolint:nestif
 		var charset CharSet
 		c := content[0]
@@ -87,12 +84,12 @@ func (e *Emulator) handleGrapheme(content string, width int) {
 
 	e.scr.SetCell(x, y, &cell)
 
-	// Handle phantom state at the end of the line
+	// 处理行尾的幻影状态
 	e.atPhantom = awm && x >= e.scr.Width()-1
 	if !e.atPhantom {
 		x += cell.Width
 	}
 
-	// NOTE: We don't reset the phantom state here, we handle it up above.
+	// 注意：我们不在这里重置幻影状态，而是在上面处理它。
 	e.scr.setCursor(x, y, false)
 }

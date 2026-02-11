@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 // Input is a stateful text input component
@@ -96,8 +96,8 @@ func (i *Input) Render() pony.Element {
 			Padding(1).
 			Width(pony.NewFixedConstraint(50)),
 	)
-	vstack.SetID(i.ID())  // Set the input's ID on the rendered element
-	
+	vstack.SetID(i.ID()) // Set the input's ID on the rendered element
+
 	return vstack
 }
 
@@ -182,7 +182,7 @@ const tmpl = `
 
 	{{ if .ShowStatus }}
 	<divider foreground-color="gray" />
-	
+
 	<box border="rounded" border-color="{{ .StatusColor }}" padding="1">
 		<text foreground-color="{{ .StatusColor }}" font-weight="bold">{{ .StatusMessage }}</text>
 	</box>

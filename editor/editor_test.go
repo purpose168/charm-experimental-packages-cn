@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TestDefaultEditor 测试默认编辑器
 func TestDefaultEditor(t *testing.T) {
 	t.Setenv("EDITOR", "")
 	cmd, _ := Cmd("X", "README.md")
@@ -15,10 +16,11 @@ func TestDefaultEditor(t *testing.T) {
 		expect = []string{"nano", "README.md"}
 	}
 	if !reflect.DeepEqual(got, expect) {
-		t.Fatalf("expected %v; got %v", expect, got)
+		t.Fatalf("期望 %v；实际得到 %v", expect, got)
 	}
 }
 
+// TestEditor 测试编辑器命令构建
 func TestEditor(t *testing.T) {
 	filename := "README.md"
 	for k, v := range map[string][]string{
@@ -34,11 +36,12 @@ func TestEditor(t *testing.T) {
 			cmd, _ := Cmd("X", "README.md")
 			got := cmd.Args
 			if !reflect.DeepEqual(got, v) {
-				t.Fatalf("expected %v; got %v", v, got)
+				t.Fatalf("期望 %v；实际得到 %v", v, got)
 			}
 		})
 	}
 
+	// 测试行号选项
 	t.Run("with line number", func(t *testing.T) {
 		for k, v := range map[string][]string{
 			"nano":         {"nano", "+12", filename},
@@ -59,12 +62,13 @@ func TestEditor(t *testing.T) {
 				cmd, _ := Cmd("X", "README.md", LineNumber(12))
 				got := cmd.Args
 				if !reflect.DeepEqual(got, v) {
-					t.Fatalf("expected %v; got %v", v, got)
+					t.Fatalf("期望 %v；实际得到 %v", v, got)
 				}
 			})
 		}
 	})
 
+	// 测试行尾选项
 	t.Run("with end of line", func(t *testing.T) {
 		for k, v := range map[string][]string{
 			"nano":         {"nano", filename},
@@ -81,12 +85,13 @@ func TestEditor(t *testing.T) {
 				cmd, _ := Cmd("X", "README.md", EndOfLine())
 				got := cmd.Args
 				if !reflect.DeepEqual(got, v) {
-					t.Fatalf("expected %v; got %v", v, got)
+					t.Fatalf("期望 %v；实际得到 %v", v, got)
 				}
 			})
 		}
 	})
 
+	// 测试行号和行尾选项组合
 	t.Run("with line and end of line", func(t *testing.T) {
 		for k, v := range map[string][]string{
 			"nano":         {"nano", "+3", filename},
@@ -102,23 +107,25 @@ func TestEditor(t *testing.T) {
 				cmd, _ := Cmd("X", "README.md", EndOfLine(), LineNumber(3))
 				got := cmd.Args
 				if !reflect.DeepEqual(got, v) {
-					t.Fatalf("expected %v; got %v", v, got)
+					t.Fatalf("期望 %v；实际得到 %v", v, got)
 				}
 			})
 		}
 	})
 
+	// 测试 Snap 安装的情况
 	t.Run("inside snap", func(t *testing.T) {
 		t.Setenv("SNAP_REVISION", "10")
 		got, err := Cmd("X", "foo")
 		if err == nil {
-			t.Fatalf("expected an error, got nil")
+			t.Fatalf("期望错误，实际为 nil")
 		}
 		if got != nil {
-			t.Fatalf("should have returned nil, got %v", got)
+			t.Fatalf("应返回 nil，实际得到 %v", got)
 		}
 	})
 
+	// 测试位置选项
 	t.Run("with at position", func(t *testing.T) {
 		for k, v := range map[string][]string{
 			"nano":         {"nano", "+5,10", filename},
@@ -139,7 +146,7 @@ func TestEditor(t *testing.T) {
 				cmd, _ := Cmd("X", "README.md", AtPosition(5, 10))
 				got := cmd.Args
 				if !reflect.DeepEqual(got, v) {
-					t.Fatalf("expected %v; got %v", v, got)
+					t.Fatalf("期望 %v；实际得到 %v", v, got)
 				}
 			})
 		}

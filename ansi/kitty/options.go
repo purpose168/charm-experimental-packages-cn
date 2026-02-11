@@ -14,139 +14,127 @@ var (
 
 type Stringish interface{ string | []byte }
 
-// Options represents a Kitty Graphics Protocol options.
+// Options 表示 Kitty 图形协议的选项。
 type Options struct {
-	// Common options.
+	// 通用选项。
 
-	// Action (a=t) is the action to be performed on the image. Can be one of
+	// Action (a=t) 是要对图像执行的操作。可以是以下之一：
 	// [Transmit], [TransmitDisplay], [Query], [Put], [Delete], [Frame],
-	// [Animate], [Compose].
+	// [Animate], [Compose]。
 	Action byte
 
-	// Quite mode (q=0) is the quiet mode. Can be either zero, one, or two
-	// where zero is the default, 1 suppresses OK responses, and 2 suppresses
-	// both OK and error responses.
+	// Quite mode (q=0) 是安静模式。可以是 0、1 或 2，
+	// 其中 0 是默认值，1 抑制 OK 响应，2 抑制 OK 和错误响应。
 	Quite byte
 
-	// Transmission options.
+	// 传输选项。
 
-	// ID (i=) is the image ID. The ID is a unique identifier for the image.
-	// Must be a positive integer up to [math.MaxUint32].
+	// ID (i=) 是图像 ID。ID 是图像的唯一标识符。
+	// 必须是不超过 [math.MaxUint32] 的正整数。
 	ID int
 
-	// PlacementID (p=) is the placement ID. The placement ID is a unique
-	// identifier for the placement of the image. Must be a positive integer up
-	// to [math.MaxUint32].
+	// PlacementID (p=) 是放置 ID。放置 ID 是图像放置的唯一标识符。
+	// 必须是不超过 [math.MaxUint32] 的正整数。
 	PlacementID int
 
-	// Number (I=0) is the number of images to be transmitted.
+	// Number (I=0) 是要传输的图像数量。
 	Number int
 
-	// Format (f=32) is the image format. One of [RGBA], [RGB], [PNG].
+	// Format (f=32) 是图像格式。以下之一：[RGBA], [RGB], [PNG]。
 	Format int
 
-	// ImageWidth (s=0) is the transmitted image width.
+	// ImageWidth (s=0) 是传输的图像宽度。
 	ImageWidth int
 
-	// ImageHeight (v=0) is the transmitted image height.
+	// ImageHeight (v=0) 是传输的图像高度。
 	ImageHeight int
 
-	// Compression (o=) is the image compression type. Can be [Zlib] or zero.
+	// Compression (o=) 是图像压缩类型。可以是 [Zlib] 或 0。
 	Compression byte
 
-	// Transmission (t=d) is the image transmission type. Can be [Direct], [File],
-	// [TempFile], or[SharedMemory].
+	// Transmission (t=d) 是图像传输类型。可以是 [Direct], [File],
+	// [TempFile], 或 [SharedMemory]。
 	Transmission byte
 
-	// File is the file path to be used when the transmission type is [File].
-	// If [Options.Transmission] is omitted i.e. zero and this is non-empty,
-	// the transmission type is set to [File].
+	// File 是当传输类型为 [File] 时要使用的文件路径。
+	// 如果 [Options.Transmission] 被省略（即 0）且此值非空，
+	// 传输类型将设置为 [File]。
 	File string
 
-	// Size (S=0) is the size to be read from the transmission medium.
+	// Size (S=0) 是要从传输介质读取的大小。
 	Size int
 
-	// Offset (O=0) is the offset byte to start reading from the transmission
-	// medium.
+	// Offset (O=0) 是开始从传输介质读取的偏移字节。
 	Offset int
 
-	// Chunk (m=) whether the image is transmitted in chunks. Can be either
-	// zero or one. When true, the image is transmitted in chunks. Each chunk
-	// must be a multiple of 4, and up to [MaxChunkSize] bytes. Each chunk must
-	// have the m=1 option except for the last chunk which must have m=0.
+	// Chunk (m=) 表示图像是否以块方式传输。可以是 0 或 1。
+	// 当为 true 时，图像以块方式传输。每个块必须是 4 的倍数，
+	// 且最多 [MaxChunkSize] 字节。除最后一个块必须有 m=0 选项外，
+	// 每个块都必须有 m=1 选项。
 	Chunk bool
 
-	// ChunkFormatter is the function used to format each chunk when
-	// [Options.Chunk] is true. If nil, the chunks are sent as is.
+	// ChunkFormatter 是当 [Options.Chunk] 为 true 时用于格式化每个块的函数。
+	// 如果为 nil，则块按原样发送。
 	ChunkFormatter func(chunk string) string
 
-	// Display options.
+	// 显示选项。
 
-	// X (x=0) is the pixel X coordinate of the image to start displaying.
+	// X (x=0) 是图像开始显示的像素 X 坐标。
 	X int
 
-	// Y (y=0) is the pixel Y coordinate of the image to start displaying.
+	// Y (y=0) 是图像开始显示的像素 Y 坐标。
 	Y int
 
-	// Z (z=0) is the Z coordinate of the image to display.
+	// Z (z=0) 是要显示的图像的 Z 坐标。
 	Z int
 
-	// Width (w=0) is the width of the image to display.
+	// Width (w=0) 是要显示的图像宽度。
 	Width int
 
-	// Height (h=0) is the height of the image to display.
+	// Height (h=0) 是要显示的图像高度。
 	Height int
 
-	// OffsetX (X=0) is the OffsetX coordinate of the cursor cell to start
-	// displaying the image. OffsetX=0 is the leftmost cell. This must be
-	// smaller than the terminal cell width.
+	// OffsetX (X=0) 是开始显示图像的光标单元格的 OffsetX 坐标。
+	// OffsetX=0 是最左侧的单元格。这必须小于终端单元格宽度。
 	OffsetX int
 
-	// OffsetY (Y=0) is the OffsetY coordinate of the cursor cell to start
-	// displaying the image. OffsetY=0 is the topmost cell. This must be
-	// smaller than the terminal cell height.
+	// OffsetY (Y=0) 是开始显示图像的光标单元格的 OffsetY 坐标。
+	// OffsetY=0 是最顶部的单元格。这必须小于终端单元格高度。
 	OffsetY int
 
-	// Columns (c=0) is the number of columns to display the image. The image
-	// will be scaled to fit the number of columns.
+	// Columns (c=0) 是显示图像的列数。图像将被缩放以适应列数。
 	Columns int
 
-	// Rows (r=0) is the number of rows to display the image. The image will be
-	// scaled to fit the number of rows.
+	// Rows (r=0) 是显示图像的行数。图像将被缩放以适应行数。
 	Rows int
 
-	// VirtualPlacement (U=0) whether to use virtual placement. This is used
-	// with Unicode [Placeholder] to display images.
+	// VirtualPlacement (U=0) 是否使用虚拟放置。这与 Unicode [Placeholder] 一起使用以显示图像。
 	VirtualPlacement bool
 
-	// DoNotMoveCursor (C=0) whether to move the cursor after displaying the
-	// image.
+	// DoNotMoveCursor (C=0) 是否在显示图像后移动光标。
 	DoNotMoveCursor bool
 
-	// ParentID (P=0) is the parent image ID. The parent ID is the ID of the
-	// image that is the parent of the current image. This is used with Unicode
-	// [Placeholder] to display images relative to the parent image.
+	// ParentID (P=0) 是父图像 ID。父 ID 是当前图像的父图像的 ID。
+	// 这与 Unicode [Placeholder] 一起使用以相对于父图像显示图像。
 	ParentID int
 
-	// ParentPlacementID (Q=0) is the parent placement ID. The parent placement
-	// ID is the ID of the placement of the parent image. This is used with
-	// Unicode [Placeholder] to display images relative to the parent image.
+	// ParentPlacementID (Q=0) 是父放置 ID。父放置 ID 是父图像放置的 ID。
+	// 这与 Unicode [Placeholder] 一起使用以相对于父图像显示图像。
 	ParentPlacementID int
 
-	// Delete options.
+	// 删除选项。
 
-	// Delete (d=a) is the delete action. Can be one of [DeleteAll],
+	// Delete (d=a) 是删除操作。可以是以下之一：[DeleteAll],
 	// [DeleteID], [DeleteNumber], [DeleteCursor], [DeleteFrames],
 	// [DeleteCell], [DeleteCellZ], [DeleteRange], [DeleteColumn], [DeleteRow],
-	// [DeleteZ].
+	// [DeleteZ]。
 	Delete byte
 
-	// DeleteResources indicates whether to delete the resources associated
-	// with the image.
+	// DeleteResources 指示是否删除与图像关联的资源。
 	DeleteResources bool
 }
 
-// Options returns the options as a slice of a key-value pairs.
+// Options 返回作为键值对切片的选项。
 func (o *Options) Options() (opts []string) {
 	opts = []string{}
 	if o.Format == 0 {
@@ -268,7 +256,7 @@ func (o *Options) Options() (opts []string) {
 	if o.Delete != DeleteAll || o.DeleteResources {
 		da := o.Delete
 		if o.DeleteResources {
-			da = da - ' ' // to uppercase
+			da = da - ' ' // 转为大写
 		}
 
 		opts = append(opts, fmt.Sprintf("d=%c", da))
@@ -278,20 +266,20 @@ func (o *Options) Options() (opts []string) {
 		opts = append(opts, fmt.Sprintf("a=%c", o.Action))
 	}
 
-	return opts // complex function with multiple returns
+	return opts // 具有多个返回值的复杂函数
 }
 
-// String returns the string representation of the options.
+// String 返回选项的字符串表示。
 func (o Options) String() string {
 	return strings.Join(o.Options(), ",")
 }
 
-// MarshalText returns the string representation of the options.
+// MarshalText 返回选项的字符串表示。
 func (o Options) MarshalText() ([]byte, error) {
 	return []byte(o.String()), nil
 }
 
-// UnmarshalText parses the options from the given string.
+// UnmarshalText 从给定字符串解析选项。
 func (o *Options) UnmarshalText(text []byte) error {
 	opts := strings.Split(string(text), ",")
 	for _, opt := range opts {
@@ -311,7 +299,7 @@ func (o *Options) UnmarshalText(text []byte) error {
 			d := ps[1][0]
 			if d >= 'A' && d <= 'Z' {
 				o.DeleteResources = true
-				d = d + ' ' // to lowercase
+				d = d + ' ' // 转为小写
 			}
 			o.Delete = d
 		case "i", "q", "p", "I", "f", "s", "v", "S", "O", "m", "x", "y", "z", "w", "h", "X", "Y", "c", "r", "U", "P", "Q":

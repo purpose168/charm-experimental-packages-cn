@@ -16,8 +16,7 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// DefaultDrawer are the default options used for creating terminal screen
-// images.
+// DefaultDrawer 是用于创建终端屏幕图像的默认选项。
 var DefaultDrawer = func() *Drawer {
 	cellW, cellH := 10, 16
 	regular, _ := freetype.ParseFont(gomono.TTF)
@@ -25,7 +24,7 @@ var DefaultDrawer = func() *Drawer {
 	italic, _ := freetype.ParseFont(gomonoitalic.TTF)
 	boldItalic, _ := freetype.ParseFont(gomonobolditalic.TTF)
 	faceOpts := &truetype.Options{
-		Size:    14, // Font size -2 to account for padding
+		Size:    14, // 字体大小 -2 以考虑内边距
 		DPI:     72,
 		Hinting: font.HintingFull,
 	}
@@ -44,30 +43,25 @@ var DefaultDrawer = func() *Drawer {
 	}
 }()
 
-// Drawer contains options for drawing a terminal emulator screen to an image.
+// Drawer 包含用于将终端模拟器屏幕绘制到图像的选项。
 type Drawer struct {
-	// CellWidth is the width of each cell in pixels. Default is 10.
+	// CellWidth 是每个单元格的宽度（以像素为单位）。默认为 10。
 	CellWidth int
-	// CellHeight is the height of each cell in pixels. Default is 16.
+	// CellHeight 是每个单元格的高度（以像素为单位）。默认为 16。
 	CellHeight int
-	// RegularFace is the font face to use for regular text. Default is Go
-	// mono.
+	// RegularFace 是用于普通文本的字体。默认为 Go mono。
 	RegularFace font.Face
-	// BoldFace is the font face to use for bold text. If nil, Go mono bold is
-	// used.
+	// BoldFace 是用于粗体文本的字体。如果为 nil，则使用 Go mono bold。
 	BoldFace font.Face
-	// ItalicFace is the font face to use for italic text. If nil, Go mono italic
-	// is used.
+	// ItalicFace 是用于斜体文本的字体。如果为 nil，则使用 Go mono italic。
 	ItalicFace font.Face
-	// BoldItalicFace is the font face to use for bold italic text. If nil, Go
-	// mono bold italic is used.
+	// BoldItalicFace 是用于粗斜体文本的字体。如果为 nil，则使用 Go mono bold italic。
 	BoldItalicFace font.Face
 }
 
-// Draw draws a [uv.Screen] to an image using the drawer options.
+// Draw 使用抽屉选项将 [uv.Screen] 绘制到图像中。
 //
-// If s implements a [BackgroundColor]() method, it is used to fill the
-// background. Otherwise, [color.Black] is used.
+// 如果 s 实现了 [BackgroundColor]() 方法，则使用它来填充背景。否则，使用 [color.Black]。
 func (d *Drawer) Draw(t uv.Screen) image.Image {
 	opt := *d
 	if opt.CellWidth <= 0 {
@@ -94,7 +88,7 @@ func (d *Drawer) Draw(t uv.Screen) image.Image {
 	r := image.Rect(0, 0, width*opt.CellWidth, height*opt.CellHeight)
 	img := image.NewRGBA(r)
 
-	// Fill background
+	// 填充背景
 	var bg color.Color = color.Black
 	if tbg, ok := t.(interface {
 		BackgroundColor() color.Color
@@ -105,11 +99,11 @@ func (d *Drawer) Draw(t uv.Screen) image.Image {
 	}
 	draw.Draw(img, img.Bounds(), &image.Uniform{C: bg}, image.Point{}, draw.Src)
 
-	// Draw cells
+	// 绘制单元格
 	drawCell := func(x, y int, cell *uv.Cell) {
 		px := x * opt.CellWidth
 		py := y * opt.CellHeight
-		dot := fixed.P(px, py+opt.CellHeight-4) // 4 pixels from bottom for baseline
+		dot := fixed.P(px, py+opt.CellHeight-4) // 从底部起 4 像素作为基线
 		style := cell.Style
 		attrs := style.Attrs
 		fg := style.Fg
@@ -133,10 +127,10 @@ func (d *Drawer) Draw(t uv.Screen) image.Image {
 		}
 		drawer.DrawString(cell.Content)
 
-		// Handle underline
+		// 处理下划线
 		//nolint:godox
-		// TODO: Implement more underline styles
-		// For now, we only support single underline
+		// TODO: 实现更多下划线样式
+		// 目前，我们只支持单下划线
 		if cell.Style.Underline > uv.UnderlineNone {
 			col := cell.Style.UnderlineColor
 			if col == nil {
@@ -148,7 +142,7 @@ func (d *Drawer) Draw(t uv.Screen) image.Image {
 		}
 	}
 
-	// Iterate over screen cells
+	// 遍历屏幕单元格
 	for y := range height {
 		for x := 0; x < width; {
 			cell := t.CellAt(x, y)
@@ -163,7 +157,7 @@ func (d *Drawer) Draw(t uv.Screen) image.Image {
 	return img
 }
 
-// Image return s an image of the terminal emulator screen.
+// Image 返回终端模拟器屏幕的图像。
 func (t *Terminal) Image() image.Image {
 	t.mu.Lock()
 	defer t.mu.Unlock()

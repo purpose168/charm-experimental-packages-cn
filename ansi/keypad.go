@@ -1,27 +1,25 @@
 package ansi
 
-// Keypad Application Mode (DECKPAM) is a mode that determines whether the
-// keypad sends application sequences or ANSI sequences.
+// 数字键盘应用模式 (DECKPAM) 是一种决定数字键盘发送应用序列还是 ANSI 序列的模式。
 //
-// This works like enabling [DECNKM].
-// Use [NumericKeypadMode] to set the numeric keypad mode.
+// 这类似于启用 [DECNKM]。
+// 使用 [NumericKeypadMode] 来设置数字键盘模式。
 //
 //	ESC =
 //
-// See: https://vt100.net/docs/vt510-rm/DECKPAM.html
+// 参见: https://vt100.net/docs/vt510-rm/DECKPAM.html
 const (
 	KeypadApplicationMode = "\x1b="
 	DECKPAM               = KeypadApplicationMode
 )
 
-// Keypad Numeric Mode (DECKPNM) is a mode that determines whether the keypad
-// sends application sequences or ANSI sequences.
+// 数字键盘数字模式 (DECKPNM) 是一种决定数字键盘发送应用序列还是 ANSI 序列的模式。
 //
-// This works the same as disabling [DECNKM].
+// 这与禁用 [DECNKM] 效果相同。
 //
 //	ESC >
 //
-// See: https://vt100.net/docs/vt510-rm/DECKPNM.html
+// 参见: https://vt100.net/docs/vt510-rm/DECKPNM.html
 const (
 	KeypadNumericMode = "\x1b>"
 	DECKPNM           = KeypadNumericMode

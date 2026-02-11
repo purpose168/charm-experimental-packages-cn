@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// ErrInvalidRaster is returned when Raster Attributes are invalid.
-var ErrInvalidRaster = fmt.Errorf("invalid raster attributes")
+// ErrInvalidRaster 在光栅属性无效时返回。
+var ErrInvalidRaster = fmt.Errorf("无效光栅属性")
 
-// WriteRaster writes Raster attributes to a writer. If ph and pv are 0, they
-// are omitted.
+// WriteRaster 向写入器写入光栅属性。如果 ph 和 pv 为 0，则
+// 省略它们。
 func WriteRaster(w io.Writer, pan, pad, ph, pv int) (n int, err error) {
 	if pad == 0 {
 		return WriteRaster(w, 1, 1, ph, pv)
@@ -23,26 +23,26 @@ func WriteRaster(w io.Writer, pan, pad, ph, pv int) (n int, err error) {
 	return fmt.Fprintf(w, "%c%d;%d;%d;%d", RasterAttribute, pan, pad, ph, pv) //nolint:wrapcheck
 }
 
-// Raster represents Sixel raster attributes.
+// Raster 表示六像素光栅属性。
 type Raster struct {
 	Pan, Pad, Ph, Pv int
 }
 
-// WriteTo writes Raster attributes to a writer.
+// WriteTo 向写入器写入光栅属性。
 func (r Raster) WriteTo(w io.Writer) (int64, error) {
 	n, err := WriteRaster(w, r.Pan, r.Pad, r.Ph, r.Pv)
 	return int64(n), err
 }
 
-// String returns the Raster as a string.
+// String 将光栅返回为字符串。
 func (r Raster) String() string {
 	var b strings.Builder
 	r.WriteTo(&b) //nolint:errcheck,gosec
 	return b.String()
 }
 
-// DecodeRaster decodes a Raster from a byte slice. It returns the Raster and
-// the number of bytes read.
+// DecodeRaster 从字节切片解码光栅。它返回光栅和
+// 读取的字节数。
 func DecodeRaster(data []byte) (r Raster, n int) {
 	if len(data) == 0 || data[0] != RasterAttribute {
 		return r, n

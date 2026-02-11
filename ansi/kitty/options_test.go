@@ -14,12 +14,12 @@ func TestOptions_Options(t *testing.T) {
 		expected []string
 	}{
 		{
-			name:     "default options",
+			name:     "默认选项",
 			options:  Options{},
-			expected: []string{}, // Default values don't generate options
+			expected: []string{}, // 默认值不生成选项
 		},
 		{
-			name: "basic transmission options",
+			name: "基本传输选项",
 			options: Options{
 				Format: PNG,
 				ID:     1,
@@ -32,7 +32,7 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "display options",
+			name: "显示选项",
 			options: Options{
 				X:      100,
 				Y:      200,
@@ -49,7 +49,7 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "compression and chunking",
+			name: "压缩和分块",
 			options: Options{
 				Compression: Zlib,
 				Chunk:       true,
@@ -61,17 +61,17 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "delete options",
+			name: "删除选项",
 			options: Options{
 				Delete:          DeleteID,
 				DeleteResources: true,
 			},
 			expected: []string{
-				"d=I", // Uppercase due to DeleteResources being true
+				"d=I", // 由于 DeleteResources 为 true 而转为大写
 			},
 		},
 		{
-			name: "virtual placement",
+			name: "虚拟放置",
 			options: Options{
 				VirtualPlacement:  true,
 				ParentID:          5,
@@ -84,7 +84,7 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "cell positioning",
+			name: "单元格定位",
 			options: Options{
 				OffsetX: 10,
 				OffsetY: 20,
@@ -99,7 +99,7 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "transmission details",
+			name: "传输详情",
 			options: Options{
 				Transmission: File,
 				File:         "/tmp/image.png",
@@ -115,7 +115,7 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "quiet mode and format",
+			name: "安静模式和格式",
 			options: Options{
 				Quite:  2,
 				Format: RGB,
@@ -126,13 +126,13 @@ func TestOptions_Options(t *testing.T) {
 			},
 		},
 		{
-			name: "all zero values",
+			name: "全零值",
 			options: Options{
 				Format: 0,
 				Action: 0,
 				Delete: 0,
 			},
-			expected: []string{}, // Should use defaults and not generate options
+			expected: []string{}, // 应使用默认值且不生成选项
 		},
 	}
 
@@ -158,28 +158,28 @@ func TestOptions_Validation(t *testing.T) {
 		check   func([]string) bool
 	}{
 		{
-			name: "format validation",
+			name: "格式验证",
 			options: Options{
-				Format: 999, // Invalid format
+				Format: 999, // 无效格式
 			},
 			check: func(opts []string) bool {
-				// Should still output the format even if invalid
+				// 即使无效也应该输出格式
 				return containsOption(opts, "f=999")
 			},
 		},
 		{
-			name: "delete with resources",
+			name: "带资源的删除",
 			options: Options{
 				Delete:          DeleteID,
 				DeleteResources: true,
 			},
 			check: func(opts []string) bool {
-				// Should be uppercase when DeleteResources is true
+				// 当 DeleteResources 为 true 时应为大写
 				return containsOption(opts, "d=I")
 			},
 		},
 		{
-			name: "transmission with file",
+			name: "带文件的传输",
 			options: Options{
 				File: "/tmp/test.png",
 			},
@@ -262,12 +262,12 @@ func TestOptions_MarshalText(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "marshal empty options",
+			name: "序列化空选项",
 			o:    Options{},
 			want: []byte(""),
 		},
 		{
-			name: "marshal with values",
+			name: "带值序列化",
 			o: Options{
 				Action:          'A',
 				ID:              123,
@@ -302,12 +302,12 @@ func TestOptions_UnmarshalText(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "unmarshal empty",
+			name: "反序列化空",
 			text: []byte(""),
 			want: Options{},
 		},
 		{
-			name: "unmarshal basic options",
+			name: "反序列化基本选项",
 			text: []byte("a=A,i=123,w=400,h=500"),
 			want: Options{
 				Action: 'A',
@@ -317,12 +317,12 @@ func TestOptions_UnmarshalText(t *testing.T) {
 			},
 		},
 		{
-			name: "unmarshal with invalid number",
+			name: "反序列化带无效数字",
 			text: []byte("i=abc"),
 			want: Options{},
 		},
 		{
-			name: "unmarshal with delete resources",
+			name: "反序列化带删除资源",
 			text: []byte("d=D"),
 			want: Options{
 				Delete:          'd',
@@ -330,26 +330,26 @@ func TestOptions_UnmarshalText(t *testing.T) {
 			},
 		},
 		{
-			name: "unmarshal with boolean chunk",
+			name: "反序列化带布尔分块",
 			text: []byte("m=1"),
 			want: Options{
 				Chunk: true,
 			},
 		},
 		{
-			name: "unmarshal with virtual placement",
+			name: "反序列化带虚拟放置",
 			text: []byte("U=1"),
 			want: Options{
 				VirtualPlacement: true,
 			},
 		},
 		{
-			name: "unmarshal with invalid format",
+			name: "反序列化带无效格式",
 			text: []byte("invalid=format"),
 			want: Options{},
 		},
 		{
-			name: "unmarshal with missing value",
+			name: "反序列化带缺失值",
 			text: []byte("a="),
 			want: Options{},
 		},

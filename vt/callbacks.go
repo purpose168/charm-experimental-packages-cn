@@ -4,60 +4,47 @@ import (
 	"image/color"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// Callbacks represents a set of callbacks for a terminal.
+// Callbacks 表示终端的一组回调函数。
 type Callbacks struct {
-	// Bell callback. When set, this function is called when a bell character is
-	// received.
+	// Bell 回调。当设置时，此函数在接收到响铃字符时被调用。
 	Bell func()
 
-	// Title callback. When set, this function is called when the terminal title
-	// changes.
+	// Title 回调。当设置时，此函数在终端标题更改时被调用。
 	Title func(string)
 
-	// IconName callback. When set, this function is called when the terminal
-	// icon name changes.
+	// IconName 回调。当设置时，此函数在终端图标名称更改时被调用。
 	IconName func(string)
 
-	// AltScreen callback. When set, this function is called when the alternate
-	// screen is activated or deactivated.
+	// AltScreen 回调。当设置时，此函数在交替屏幕被激活或停用时被调用。
 	AltScreen func(bool)
 
-	// CursorPosition callback. When set, this function is called when the cursor
-	// position changes.
+	// CursorPosition 回调。当设置时，此函数在光标位置更改时被调用。
 	CursorPosition func(old, new uv.Position) //nolint:predeclared,revive
 
-	// CursorVisibility callback. When set, this function is called when the
-	// cursor visibility changes.
+	// CursorVisibility 回调。当设置时，此函数在光标可见性更改时被调用。
 	CursorVisibility func(visible bool)
 
-	// CursorStyle callback. When set, this function is called when the cursor
-	// style changes.
+	// CursorStyle 回调。当设置时，此函数在光标样式更改时被调用。
 	CursorStyle func(style CursorStyle, blink bool)
 
-	// CursorColor callback. When set, this function is called when the cursor
-	// color changes. Nil indicates the default terminal color.
+	// CursorColor 回调。当设置时，此函数在光标颜色更改时被调用。nil 表示默认终端颜色。
 	CursorColor func(color color.Color)
 
-	// BackgroundColor callback. When set, this function is called when the
-	// background color changes. Nil indicates the default terminal color.
+	// BackgroundColor 回调。当设置时，此函数在背景颜色更改时被调用。nil 表示默认终端颜色。
 	BackgroundColor func(color color.Color)
 
-	// ForegroundColor callback. When set, this function is called when the
-	// foreground color changes. Nil indicates the default terminal color.
+	// ForegroundColor 回调。当设置时，此函数在前景颜色更改时被调用。nil 表示默认终端颜色。
 	ForegroundColor func(color color.Color)
 
-	// WorkingDirectory callback. When set, this function is called when the
-	// current working directory changes.
+	// WorkingDirectory 回调。当设置时，此函数在当前工作目录更改时被调用。
 	WorkingDirectory func(string)
 
-	// EnableMode callback. When set, this function is called when a mode is
-	// enabled.
+	// EnableMode 回调。当设置时，此函数在模式启用时被调用。
 	EnableMode func(mode ansi.Mode)
 
-	// DisableMode callback. When set, this function is called when a mode is
-	// disabled.
+	// DisableMode 回调。当设置时，此函数在模式禁用时被调用。
 	DisableMode func(mode ansi.Mode)
 }

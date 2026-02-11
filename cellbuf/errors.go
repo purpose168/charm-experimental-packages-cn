@@ -2,5 +2,5 @@ package cellbuf
 
 import "errors"
 
-// ErrOutOfBounds is returned when the given x, y position is out of bounds.
-var ErrOutOfBounds = errors.New("out of bounds")
+// ErrOutOfBounds 当给定的 x, y 位置超出边界时返回。
+var ErrOutOfBounds = errors.New("超出边界")

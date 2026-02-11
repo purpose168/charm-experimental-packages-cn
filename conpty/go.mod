@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/conpty
+module github.com/purpose168/charm-experimental-packages-cn/conpty
 
 go 1.24.0
 

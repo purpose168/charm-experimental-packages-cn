@@ -5,8 +5,8 @@ import (
 	"log"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/x/pony"
 	uv "github.com/charmbracelet/ultraviolet"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 // ListItem is a custom component that can be registered and used in markup

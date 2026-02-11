@@ -1,5 +1,4 @@
-// Package lsp provides a client implementation for the Language Server
-// Protocol (LSP).
+// Package lsp 提供了语言服务器协议（Language Server Protocol，LSP）的客户端实现。
 package lsp
 
 import (
@@ -15,11 +14,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/charmbracelet/x/powernap/pkg/lsp/protocol"
-	"github.com/charmbracelet/x/powernap/pkg/transport"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp/protocol"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/transport"
 )
 
-// LSP method constants.
+// LSP 方法常量。
 const (
 	MethodInitialize                         = "initialize"
 	MethodInitialized                        = "initialized"
@@ -40,7 +39,7 @@ const (
 	MethodWorkspaceDidChangeWatchedFiles     = "workspace/didChangeWatchedFiles"
 )
 
-// NewClient creates a new LSP client with the given configuration.
+// NewClient 使用给定的配置创建一个新的 LSP 客户端。
 func NewClient(config ClientConfig) (*Client, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -78,10 +77,10 @@ func NewClient(config ClientConfig) (*Client, error) {
 	return client, nil
 }
 
-// Kill cancels the connection context.
+// Kill 取消连接上下文。
 func (c *Client) Kill() { c.cancel() }
 
-// Initialize sends the initialize request to the language server.
+// Initialize 向语言服务器发送初始化请求。
 func (c *Client) Initialize(ctx context.Context, enableSnippets bool) error {
 	if c.initialized.Load() {
 		return fmt.Errorf("client already initialized")
@@ -173,7 +172,7 @@ func (c *Client) Initialize(ctx context.Context, enableSnippets bool) error {
 	return nil
 }
 
-// Shutdown sends a shutdown request to the language server.
+// Shutdown 向语言服务器发送关闭请求。
 func (c *Client) Shutdown(ctx context.Context) error {
 	if c.shutdown.Load() {
 		return nil
@@ -188,7 +187,7 @@ func (c *Client) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-// Exit sends an exit notification to the language server.
+// Exit 向语言服务器发送退出通知。
 func (c *Client) Exit() error {
 	err := c.conn.Notify(c.ctx, MethodExit, nil)
 	if err != nil {
@@ -199,36 +198,36 @@ func (c *Client) Exit() error {
 	return nil
 }
 
-// GetCapabilities returns the server capabilities.
+// GetCapabilities 返回服务器能力。
 func (c *Client) GetCapabilities() protocol.ServerCapabilities {
 	return c.capabilities
 }
 
-// IsInitialized returns whether the client has been initialized.
+// IsInitialized 返回客户端是否已初始化。
 func (c *Client) IsInitialized() bool {
 	return c.initialized.Load()
 }
 
-// IsRunning returns whether the client connection is still active.
+// IsRunning 返回客户端连接是否仍然活跃。
 func (c *Client) IsRunning() bool {
 	return c.conn != nil && c.conn.IsConnected() && c.initialized.Load() && !c.shutdown.Load()
 }
 
-// RegisterNotificationHandler registers a handler for server-initiated notifications.
+// RegisterNotificationHandler 注册一个处理服务器发起的通知的处理器。
 func (c *Client) RegisterNotificationHandler(method string, handler transport.NotificationHandler) {
 	if c.conn != nil {
 		c.conn.RegisterNotificationHandler(method, handler)
 	}
 }
 
-// RegisterHandler registers a handler for server-initiated requests.
+// RegisterHandler 注册一个处理服务器发起的请求的处理器。
 func (c *Client) RegisterHandler(method string, handler transport.Handler) {
 	if c.conn != nil {
 		c.conn.RegisterHandler(method, handler)
 	}
 }
 
-// NotifyDidOpenTextDocument notifies the server that a document was opened.
+// NotifyDidOpenTextDocument 通知服务器文档已打开。
 func (c *Client) NotifyDidOpenTextDocument(ctx context.Context, uri string, languageID string, version int, text string) error {
 	if !c.initialized.Load() {
 		return fmt.Errorf("client not initialized")
@@ -253,7 +252,7 @@ func (c *Client) NotifyDidOpenTextDocument(ctx context.Context, uri string, lang
 	return c.conn.Notify(ctx, MethodTextDocumentDidOpen, params) //nolint:wrapcheck
 }
 
-// NotifyDidCloseTextDocument notifies the server that a document was closeed.
+// NotifyDidCloseTextDocument 通知服务器文档已关闭。
 func (c *Client) NotifyDidCloseTextDocument(ctx context.Context, uri string) error {
 	if !c.initialized.Load() {
 		return fmt.Errorf("client not initialized")
@@ -268,7 +267,7 @@ func (c *Client) NotifyDidCloseTextDocument(ctx context.Context, uri string) err
 	return c.conn.Notify(ctx, MethodTextDocumentDidClose, params) //nolint:wrapcheck
 }
 
-// NotifyDidChangeTextDocument notifies the server that a document was changed.
+// NotifyDidChangeTextDocument 通知服务器文档已更改。
 func (c *Client) NotifyDidChangeTextDocument(ctx context.Context, uri string, version int, changes []protocol.TextDocumentContentChangeEvent) error {
 	if !c.initialized.Load() {
 		return fmt.Errorf("client not initialized")
@@ -287,8 +286,7 @@ func (c *Client) NotifyDidChangeTextDocument(ctx context.Context, uri string, ve
 	return c.conn.Notify(ctx, MethodTextDocumentDidChange, params) //nolint:wrapcheck
 }
 
-// NotifyDidChangeWatchedFiles notifies the server that watched files have
-// changed.
+// NotifyDidChangeWatchedFiles 通知服务器被监视的文件已更改。
 func (c *Client) NotifyDidChangeWatchedFiles(ctx context.Context, changes []protocol.FileEvent) error {
 	if !c.initialized.Load() {
 		return fmt.Errorf("client not initialized")
@@ -301,7 +299,7 @@ func (c *Client) NotifyDidChangeWatchedFiles(ctx context.Context, changes []prot
 	return c.conn.Notify(ctx, MethodWorkspaceDidChangeWatchedFiles, params) //nolint:wrapcheck
 }
 
-// NotifyWorkspaceDidChangeConfiguration notifies the server that the workspace configuration has changed.
+// NotifyWorkspaceDidChangeConfiguration 通知服务器工作区配置已更改。
 func (c *Client) NotifyWorkspaceDidChangeConfiguration(ctx context.Context, settings any) error {
 	if !c.initialized.Load() {
 		return fmt.Errorf("client not initialized")
@@ -314,7 +312,7 @@ func (c *Client) NotifyWorkspaceDidChangeConfiguration(ctx context.Context, sett
 	return c.conn.Notify(ctx, MethodWorkspaceDidChangeConfiguration, params) //nolint:wrapcheck
 }
 
-// RequestCompletion requests completion items at the given position.
+// RequestCompletion 请求给定位置的补全项。
 func (c *Client) RequestCompletion(ctx context.Context, uri string, position protocol.Position) (*protocol.CompletionList, error) {
 	if !c.initialized.Load() {
 		return nil, fmt.Errorf("client not initialized")
@@ -368,7 +366,7 @@ func (c *Client) RequestCompletion(ctx context.Context, uri string, position pro
 	return &completionList, nil
 }
 
-// RequestHover requests hover information at the given position.
+// RequestHover 请求给定位置的悬停信息。
 func (c *Client) RequestHover(ctx context.Context, uri string, position protocol.Position) (*protocol.Hover, error) {
 	if !c.initialized.Load() {
 		return nil, fmt.Errorf("client not initialized")
@@ -390,7 +388,7 @@ func (c *Client) RequestHover(ctx context.Context, uri string, position protocol
 	return &result, nil
 }
 
-// FindReferences finds all references to the symbol at the given position.
+// FindReferences 查找给定位置符号的所有引用。
 func (c *Client) FindReferences(ctx context.Context, filepath string, line, character int, includeDeclaration bool) ([]protocol.Location, error) {
 	uri := string(protocol.URIFromPath(filepath))
 	params := protocol.ReferenceParams{
@@ -416,9 +414,9 @@ func (c *Client) FindReferences(ctx context.Context, filepath string, line, char
 	return result, nil
 }
 
-// setupHandlers registers handlers for server-initiated requests.
+// setupHandlers 注册处理服务器发起的请求的处理器。
 func (c *Client) setupHandlers() {
-	// Handle workspace/configuration requests
+	// 处理 workspace/configuration 请求
 	c.conn.RegisterHandler(MethodWorkspaceConfiguration, func(_ context.Context, _ string, params json.RawMessage) (any, error) {
 		var configParams protocol.ConfigurationParams
 		if err := json.Unmarshal(params, &configParams); err != nil {
@@ -434,11 +432,11 @@ func (c *Client) setupHandlers() {
 		return result, nil
 	})
 
-	// Handle other common server requests
-	// Add more handlers as needed
+	// 处理其他常见的服务器请求
+	// 根据需要添加更多处理器
 }
 
-// makeClientCapabilities creates the client capabilities for initialization.
+// makeClientCapabilities 创建初始化所需的客户端能力。
 func (c *Client) makeClientCapabilities(enableSnippets bool) map[string]any {
 	return map[string]any{
 		"textDocument": map[string]any{
@@ -578,11 +576,11 @@ func (c *Client) makeClientCapabilities(enableSnippets bool) map[string]any {
 	}
 }
 
-// startServerProcess starts the language server process.
+// startServerProcess 启动语言服务器进程。
 func startServerProcess(ctx context.Context, config ClientConfig) (io.ReadWriteCloser, error) {
 	cmd := exec.CommandContext(ctx, config.Command, config.Args...) //nolint:gosec
 
-	// Set environment variables
+	// 设置环境变量
 	if config.Environment != nil {
 		cmd.Env = os.Environ()
 		for k, v := range config.Environment {
@@ -590,7 +588,7 @@ func startServerProcess(ctx context.Context, config ClientConfig) (io.ReadWriteC
 		}
 	}
 
-	// Create pipes
+	// 创建管道
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create stdin pipe: %w", err)
@@ -601,18 +599,18 @@ func startServerProcess(ctx context.Context, config ClientConfig) (io.ReadWriteC
 		return nil, fmt.Errorf("failed to create stdout pipe: %w", err)
 	}
 
-	// Create stderr pipe to capture error messages
+	// 创建 stderr 管道以捕获错误消息
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create stderr pipe: %w", err)
 	}
 
-	// Start the process
+	// 启动进程
 	if err := cmd.Start(); err != nil {
 		return nil, fmt.Errorf("failed to start process: %w", err)
 	}
 
-	// Monitor stderr
+	// 监控 stderr
 	go func() {
 		buf := make([]byte, 4096)
 		for {

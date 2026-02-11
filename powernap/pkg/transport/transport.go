@@ -14,7 +14,7 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-// Transport handles the low-level communication with the language server.
+// Transport 处理与语言服务器的低级通信。
 type Transport struct {
 	conn   jsonrpc2.JSONRPC2
 	reader io.Reader
@@ -23,7 +23,7 @@ type Transport struct {
 	mu     sync.Mutex
 }
 
-// Message represents a JSON-RPC message.
+// Message 表示一个 JSON-RPC 消息。
 type Message struct {
 	JSONRPC string          `json:"jsonrpc"`
 	ID      *jsonrpc2.ID    `json:"id,omitempty"`
@@ -33,7 +33,7 @@ type Message struct {
 	Error   *jsonrpc2.Error `json:"error,omitempty"`
 }
 
-// New creates a new transport.
+// New 创建一个新的传输。
 func New(reader io.Reader, writer io.Writer, logger *slog.Logger) *Transport {
 	return &Transport{
 		reader: reader,
@@ -42,14 +42,14 @@ func New(reader io.Reader, writer io.Writer, logger *slog.Logger) *Transport {
 	}
 }
 
-// NewWithConn creates a new transport with an existing JSON-RPC connection.
+// NewWithConn 使用现有的 JSON-RPC 连接创建一个新的传输。
 func NewWithConn(conn jsonrpc2.JSONRPC2) *Transport {
 	return &Transport{
 		conn: conn,
 	}
 }
 
-// Send sends a message to the language server.
+// Send 向语言服务器发送消息。
 func (t *Transport) Send(ctx context.Context, msg *Message) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -95,7 +95,7 @@ func (t *Transport) Send(ctx context.Context, msg *Message) error {
 	return nil
 }
 
-// Receive receives a message from the language server.
+// Receive 从语言服务器接收消息。
 func (t *Transport) Receive(_ context.Context) (*Message, error) {
 	if t.conn != nil {
 		// This is handled by the connection's handler
@@ -152,7 +152,7 @@ func (t *Transport) Receive(_ context.Context) (*Message, error) {
 	return &msg, nil
 }
 
-// Close closes the transport.
+// Close 关闭传输。
 func (t *Transport) Close() error {
 	if t.conn != nil {
 		// Connection will be closed by the client
@@ -174,14 +174,14 @@ func (t *Transport) Close() error {
 	return nil
 }
 
-// StreamTransport provides a bidirectional stream for JSON-RPC communication.
+// StreamTransport 为 JSON-RPC 通信提供双向流。
 type StreamTransport struct {
 	reader io.Reader
 	writer io.Writer
 	closer io.Closer
 }
 
-// NewStreamTransport creates a new stream transport.
+// NewStreamTransport 创建一个新的流传输。
 func NewStreamTransport(reader io.Reader, writer io.Writer, closer io.Closer) *StreamTransport {
 	return &StreamTransport{
 		reader: reader,
@@ -190,17 +190,17 @@ func NewStreamTransport(reader io.Reader, writer io.Writer, closer io.Closer) *S
 	}
 }
 
-// Read implements io.Reader.
+// Read 实现 io.Reader 接口。
 func (s *StreamTransport) Read(p []byte) (n int, err error) {
 	return s.reader.Read(p) //nolint:wrapcheck
 }
 
-// Write implements io.Writer.
+// Write 实现 io.Writer 接口。
 func (s *StreamTransport) Write(p []byte) (n int, err error) {
 	return s.writer.Write(p) //nolint:wrapcheck
 }
 
-// Close implements io.Closer.
+// Close 实现 io.Closer 接口。
 func (s *StreamTransport) Close() error {
 	if s.closer != nil {
 		return s.closer.Close() //nolint:wrapcheck
@@ -208,7 +208,7 @@ func (s *StreamTransport) Close() error {
 	return nil
 }
 
-// ObjectStream creates a jsonrpc2.ObjectStream from the transport.
+// ObjectStream 从传输创建一个 jsonrpc2.ObjectStream。
 func (s *StreamTransport) ObjectStream() jsonrpc2.ObjectStream {
 	return jsonrpc2.NewBufferedStream(s, jsonrpc2.VSCodeObjectCodec{})
 }

@@ -2,10 +2,9 @@ package ansi
 
 import "io"
 
-// Execute is a function that "execute" the given escape sequence by writing it
-// to the provided output writter.
+// Execute 是一个函数，通过将给定的转义序列写入到提供的输出写入器来"执行"该序列。
 //
-// This is a syntactic sugar over [io.WriteString].
+// 这是 [io.WriteString] 的语法糖。
 func Execute(w io.Writer, s string) (int, error) {
 	return io.WriteString(w, s) //nolint:wrapcheck
 }

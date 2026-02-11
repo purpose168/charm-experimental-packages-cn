@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// This file was originally part of https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes
+// 此文件最初来自 https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes
 
 package gitignore
 
@@ -21,15 +21,15 @@ import (
 	"strings"
 )
 
-// MatchResult defines outcomes of a match, no match, exclusion or inclusion.
+// MatchResult 定义匹配的结果，包括无匹配、排除或包含。
 type MatchResult int
 
 const (
-	// NoMatch defines the no match outcome of a match check
+	// NoMatch 定义匹配检查的无匹配结果
 	NoMatch MatchResult = iota
-	// Exclude defines an exclusion of a file as a result of a match check
+	// Exclude 定义匹配检查结果为排除文件
 	Exclude
-	// Include defines an explicit inclusion of a file as a result of a match check
+	// Include 定义匹配检查结果为明确包含文件
 	Include
 )
 
@@ -39,9 +39,9 @@ const (
 	patternDirSep   = "/"
 )
 
-// Pattern defines a single gitignore pattern.
+// Pattern 定义单个 gitignore 模式。
 type Pattern interface {
-	// Match matches the given path to the pattern.
+	// Match 将给定路径与模式进行匹配。
 	Match(path []string, isDir bool) MatchResult
 }
 
@@ -53,9 +53,9 @@ type pattern struct {
 	isGlob    bool
 }
 
-// ParsePattern parses a gitignore pattern string into the Pattern structure.
+// ParsePattern 将 gitignore 模式字符串解析为 Pattern 结构。
 func ParsePattern(p string, domain []string) Pattern {
-	// storing domain, copy it to ensure it isn't changed externally
+	// 存储域，复制它以确保不会被外部更改
 	domain = append([]string(nil), domain...)
 	res := pattern{domain: domain}
 
@@ -152,7 +152,7 @@ func (p *pattern) globMatch(path []string, isDir bool) bool {
 					matched = true
 					break
 				} else if len(path) == 0 {
-					// if nothing left then fail
+					// 如果没有剩余内容则匹配失败
 					matched = false
 				}
 			}
@@ -162,7 +162,7 @@ func (p *pattern) globMatch(path []string, isDir bool) bool {
 			}
 			matched = true
 			path = path[1:]
-			// files matching dir globs, don't match
+			// 匹配目录通配符的文件不匹配
 			if len(path) == 0 && i < len(p.pattern)-1 {
 				matched = false
 			}

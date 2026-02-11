@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/termios
+module github.com/purpose168/charm-experimental-packages-cn/termios
 
 go 1.24.0
 

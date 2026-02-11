@@ -58,14 +58,14 @@ func TestWriteRaster(t *testing.T) {
 			var buf bytes.Buffer
 			n, err := WriteRaster(&buf, tt.pan, tt.pad, tt.ph, tt.pv)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("WriteRaster() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("WriteRaster() 错误 = %v，期望错误 %v", err, tt.wantErr)
 				return
 			}
 			if got := buf.String(); got != tt.want {
-				t.Errorf("WriteRaster() = %q, want %q", got, tt.want)
+				t.Errorf("WriteRaster() = %q，期望 %q", got, tt.want)
 			}
 			if n != len(tt.want) {
-				t.Errorf("WriteRaster() returned length %d, want %d", n, len(tt.want))
+				t.Errorf("WriteRaster() 返回长度 %d，期望 %d", n, len(tt.want))
 			}
 		})
 	}
@@ -95,14 +95,14 @@ func TestRaster_WriteTo(t *testing.T) {
 			var buf bytes.Buffer
 			n, err := tt.raster.WriteTo(&buf)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Raster.WriteTo() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Raster.WriteTo() 错误 = %v，期望错误 %v", err, tt.wantErr)
 				return
 			}
 			if got := buf.String(); got != tt.want {
-				t.Errorf("Raster.WriteTo() = %q, want %q", got, tt.want)
+				t.Errorf("Raster.WriteTo() = %q，期望 %q", got, tt.want)
 			}
 			if n != int64(len(tt.want)) {
-				t.Errorf("Raster.WriteTo() returned length %d, want %d", n, len(tt.want))
+				t.Errorf("Raster.WriteTo() 返回长度 %d，期望 %d", n, len(tt.want))
 			}
 		})
 	}
@@ -163,10 +163,10 @@ func TestDecodeRaster(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, n := DecodeRaster([]byte(tt.input))
 			if got != tt.want {
-				t.Errorf("DecodeRaster() = %+v, want %+v", got, tt.want)
+				t.Errorf("DecodeRaster() = %+v，期望 %+v", got, tt.want)
 			}
 			if n != tt.wantRead {
-				t.Errorf("DecodeRaster() read = %d, want %d", n, tt.wantRead)
+				t.Errorf("DecodeRaster() 读取 = %d，期望 %d", n, tt.wantRead)
 			}
 		})
 	}
@@ -193,7 +193,7 @@ func TestRaster_String(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.raster.String(); got != tt.want {
-				t.Errorf("Raster.String() = %q, want %q", got, tt.want)
+				t.Errorf("Raster.String() = %q，期望 %q", got, tt.want)
 			}
 		})
 	}

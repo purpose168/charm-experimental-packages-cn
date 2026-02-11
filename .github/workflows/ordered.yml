@@ -56,7 +56,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   lint:
-    uses: charmbracelet/meta/.github/workflows/lint.yml@main
+    uses: purpose168/meta-cn/.github/workflows/lint.yml@main
     with:
       directory: exp/ordered
 

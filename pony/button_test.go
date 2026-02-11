@@ -20,9 +20,9 @@ func TestButtonWithMethods(t *testing.T) {
 		Width(NewFixedConstraint(20)).
 		Height(NewFixedConstraint(3))
 
-	// Methods work - verified by golden tests
+	// 方法正常工作 - 已通过黄金测试验证
 	if btn == nil {
-		t.Error("Button should not be nil")
+		t.Error("按钮不应为nil")
 	}
 }
 
@@ -31,7 +31,7 @@ func TestButtonLayout(t *testing.T) {
 	size := btn.Layout(Fixed(40, 10))
 
 	if size.Width == 0 || size.Height == 0 {
-		t.Errorf("Button size is zero: %v", size)
+		t.Errorf("按钮大小为零: %v", size)
 	}
 }
 
@@ -48,7 +48,7 @@ func TestButtonDraw(t *testing.T) {
 
 	bounds := btn.Bounds()
 	if bounds.Dx() == 0 || bounds.Dy() == 0 {
-		t.Error("Button bounds not set after draw")
+		t.Error("绘制后按钮边界未设置")
 	}
 }
 
@@ -57,7 +57,7 @@ func TestButtonChildren(t *testing.T) {
 	children := btn.Children()
 
 	if children != nil {
-		t.Error("Button should have nil children")
+		t.Error("按钮应具有nil子元素")
 	}
 }
 
@@ -83,19 +83,19 @@ func TestBoundsMapAllElements(t *testing.T) {
 
 	allElements := boundsMap.AllElements()
 	if len(allElements) == 0 {
-		t.Error("AllElements returned empty list")
+		t.Error("AllElements返回空列表")
 	}
 
 	if len(allElements) != 3 {
-		t.Errorf("AllElements returned %d elements, want 3", len(allElements))
+		t.Errorf("AllElements返回%d个元素，期望3个", len(allElements))
 	}
 
 	for _, eb := range allElements {
 		if eb.Element == nil {
-			t.Error("Element in AllElements is nil")
+			t.Error("AllElements中的元素为nil")
 		}
 		if eb.Bounds.Dx() == 0 && eb.Bounds.Dy() == 0 {
-			t.Errorf("Element %s has zero bounds", eb.Element.ID())
+			t.Errorf("元素%s的边界为零", eb.Element.ID())
 		}
 	}
 }

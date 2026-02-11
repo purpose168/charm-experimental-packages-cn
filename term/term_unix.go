@@ -69,7 +69,7 @@ func getSize(fd uintptr) (width, height int, err error) {
 	return int(ws.Col), int(ws.Row), nil
 }
 
-// passwordReader is an io.Reader that reads from a specific file descriptor.
+// passwordReader 是一个从特定文件描述符读取的 io.Reader。
 type passwordReader int
 
 func (r passwordReader) Read(buf []byte) (int, error) {

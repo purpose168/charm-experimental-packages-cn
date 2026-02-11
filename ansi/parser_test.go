@@ -7,43 +7,61 @@ import (
 	"testing"
 )
 
+// csiSequence 表示 CSI 序列
+
 type csiSequence struct {
-	Cmd    Cmd
-	Params Params
+	Cmd    Cmd    // 命令
+	Params Params // 参数
 }
+
+// dcsSequence 表示 DCS 序列
 
 type dcsSequence struct {
-	Cmd    Cmd
-	Params Params
-	Data   []byte
+	Cmd    Cmd    // 命令
+	Params Params // 参数
+	Data   []byte // 数据
 }
+
+// testCase 表示测试用例
 
 type testCase struct {
-	name     string
-	input    string
-	expected []any
+	name     string // 测试用例名称
+	input    string // 输入字符串
+	expected []any  // 期望结果
 }
 
+// testDispatcher 表示测试调度器
+
 type testDispatcher struct {
-	dispatched []any
+	dispatched []any // 已分发的序列
 }
+
+// dispatchRune 分发符文
 
 func (d *testDispatcher) dispatchRune(r rune) {
 	d.dispatched = append(d.dispatched, r)
 }
 
+// dispatchControl 分发控制字符
+
 func (d *testDispatcher) dispatchControl(b byte) {
 	d.dispatched = append(d.dispatched, b)
 }
+
+// dispatchEsc 分发 ESC 序列
 
 func (d *testDispatcher) dispatchEsc(cmd Cmd) {
 	d.dispatched = append(d.dispatched, cmd)
 }
 
+// dispatchCsi 分发 CSI 序列
+
 func (d *testDispatcher) dispatchCsi(cmd Cmd, params Params) {
 	params = slices.Clone(params)
 	d.dispatched = append(d.dispatched, csiSequence{Cmd: cmd, Params: params})
 }
+
+// dispatchDcs 分发 DCS 序列
 
 func (d *testDispatcher) dispatchDcs(cmd Cmd, params Params, data []byte) {
 	params = slices.Clone(params)
@@ -51,15 +69,21 @@ func (d *testDispatcher) dispatchDcs(cmd Cmd, params Params, data []byte) {
 	d.dispatched = append(d.dispatched, dcsSequence{Cmd: cmd, Params: params, Data: data})
 }
 
+// dispatchOsc 分发 OSC 序列
+
 func (d *testDispatcher) dispatchOsc(cmd int, data []byte) {
 	data = slices.Clone(data)
 	d.dispatched = append(d.dispatched, data)
 }
 
+// dispatchApc 分发 APC 序列
+
 func (d *testDispatcher) dispatchApc(data []byte) {
 	data = slices.Clone(data)
 	d.dispatched = append(d.dispatched, data)
 }
+
+// testParser 创建一个测试用的解析器
 
 func testParser(d *testDispatcher) *Parser {
 	p := NewParser()
@@ -77,15 +101,17 @@ func testParser(d *testDispatcher) *Parser {
 	return p
 }
 
+// TestControlSequence 测试控制序列的解析
+
 func TestControlSequence(t *testing.T) {
 	cases := []testCase{
 		{
-			name:     "just_esc",
+			name:     "仅ESC",
 			input:    "\x1b",
 			expected: []any{},
 		},
 		{
-			name:  "double_esc",
+			name:  "双重ESC",
 			input: "\x1b\x1b",
 			expected: []any{
 				byte(0x1b),
@@ -114,7 +140,7 @@ func TestControlSequence(t *testing.T) {
 		// 	},
 		// },
 		{
-			name:  "csi plus text",
+			name:  "CSI加文本",
 			input: "Hello, \x1b[31mWorld!\x1b[0m",
 			expected: []any{
 				rune('H'),
@@ -154,9 +180,11 @@ func TestControlSequence(t *testing.T) {
 	}
 }
 
+// parsers 定义了不同配置的解析器
+
 var parsers = []struct {
-	name   string
-	parser *Parser
+	name   string  // 解析器名称
+	parser *Parser // 解析器实例
 }{
 	{
 		name:   "simple",
@@ -182,10 +210,12 @@ var parsers = []struct {
 	},
 }
 
+// BenchmarkParser 基准测试解析器性能
+
 func BenchmarkParser(b *testing.B) {
 	bts, err := os.ReadFile("./fixtures/demo.vte")
 	if err != nil {
-		b.Fatalf("Error: %v", err)
+		b.Fatalf("错误: %v", err)
 	}
 
 	for _, p := range parsers {
@@ -196,6 +226,8 @@ func BenchmarkParser(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkParserUTF8 基准测试解析器处理UTF-8的性能
 
 func BenchmarkParserUTF8(b *testing.B) {
 	bts, err := os.ReadFile("./fixtures/UTF-8-demo.txt")

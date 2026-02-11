@@ -2,16 +2,16 @@ package ansi
 
 import "strconv"
 
-// KeyModifierOptions (XTMODKEYS) sets/resets xterm key modifier options.
+// KeyModifierOptions (XTMODKEYS) 设置/重置 xterm 键修饰符选项。
 //
-// Default is 0.
+// 默认值为 0。
 //
 //	CSI > Pp m
 //	CSI > Pp ; Pv m
 //
-// If Pv is omitted, the resource is reset to its initial value.
+// 如果省略 Pv，则资源将重置为其初始值。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
 func KeyModifierOptions(p int, vs ...int) string {
 	var pp, pv string
 	if p > 0 {
@@ -31,30 +31,30 @@ func KeyModifierOptions(p int, vs ...int) string {
 	return "\x1b[>" + pp + "m"
 }
 
-// XTMODKEYS is an alias for [KeyModifierOptions].
+// XTMODKEYS 是 [KeyModifierOptions] 的别名
 func XTMODKEYS(p int, vs ...int) string {
 	return KeyModifierOptions(p, vs...)
 }
 
-// SetKeyModifierOptions sets xterm key modifier options.
-// This is an alias for [KeyModifierOptions].
+// SetKeyModifierOptions 设置 xterm 键修饰符选项。
+// 这是 [KeyModifierOptions] 的别名
 func SetKeyModifierOptions(pp int, pv int) string {
 	return KeyModifierOptions(pp, pv)
 }
 
-// ResetKeyModifierOptions resets xterm key modifier options.
-// This is an alias for [KeyModifierOptions].
+// ResetKeyModifierOptions 重置 xterm 键修饰符选项。
+// 这是 [KeyModifierOptions] 的别名
 func ResetKeyModifierOptions(pp int) string {
 	return KeyModifierOptions(pp)
 }
 
-// QueryKeyModifierOptions (XTQMODKEYS) requests xterm key modifier options.
+// QueryKeyModifierOptions (XTQMODKEYS) 请求 xterm 键修饰符选项。
 //
-// Default is 0.
+// 默认值为 0。
 //
 //	CSI ? Pp m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
 func QueryKeyModifierOptions(pp int) string {
 	var p string
 	if pp > 0 {
@@ -63,76 +63,79 @@ func QueryKeyModifierOptions(pp int) string {
 	return "\x1b[?" + p + "m"
 }
 
-// XTQMODKEYS is an alias for [QueryKeyModifierOptions].
+// XTQMODKEYS 是 [QueryKeyModifierOptions] 的别名
 func XTQMODKEYS(pp int) string {
 	return QueryKeyModifierOptions(pp)
 }
 
-// Modify Other Keys (modifyOtherKeys) is an xterm feature that allows the
-// terminal to modify the behavior of certain keys to send different escape
-// sequences when pressed.
+// Modify Other Keys (modifyOtherKeys) 是 xterm 的一个功能，允许终端修改某些键的行为，
+// 使其在按下时发送不同的转义序列。
 //
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 const (
-	SetModifyOtherKeys1  = "\x1b[>4;1m"
-	SetModifyOtherKeys2  = "\x1b[>4;2m"
+	// SetModifyOtherKeys1 设置 modifyOtherKeys 模式 1
+	SetModifyOtherKeys1 = "\x1b[>4;1m"
+	// SetModifyOtherKeys2 设置 modifyOtherKeys 模式 2
+	SetModifyOtherKeys2 = "\x1b[>4;2m"
+	// ResetModifyOtherKeys 重置 modifyOtherKeys 模式
 	ResetModifyOtherKeys = "\x1b[>4m"
+	// QueryModifyOtherKeys 查询 modifyOtherKeys 模式
 	QueryModifyOtherKeys = "\x1b[?4m"
 )
 
-// ModifyOtherKeys returns a sequence that sets XTerm modifyOtherKeys mode.
-// The mode argument specifies the mode to set.
+// ModifyOtherKeys 返回一个设置 XTerm modifyOtherKeys 模式的序列。
+// mode 参数指定要设置的模式：
 //
-//	0: Disable modifyOtherKeys mode.
-//	1: Enable modifyOtherKeys mode 1.
-//	2: Enable modifyOtherKeys mode 2.
+//	0: 禁用 modifyOtherKeys 模式
+//	1: 启用 modifyOtherKeys 模式 1
+//	2: 启用 modifyOtherKeys 模式 2
 //
 //	CSI > 4 ; mode m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 //
-// Deprecated: use [SetModifyOtherKeys1] or [SetModifyOtherKeys2] instead.
+// 已废弃：请改用 [SetModifyOtherKeys1] 或 [SetModifyOtherKeys2]
 func ModifyOtherKeys(mode int) string {
 	return "\x1b[>4;" + strconv.Itoa(mode) + "m"
 }
 
-// DisableModifyOtherKeys disables the modifyOtherKeys mode.
+// DisableModifyOtherKeys 禁用 modifyOtherKeys 模式
 //
 //	CSI > 4 ; 0 m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 //
-// Deprecated: use [ResetModifyOtherKeys] instead.
+// 已废弃：请改用 [ResetModifyOtherKeys]
 const DisableModifyOtherKeys = "\x1b[>4;0m"
 
-// EnableModifyOtherKeys1 enables the modifyOtherKeys mode 1.
+// EnableModifyOtherKeys1 启用 modifyOtherKeys 模式 1
 //
 //	CSI > 4 ; 1 m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 //
-// Deprecated: use [SetModifyOtherKeys1] instead.
+// 已废弃：请改用 [SetModifyOtherKeys1]
 const EnableModifyOtherKeys1 = "\x1b[>4;1m"
 
-// EnableModifyOtherKeys2 enables the modifyOtherKeys mode 2.
+// EnableModifyOtherKeys2 启用 modifyOtherKeys 模式 2
 //
 //	CSI > 4 ; 2 m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 //
-// Deprecated: use [SetModifyOtherKeys2] instead.
+// 已废弃：请改用 [SetModifyOtherKeys2]
 const EnableModifyOtherKeys2 = "\x1b[>4;2m"
 
-// RequestModifyOtherKeys requests the modifyOtherKeys mode.
+// RequestModifyOtherKeys 请求 modifyOtherKeys 模式
 //
 //	CSI ? 4  m
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
-// See: https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s_
+// 参见：https://invisible-island.net/xterm/manpage/xterm.html#VT100-Widget-Resources:modifyOtherKeys
 //
-// Deprecated: use [QueryModifyOtherKeys] instead.
+// 已废弃：请改用 [QueryModifyOtherKeys]
 const RequestModifyOtherKeys = "\x1b[?4m"

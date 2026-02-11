@@ -1,4 +1,4 @@
-// Package main demonstrates usage.
+// 包main演示了如何使用。
 package main
 
 import (
@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 func main() {

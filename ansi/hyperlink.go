@@ -2,14 +2,14 @@ package ansi
 
 import "strings"
 
-// SetHyperlink returns a sequence for starting a hyperlink.
+// SetHyperlink 返回用于开始超链接的序列。
 //
 //	OSC 8 ; Params ; Uri ST
 //	OSC 8 ; Params ; Uri BEL
 //
-// To reset the hyperlink, omit the URI.
+// 要重置超链接，请省略 URI。
 //
-// See: https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+// 参考：https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
 func SetHyperlink(uri string, params ...string) string {
 	var p string
 	if len(params) > 0 {
@@ -18,11 +18,11 @@ func SetHyperlink(uri string, params ...string) string {
 	return "\x1b]8;" + p + ";" + uri + "\x07"
 }
 
-// ResetHyperlink returns a sequence for resetting the hyperlink.
+// ResetHyperlink 返回用于重置超链接的序列。
 //
-// This is equivalent to SetHyperlink("", params...).
+// 这等同于 SetHyperlink("", params...)。
 //
-// See: https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+// 参考：https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
 func ResetHyperlink(params ...string) string {
 	return SetHyperlink("", params...)
 }

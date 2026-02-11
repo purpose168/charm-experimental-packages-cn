@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/ansi/kitty"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/kitty"
 )
 
 var sequences = buildKeysTable(FlagTerminfo, "dumb")

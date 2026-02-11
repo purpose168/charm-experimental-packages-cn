@@ -2,11 +2,12 @@ package ansi
 
 import "testing"
 
+// TestUrxvtExt 测试 URxvtExt 函数的功能
 func TestUrxvtExt(t *testing.T) {
 	tests := []struct {
-		extension string
-		params    []string
-		expected  string
+		extension string   // 扩展名称
+		params    []string // 参数列表
+		expected  string   // 预期结果
 	}{
 		{
 			extension: "foo",
@@ -31,9 +32,12 @@ func TestUrxvtExt(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := URxvtExt(tt.extension, tt.params...)
-		if result != tt.expected {
-			t.Errorf("URxvtExt(%q, %v) = %q; want %q", tt.extension, tt.params, result, tt.expected)
-		}
+		tt := tt // Capture range variable to avoid loop variable reuse issue
+		t.Run(tt.extension, func(t *testing.T) {
+			result := URxvtExt(tt.extension, tt.params...)
+			if result != tt.expected {
+				t.Errorf("URxvtExt(%q, %v) = %q; want %q", tt.extension, tt.params, result, tt.expected)
+			}
+		})
 	}
 }

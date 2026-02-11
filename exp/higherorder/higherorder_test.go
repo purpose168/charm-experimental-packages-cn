@@ -30,8 +30,8 @@ func Test_Foldr(t *testing.T) {
 
 func Test_Map(t *testing.T) {
 	{
-		// Map over ints, returning the square of each int.
-		// (Take ints, return ints.)
+		// 对整数进行映射，返回每个整数的平方。
+		// （接受整数，返回整数。）
 		x := Map(func(a int) int {
 			return a * a
 		}, []int{2, 3, 4})
@@ -44,8 +44,8 @@ func Test_Map(t *testing.T) {
 		}
 	}
 	{
-		// Map over strings, returning the length of each string.
-		// (Take ints, return strings.)
+		// 对字符串进行映射，返回每个字符串的长度。
+		// （接受字符串，返回整数。）
 		x := Map(func(a string) int {
 			return len([]rune(a))
 		}, []string{"one", "two", "three"})

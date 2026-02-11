@@ -1,8 +1,8 @@
-// Package higherorder provides higher-order functions for Go.
+// Package higherorder 为 Go 提供高阶函数。
 package higherorder
 
-// Foldl applies a function to each element of a list, starting from the left.
-// A single value is returned.
+// Foldl 从左侧开始，对列表的每个元素应用一个函数。
+// 返回单个值。
 func Foldl[A any](f func(x, y A) A, start A, list []A) A {
 	for _, v := range list {
 		start = f(start, v)
@@ -10,8 +10,8 @@ func Foldl[A any](f func(x, y A) A, start A, list []A) A {
 	return start
 }
 
-// Foldr applies a function to each element of a list, starting from the right.
-// A single value is returned.
+// Foldr 从右侧开始，对列表的每个元素应用一个函数。
+// 返回单个值。
 func Foldr[A any](f func(x, y A) A, start A, list []A) A {
 	for i := len(list) - 1; i >= 0; i-- {
 		start = f(start, list[i])
@@ -19,7 +19,7 @@ func Foldr[A any](f func(x, y A) A, start A, list []A) A {
 	return start
 }
 
-// Map applies a given function to each element of a list, returning a new list.
+// Map 对列表的每个元素应用给定的函数，返回一个新列表。
 func Map[A, B any](f func(A) B, list []A) []B {
 	res := make([]B, len(list))
 	for i, v := range list {
@@ -28,7 +28,7 @@ func Map[A, B any](f func(A) B, list []A) []B {
 	return res
 }
 
-// Filter applies a function to each element of a list, if the function returns false those elements are removed, returning a new list.
+// Filter 对列表的每个元素应用一个函数，如果函数返回 false，则移除这些元素，返回一个新列表。
 func Filter[A any](f func(A) bool, list []A) []A {
 	res := make([]A, 0)
 	for _, v := range list {

@@ -14,6 +14,7 @@ import (
 	"gopkg.in/dnaeon/go-vcr.v4/pkg/recorder"
 )
 
+// customMatcher 创建一个自定义的请求匹配器，处理JSON请求中的键顺序问题。
 func customMatcher(t *testing.T) recorder.MatcherFunc {
 	return func(r *http.Request, i cassette.Request) bool {
 		if r.Body == nil || r.Body == http.NoBody {
@@ -30,9 +31,8 @@ func customMatcher(t *testing.T) recorder.MatcherFunc {
 		_ = r.Body.Close()
 		r.Body = io.NopCloser(bytes.NewBuffer(reqBody))
 
-		// Some providers can sometimes generate JSON requests with keys in
-		// a different order, which means a direct string comparison will fail.
-		// Falling back to deserializing the content if we don't have a match.
+		// 一些提供商有时会生成键顺序不同的JSON请求，这意味着直接字符串比较会失败。
+		// 如果没有匹配，我们会回退到反序列化内容。
 		requestContent := normalizeLineEndings(reqBody)
 		cassetteContent := normalizeLineEndings(i.Body)
 		if requestContent == cassetteContent {
@@ -55,9 +55,8 @@ func customMatcher(t *testing.T) recorder.MatcherFunc {
 	}
 }
 
-// normalizeLineEndings does not only replace `\r\n` into `\n`,
-// but also replaces `\\r\\n` into `\\n`. That's because we want the content
-// inside JSON string to be replaces as well.
+// normalizeLineEndings 不仅将 `\r\n` 替换为 `\n`，
+// 还将 `\\r\\n` 替换为 `\\n`。这是因为我们也希望替换JSON字符串中的内容。
 func normalizeLineEndings[T string | []byte](s T) string {
 	str := string(s)
 	str = strings.ReplaceAll(str, "\r\n", "\n")
@@ -65,6 +64,7 @@ func normalizeLineEndings[T string | []byte](s T) string {
 	return str
 }
 
+// printDiff 打印请求内容和盒式磁带内容之间的差异。
 func printDiff(t *testing.T, requestContent, cassetteContent string) {
 	t.Logf("Request interaction not found for %q.\nDiff:\n%s", t.Name(), cmp.Diff(cassetteContent, requestContent))
 }

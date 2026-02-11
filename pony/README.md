@@ -2,8 +2,8 @@
 
 > **⚠️ EXPERIMENTAL**: This is an experimental project, primarily AI-generated as an exploration of declarative TUI frameworks. Use at your own risk.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/charmbracelet/x/pony.svg)](https://pkg.go.dev/github.com/charmbracelet/x/pony)
-[![Build Status](https://github.com/charmbracelet/x/actions/workflows/pony.yml/badge.svg)](https://github.com/charmbracelet/x/actions/workflows/pony.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/purpose168/charm-experimental-packages-cn/pony.svg)](https://pkg.go.dev/github.com/purpose168/charm-experimental-packages-cn/pony)
+[![Build Status](https://github.com/purpose168/charm-experimental-packages-cn/actions/workflows/pony.yml/badge.svg)](https://github.com/purpose168/charm-experimental-packages-cn/actions/workflows/pony.yml)
 
 A declarative, type-safe markup language for building terminal user interfaces with [Ultraviolet](../ultraviolet) as the rendering engine.
 
@@ -42,7 +42,7 @@ output := tmpl.Render(ViewData{Title: "My App", Count: 42}, 80, 24)
 ### Installation
 
 ```bash
-go get github.com/charmbracelet/x/pony
+go get github.com/purpose168/charm-experimental-packages-cn/pony
 ```
 
 ### Basic Example
@@ -52,7 +52,7 @@ package main
 
 import (
     "fmt"
-    "github.com/charmbracelet/x/pony"
+    "github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 func main() {
@@ -223,7 +223,7 @@ Attributes: `id`, `text`, `border`, `padding`, `width`, `height`
 
 **Text Attributes:**
 - `foreground-color` - Text color (named, hex, rgb)
-- `background-color` - Background color  
+- `background-color` - Background color
 - `font-weight` - `bold` or omit for normal
 - `font-style` - `italic` or omit for normal
 - `text-decoration` - `underline` or `strikethrough`
@@ -459,7 +459,7 @@ func (m model) View() tea.View {
 ```go
 import (
     tea "charm.land/bubbletea/v2"
-    "github.com/charmbracelet/x/pony"
+    "github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 type ViewData struct {

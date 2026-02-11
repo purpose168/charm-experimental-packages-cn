@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Code generated for LSP. DO NOT EDIT.
+// 为 LSP 生成的代码。请勿编辑。
 
 package protocol
 
-// Code generated from protocol/metaModel.json at ref release/protocol/3.17.6-next.9 (hash c94395b5da53729e6dff931293b051009ccaaaa4).
+// 代码从 protocol/metaModel.json 生成，参考版本 release/protocol/3.17.6-next.9（哈希值 c94395b5da53729e6dff931293b051009ccaaaa4）。
 // https://github.com/microsoft/vscode-languageserver-node/blob/release/protocol/3.17.6-next.9/protocol/metaModel.json
-// LSP metaData.version = 3.17.0.
+// LSP metaData.version = 3.17.0。
 
 import "encoding/json"
 
@@ -18,20 +18,20 @@ type And_RegOpt_textDocument_colorPresentation struct {
 	TextDocumentRegistrationOptions
 }
 
-// A special text edit with an additional change annotation.
+// 带有额外更改注释的特殊文本编辑。
 //
-// @since 3.16.0.
+// @since 3.16.0。
 //
-// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#annotatedTextEdit
+// 参见 https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#annotatedTextEdit
 type AnnotatedTextEdit struct {
 	// The actual identifier of the change annotation
 	AnnotationID *ChangeAnnotationIdentifier `json:"annotationId,omitempty"`
 	TextEdit
 }
 
-// The parameters passed via an apply workspace edit request.
+// 通过应用工作区编辑请求传递的参数。
 //
-// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#applyWorkspaceEditParams
+// 参见 https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification#applyWorkspaceEditParams
 type ApplyWorkspaceEditParams struct {
 	// An optional label of the workspace edit. This label is
 	// presented in the user interface for example on an undo

@@ -4,7 +4,7 @@ import (
 	"maps"
 	"strconv"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 // buildKeysTable builds a table of key sequences and their corresponding key

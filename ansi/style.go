@@ -6,20 +6,17 @@ import (
 	"strings"
 )
 
-// ResetStyle is a SGR (Select Graphic Rendition) style sequence that resets
-// all attributes.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// ResetStyle 是一个 SGR（选择图形渲染）样式序列，用于重置所有属性。
+// 参见：https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 const ResetStyle = "\x1b[m"
 
-// Attr is a SGR (Select Graphic Rendition) style attribute.
+// Attr 是一个 SGR（选择图形渲染）样式属性。
 type Attr = int
 
-// Style represents an ANSI SGR (Select Graphic Rendition) style.
+// Style 表示一个 ANSI SGR（选择图形渲染）样式。
 type Style []string
 
-// NewStyle returns a new style with the given attributes. Attributes are SGR
-// (Select Graphic Rendition) codes that control text formatting like bold,
-// italic, colors, etc.
+// NewStyle 返回一个带有给定属性的新样式。属性是控制文本格式的 SGR（选择图形渲染）代码，如粗体、斜体、颜色等。
 func NewStyle(attrs ...Attr) Style {
 	if len(attrs) == 0 {
 		return Style{}
@@ -39,8 +36,7 @@ func NewStyle(attrs ...Attr) Style {
 	return s
 }
 
-// String returns the ANSI SGR (Select Graphic Rendition) style sequence for
-// the given style.
+// String 返回给定样式的 ANSI SGR（选择图形渲染）样式序列。
 func (s Style) String() string {
 	if len(s) == 0 {
 		return ResetStyle
@@ -48,8 +44,7 @@ func (s Style) String() string {
 	return "\x1b[" + strings.Join(s, ";") + "m"
 }
 
-// Styled returns a styled string with the given style applied. The style is
-// applied at the beginning and reset at the end of the string.
+// Styled 返回一个应用了给定样式的带样式字符串。样式在字符串开头应用，在结尾重置。
 func (s Style) Styled(str string) string {
 	if len(s) == 0 {
 		return str
@@ -57,26 +52,25 @@ func (s Style) Styled(str string) string {
 	return s.String() + str + ResetStyle
 }
 
-// Reset appends the reset style attribute to the style. This resets all
-// formatting attributes to their defaults.
+// Reset 向样式添加重置样式属性。这会将所有格式属性重置为默认值。
 func (s Style) Reset() Style {
 	return append(s, attrReset)
 }
 
-// Bold appends the bold or normal intensity style attribute to the style.
-// You can use [Style.Normal] to reset to normal intensity.
+// Bold 向样式添加粗体或正常强度的样式属性。
+// 您可以使用 [Style.Normal] 重置为正常强度。
 func (s Style) Bold() Style {
 	return append(s, attrBold)
 }
 
-// Faint appends the faint or normal intensity style attribute to the style.
-// You can use [Style.Normal] to reset to normal intensity.
+// Faint 向样式添加微弱或正常强度的样式属性。
+// 您可以使用 [Style.Normal] 重置为正常强度。
 func (s Style) Faint() Style {
 	return append(s, attrFaint)
 }
 
-// Italic appends the italic or no italic style attribute to the style.
-// When v is true, text is rendered in italic. When false, italic is disabled.
+// Italic 向样式添加斜体或非斜体样式属性。
+// 当 v 为 true 时，文本以斜体呈现。当为 false 时，斜体被禁用。
 func (s Style) Italic(v bool) Style {
 	if v {
 		return append(s, attrItalic)
@@ -84,8 +78,8 @@ func (s Style) Italic(v bool) Style {
 	return append(s, attrNoItalic)
 }
 
-// Underline appends the underline or no underline style attribute to the style.
-// When v is true, text is underlined. When false, underline is disabled.
+// Underline 向样式添加下划线或非下划线样式属性。
+// 当 v 为 true 时，文本带下划线。当为 false 时，下划线被禁用。
 func (s Style) Underline(v bool) Style {
 	if v {
 		return append(s, attrUnderline)
@@ -93,9 +87,8 @@ func (s Style) Underline(v bool) Style {
 	return append(s, attrNoUnderline)
 }
 
-// UnderlineStyle appends the underline style attribute to the style.
-// Supports various underline styles including single, double, curly, dotted,
-// and dashed.
+// UnderlineStyle 向样式添加下划线样式属性。
+// 支持多种下划线样式，包括单线、双线、波浪线、点线和虚线。
 func (s Style) UnderlineStyle(u Underline) Style {
 	switch u {
 	case UnderlineNone:
@@ -114,9 +107,8 @@ func (s Style) UnderlineStyle(u Underline) Style {
 	return s
 }
 
-// Blink appends the slow blink or no blink style attribute to the style.
-// When v is true, text blinks slowly (less than 150 per minute). When false,
-// blinking is disabled.
+// Blink 向样式添加慢速闪烁或非闪烁样式属性。
+// 当 v 为 true 时，文本缓慢闪烁（每分钟少于 150 次）。当为 false 时，闪烁被禁用。
 func (s Style) Blink(v bool) Style {
 	if v {
 		return append(s, attrBlink)
@@ -124,11 +116,10 @@ func (s Style) Blink(v bool) Style {
 	return append(s, attrNoBlink)
 }
 
-// RapidBlink appends the rapid blink or no blink style attribute to the style.
-// When v is true, text blinks rapidly (150+ per minute). When false, blinking
-// is disabled.
+// RapidBlink 向样式添加快速闪烁或非闪烁样式属性。
+// 当 v 为 true 时，文本快速闪烁（每分钟 150 次以上）。当为 false 时，闪烁被禁用。
 //
-// Note that this is not widely supported in terminal emulators.
+// 注意：这在终端模拟器中支持度不高。
 func (s Style) RapidBlink(v bool) Style {
 	if v {
 		return append(s, attrRapidBlink)
@@ -136,9 +127,8 @@ func (s Style) RapidBlink(v bool) Style {
 	return append(s, attrNoBlink)
 }
 
-// Reverse appends the reverse or no reverse style attribute to the style.
-// When v is true, foreground and background colors are swapped. When false,
-// reverse video is disabled.
+// Reverse 向样式添加反转或非反转样式属性。
+// 当 v 为 true 时，前景色和背景色交换。当为 false 时，反转视频被禁用。
 func (s Style) Reverse(v bool) Style {
 	if v {
 		return append(s, attrReverse)
@@ -146,9 +136,8 @@ func (s Style) Reverse(v bool) Style {
 	return append(s, attrNoReverse)
 }
 
-// Conceal appends the conceal or no conceal style attribute to the style.
-// When v is true, text is hidden/concealed. When false, concealment is
-// disabled.
+// Conceal 向样式添加隐藏或非隐藏样式属性。
+// 当 v 为 true 时，文本被隐藏/掩盖。当为 false 时，隐藏被禁用。
 func (s Style) Conceal(v bool) Style {
 	if v {
 		return append(s, attrConceal)
@@ -156,9 +145,8 @@ func (s Style) Conceal(v bool) Style {
 	return append(s, attrNoConceal)
 }
 
-// Strikethrough appends the strikethrough or no strikethrough style attribute
-// to the style. When v is true, text is rendered with a horizontal line through
-// it. When false, strikethrough is disabled.
+// Strikethrough 向样式添加删除线或非删除线样式属性。
+// 当 v 为 true 时，文本中间会显示一条水平线。当为 false 时，删除线被禁用。
 func (s Style) Strikethrough(v bool) Style {
 	if v {
 		return append(s, attrStrikethrough)
@@ -166,78 +154,76 @@ func (s Style) Strikethrough(v bool) Style {
 	return append(s, attrNoStrikethrough)
 }
 
-// Normal appends the normal intensity style attribute to the style. This
-// resets [Style.Bold] and [Style.Faint] attributes.
+// Normal 向样式添加正常强度样式属性。这会重置 [Style.Bold] 和 [Style.Faint] 属性。
 func (s Style) Normal() Style {
 	return append(s, attrNormalIntensity)
 }
 
-// NoItalic appends the no italic style attribute to the style.
+// NoItalic 向样式添加非斜体样式属性。
 //
-// Deprecated: use [Style.Italic](false) instead.
+// 已弃用：请使用 [Style.Italic](false) 代替。
 func (s Style) NoItalic() Style {
 	return append(s, attrNoItalic)
 }
 
-// NoUnderline appends the no underline style attribute to the style.
+// NoUnderline 向样式添加非下划线样式属性。
 //
-// Deprecated: use [Style.Underline](false) instead.
+// 已弃用：请使用 [Style.Underline](false) 代替。
 func (s Style) NoUnderline() Style {
 	return append(s, attrNoUnderline)
 }
 
-// NoBlink appends the no blink style attribute to the style.
+// NoBlink 向样式添加非闪烁样式属性。
 //
-// Deprecated: use [Style.Blink](false) or [Style.RapidBlink](false) instead.
+// 已弃用：请使用 [Style.Blink](false) 或 [Style.RapidBlink](false) 代替。
 func (s Style) NoBlink() Style {
 	return append(s, attrNoBlink)
 }
 
-// NoReverse appends the no reverse style attribute to the style.
+// NoReverse 向样式添加非反转样式属性。
 //
-// Deprecated: use [Style.Reverse](false) instead.
+// 已弃用：请使用 [Style.Reverse](false) 代替。
 func (s Style) NoReverse() Style {
 	return append(s, attrNoReverse)
 }
 
-// NoConceal appends the no conceal style attribute to the style.
+// NoConceal 向样式添加非隐藏样式属性。
 //
-// Deprecated: use [Style.Conceal](false) instead.
+// 已弃用：请使用 [Style.Conceal](false) 代替。
 func (s Style) NoConceal() Style {
 	return append(s, attrNoConceal)
 }
 
-// NoStrikethrough appends the no strikethrough style attribute to the style.
+// NoStrikethrough 向样式添加非删除线样式属性。
 //
-// Deprecated: use [Style.Strikethrough](false) instead.
+// 已弃用：请使用 [Style.Strikethrough](false) 代替。
 func (s Style) NoStrikethrough() Style {
 	return append(s, attrNoStrikethrough)
 }
 
-// DefaultForegroundColor appends the default foreground color style attribute to the style.
+// DefaultForegroundColor 向样式添加默认前景色样式属性。
 //
-// Deprecated: use [Style.ForegroundColor](nil) instead.
+// 已弃用：请使用 [Style.ForegroundColor](nil) 代替。
 func (s Style) DefaultForegroundColor() Style {
 	return append(s, attrDefaultForegroundColor)
 }
 
-// DefaultBackgroundColor appends the default background color style attribute to the style.
+// DefaultBackgroundColor 向样式添加默认背景色样式属性。
 //
-// Deprecated: use [Style.BackgroundColor](nil) instead.
+// 已弃用：请使用 [Style.BackgroundColor](nil) 代替。
 func (s Style) DefaultBackgroundColor() Style {
 	return append(s, attrDefaultBackgroundColor)
 }
 
-// DefaultUnderlineColor appends the default underline color style attribute to the style.
+// DefaultUnderlineColor 向样式添加默认下划线颜色样式属性。
 //
-// Deprecated: use [Style.UnderlineColor](nil) instead.
+// 已弃用：请使用 [Style.UnderlineColor](nil) 代替。
 func (s Style) DefaultUnderlineColor() Style {
 	return append(s, attrDefaultUnderlineColor)
 }
 
-// ForegroundColor appends the foreground color style attribute to the style.
-// If c is nil, the default foreground color is used. Supports [BasicColor],
-// [IndexedColor] (256-color), and [color.Color] (24-bit RGB).
+// ForegroundColor 向样式添加前景色样式属性。
+// 如果 c 为 nil，则使用默认前景色。支持 [BasicColor]、[IndexedColor]（256 色）和 [color.Color]（24 位 RGB）。
 func (s Style) ForegroundColor(c Color) Style {
 	if c == nil {
 		return append(s, attrDefaultForegroundColor)
@@ -245,9 +231,8 @@ func (s Style) ForegroundColor(c Color) Style {
 	return append(s, foregroundColorString(c))
 }
 
-// BackgroundColor appends the background color style attribute to the style.
-// If c is nil, the default background color is used. Supports [BasicColor],
-// [IndexedColor] (256-color), and [color.Color] (24-bit RGB).
+// BackgroundColor 向样式添加背景色样式属性。
+// 如果 c 为 nil，则使用默认背景色。支持 [BasicColor]、[IndexedColor]（256 色）和 [color.Color]（24 位 RGB）。
 func (s Style) BackgroundColor(c Color) Style {
 	if c == nil {
 		return append(s, attrDefaultBackgroundColor)
@@ -255,9 +240,8 @@ func (s Style) BackgroundColor(c Color) Style {
 	return append(s, backgroundColorString(c))
 }
 
-// UnderlineColor appends the underline color style attribute to the style.
-// If c is nil, the default underline color is used. Supports [BasicColor],
-// [IndexedColor] (256-color), and [color.Color] (24-bit RGB).
+// UnderlineColor 向样式添加下划线颜色样式属性。
+// 如果 c 为 nil，则使用默认下划线颜色。支持 [BasicColor]、[IndexedColor]（256 色）和 [color.Color]（24 位 RGB）。
 func (s Style) UnderlineColor(c Color) Style {
 	if c == nil {
 		return append(s, attrDefaultUnderlineColor)
@@ -265,13 +249,12 @@ func (s Style) UnderlineColor(c Color) Style {
 	return append(s, underlineColorString(c))
 }
 
-// Underline represents an ANSI SGR (Select Graphic Rendition) underline style.
+// Underline 表示一个 ANSI SGR（选择图形渲染）下划线样式。
 type Underline = byte
 
-// UnderlineStyle represents an ANSI SGR (Select Graphic Rendition) underline
-// style.
+// UnderlineStyle 表示一个 ANSI SGR（选择图形渲染）下划线样式。
 //
-// Deprecated: use [Underline] instead.
+// 已弃用：请使用 [Underline] 代替。
 type UnderlineStyle = byte
 
 const (
@@ -281,7 +264,7 @@ const (
 	underlineDashed = "4:5"
 )
 
-// Underline styles constants.
+// 下划线样式常量。
 const (
 	UnderlineNone Underline = iota
 	UnderlineSingle
@@ -291,9 +274,9 @@ const (
 	UnderlineDashed
 )
 
-// Underline styles constants.
+// 下划线样式常量。
 //
-// Deprecated: use [UnderlineNone], [UnderlineSingle], etc. instead.
+// 已弃用：请使用 [UnderlineNone]、[UnderlineSingle] 等代替。
 const (
 	NoUnderlineStyle Underline = iota
 	SingleUnderlineStyle
@@ -303,9 +286,9 @@ const (
 	DashedUnderlineStyle
 )
 
-// Underline styles constants.
+// 下划线样式常量。
 //
-// Deprecated: use [UnderlineNone], [UnderlineSingle], etc. instead.
+// 已弃用：请使用 [UnderlineNone]、[UnderlineSingle] 等代替。
 const (
 	UnderlineStyleNone Underline = iota
 	UnderlineStyleSingle
@@ -315,8 +298,8 @@ const (
 	UnderlineStyleDashed
 )
 
-// SGR (Select Graphic Rendition) style attributes.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// SGR（选择图形渲染）样式属性。
+// 参见：https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 const (
 	AttrReset                        Attr = 0
 	AttrBold                         Attr = 1
@@ -378,9 +361,9 @@ const (
 	AttrExtendedColorIntroducer Attr = 5
 )
 
-// SGR (Select Graphic Rendition) style attributes.
+// SGR（选择图形渲染）样式属性。
 //
-// Deprecated: use Attr* constants instead.
+// 已弃用：请使用 Attr* 常量代替。
 const (
 	ResetAttr                        = AttrReset
 	BoldAttr                         = AttrBold
@@ -499,9 +482,8 @@ const (
 	attrBrightWhiteBackgroundColor   = "107"
 )
 
-// foregroundColorString returns the style SGR attribute for the given
-// foreground color.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// foregroundColorString 返回给定前景色的样式 SGR 属性。
+// 参见：https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 func foregroundColorString(c Color) string {
 	switch c := c.(type) {
 	case nil:
@@ -559,9 +541,8 @@ func foregroundColorString(c Color) string {
 	return attrDefaultForegroundColor
 }
 
-// backgroundColorString returns the style SGR attribute for the given
-// background color.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// backgroundColorString 返回给定背景色的样式 SGR 属性。
+// 参见：https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 func backgroundColorString(c Color) string {
 	switch c := c.(type) {
 	case nil:
@@ -619,9 +600,8 @@ func backgroundColorString(c Color) string {
 	return attrDefaultBackgroundColor
 }
 
-// underlineColorString returns the style SGR attribute for the given underline
-// color.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
+// underlineColorString 返回给定下划线颜色的样式 SGR 属性。
+// 参见：https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 func underlineColorString(c Color) string {
 	switch c := c.(type) {
 	case nil:
@@ -647,31 +627,26 @@ func underlineColorString(c Color) string {
 	return attrDefaultUnderlineColor
 }
 
-// ReadStyleColor decodes a color from a slice of parameters. It returns the
-// number of parameters read and the color. This function is used to read SGR
-// color parameters following the ITU T.416 standard.
+// ReadStyleColor 从参数切片中解码颜色。它返回读取的参数数量和颜色。此函数用于按照 ITU T.416 标准读取 SGR 颜色参数。
 //
-// It supports reading the following color types:
-//   - 0: implementation defined
-//   - 1: transparent
-//   - 2: RGB direct color
-//   - 3: CMY direct color
-//   - 4: CMYK direct color
-//   - 5: indexed color
-//   - 6: RGBA direct color (WezTerm extension)
+// 它支持读取以下颜色类型：
+//   - 0: 实现定义
+//   - 1: 透明
+//   - 2: RGB 直接颜色
+//   - 3: CMY 直接颜色
+//   - 4: CMYK 直接颜色
+//   - 5: 索引颜色
+//   - 6: RGBA 直接颜色（WezTerm 扩展）
 //
-// The parameters can be separated by semicolons (;) or colons (:). Mixing
-// separators is not allowed.
+// 参数可以用分号 (;) 或冒号 (:) 分隔。不允许混合使用分隔符。
 //
-// The specs supports defining a color space id, a color tolerance value, and a
-// tolerance color space id. However, these values have no effect on the
-// returned color and will be ignored.
+// 规范支持定义颜色空间 ID、颜色容差 value 和容差颜色空间 ID。然而，这些值对返回的颜色没有影响，将被忽略。
 //
-// This implementation includes a few modifications to the specs:
-//  1. Support for legacy color values separated by semicolons (;) with respect to RGB, and indexed colors
-//  2. Support ignoring and omitting the color space id (second parameter) with respect to RGB colors
-//  3. Support ignoring and omitting the 6th parameter with respect to RGB and CMY colors
-//  4. Support reading RGBA colors
+// 此实现对规范做了一些修改：
+//  1. 支持使用分号 (;) 分隔的传统颜色值（针对 RGB 和索引颜色）
+//  2. 支持忽略和省略颜色空间 ID（第二个参数）（针对 RGB 颜色）
+//  3. 支持忽略和省略第 6 个参数（针对 RGB 和 CMY 颜色）
+//  4. 支持读取 RGBA 颜色
 func ReadStyleColor(params Params, co *color.Color) int {
 	if len(params) < 2 { // Need at least SGR type and color type
 		return 0

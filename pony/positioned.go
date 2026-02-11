@@ -2,22 +2,22 @@ package pony
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// Positioned represents an absolutely positioned element.
-// The element is positioned at specific coordinates relative to its parent.
+// Positioned 表示一个绝对定位的元素。
+// 该元素相对于其父元素定位在特定坐标处。
 type Positioned struct {
 	BaseElement
 	child  Element
-	x      int // X position (cells from left)
-	y      int // Y position (cells from top)
-	right  int // Distance from right edge (if >= 0, overrides X)
-	bottom int // Distance from bottom edge (if >= 0, overrides Y)
+	x      int // X 位置（从左侧开始的单元格数）
+	y      int // Y 位置（从顶部开始的单元格数）
+	right  int // 距右边缘的距离（如果 >= 0，则覆盖 X）
+	bottom int // 距下边缘的距离（如果 >= 0，则覆盖 Y）
 	width  SizeConstraint
 	height SizeConstraint
 }
 
 var _ Element = (*Positioned)(nil)
 
-// NewPositioned creates a new absolutely positioned element.
+// NewPositioned 创建一个新的绝对定位元素。
 func NewPositioned(child Element, x, y int) *Positioned {
 	return &Positioned{
 		child:  child,
@@ -28,33 +28,33 @@ func NewPositioned(child Element, x, y int) *Positioned {
 	}
 }
 
-// Right sets the right edge distance and returns the positioned element for chaining.
-// When set (>= 0), this overrides the X position.
+// Right 设置右边缘距离并返回定位元素以支持链式调用。
+// 当设置为 >= 0 时，这会覆盖 X 位置。
 func (p *Positioned) Right(right int) *Positioned {
 	p.right = right
 	return p
 }
 
-// Bottom sets the bottom edge distance and returns the positioned element for chaining.
-// When set (>= 0), this overrides the Y position.
+// Bottom 设置下边缘距离并返回定位元素以支持链式调用。
+// 当设置为 >= 0 时，这会覆盖 Y 位置。
 func (p *Positioned) Bottom(bottom int) *Positioned {
 	p.bottom = bottom
 	return p
 }
 
-// Width sets the width constraint and returns the positioned element for chaining.
+// Width 设置宽度约束并返回定位元素以支持链式调用。
 func (p *Positioned) Width(width SizeConstraint) *Positioned {
 	p.width = width
 	return p
 }
 
-// Height sets the height constraint and returns the positioned element for chaining.
+// Height 设置高度约束并返回定位元素以支持链式调用。
 func (p *Positioned) Height(height SizeConstraint) *Positioned {
 	p.height = height
 	return p
 }
 
-// Draw renders the positioned element.
+// Draw 渲染定位元素。
 func (p *Positioned) Draw(scr uv.Screen, area uv.Rectangle) {
 	p.SetBounds(area)
 
@@ -62,7 +62,7 @@ func (p *Positioned) Draw(scr uv.Screen, area uv.Rectangle) {
 		return
 	}
 
-	// Calculate child size
+	// 计算子元素大小
 	constraints := Constraints{
 		MinWidth:  0,
 		MaxWidth:  area.Dx(),
@@ -70,7 +70,7 @@ func (p *Positioned) Draw(scr uv.Screen, area uv.Rectangle) {
 		MaxHeight: area.Dy(),
 	}
 
-	// Apply width/height constraints if specified
+	// 如果指定了宽度/高度约束，则应用它们
 	if !p.width.IsAuto() {
 		width := p.width.Apply(area.Dx(), area.Dx())
 		constraints.MinWidth = width
@@ -85,49 +85,49 @@ func (p *Positioned) Draw(scr uv.Screen, area uv.Rectangle) {
 
 	childSize := p.child.Layout(constraints)
 
-	// Calculate position based on positioning constraints
+	// 根据定位约束计算位置
 	var childArea uv.Rectangle
 
-	// Handle right/bottom positioning using UV layout helpers
+	// 使用 UV 布局辅助函数处理右/下定位
 	if p.right >= 0 && p.bottom >= 0 {
-		// Both right and bottom are set - position from bottom-right corner
+		// 同时设置了右和下 - 从右下角定位
 		childArea = uv.BottomRightRect(area, childSize.Width+p.right, childSize.Height+p.bottom)
-		// Adjust for the offset
+		// 调整偏移量
 		childArea.Min.X = childArea.Max.X - childSize.Width - p.right
 		childArea.Max.X = childArea.Max.X - p.right
 		childArea.Min.Y = childArea.Max.Y - childSize.Height - p.bottom
 		childArea.Max.Y = childArea.Max.Y - p.bottom
 	} else if p.right >= 0 {
-		// Right is set - position from right edge
+		// 设置了右 - 从右边缘定位
 		x := area.Max.X - p.right - childSize.Width
 		y := area.Min.Y + p.y
 		childArea = uv.Rect(x, y, childSize.Width, childSize.Height)
 	} else if p.bottom >= 0 {
-		// Bottom is set - position from bottom edge
+		// 设置了下 - 从下边缘定位
 		x := area.Min.X + p.x
 		y := area.Max.Y - p.bottom - childSize.Height
 		childArea = uv.Rect(x, y, childSize.Width, childSize.Height)
 	} else {
-		// Standard X/Y positioning from top-left
+		// 标准 X/Y 定位（从左上角开始）
 		x := area.Min.X + p.x
 		y := area.Min.Y + p.y
 		childArea = uv.Rect(x, y, childSize.Width, childSize.Height)
 	}
 
-	// Ensure the area is within parent bounds
+	// 确保区域在父元素边界内
 	childArea = childArea.Intersect(area)
 
 	p.child.Draw(scr, childArea)
 }
 
-// Layout calculates the positioned element size.
-// Positioned elements don't affect parent layout - they return 0 size.
+// Layout 计算定位元素的大小。
+// 定位元素不影响父元素布局 - 它们返回 0 大小。
 func (p *Positioned) Layout(_ Constraints) Size {
-	// Positioned elements are taken out of normal flow
+	// 定位元素被排除在正常流之外
 	return Size{Width: 0, Height: 0}
 }
 
-// Children returns the child element.
+// Children 返回子元素。
 func (p *Positioned) Children() []Element {
 	if p.child == nil {
 		return nil

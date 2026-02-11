@@ -4,12 +4,13 @@ import (
 	"testing"
 )
 
+// cases 是测试用例集合
 var cases = []struct {
-	name     string
-	input    string
-	stripped string
-	width    int
-	wcwidth  int
+	name     string // 测试用例名称
+	input    string // 输入字符串
+	stripped string // 去除 ANSI 序列后的字符串
+	width    int    // 字符串宽度
+	wcwidth  int    // 使用 wcwidth 计算的字符串宽度
 }{
 	{"empty", "", "", 0, 0},
 	{"ascii", "hello", "hello", 5, 5},
@@ -36,36 +37,40 @@ var cases = []struct {
 	{"flag", "🇸🇦", "🇸🇦", 2, 1},
 }
 
+// TestStrip 测试 Strip 函数的功能，该函数去除字符串中的 ANSI 序列
 func TestStrip(t *testing.T) {
 	for i, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if res := Strip(c.input); res != c.stripped {
-				t.Errorf("test case %d (%s) failed:\nexpected %q, got %q", i, c.name, c.stripped, res)
+				t.Errorf("测试用例 %d (%s) 失败:\n预期 %q, 实际 %q", i, c.name, c.stripped, res)
 			}
 		})
 	}
 }
 
+// TestStringWidth 测试 StringWidth 函数的功能，该函数计算字符串的显示宽度
 func TestStringWidth(t *testing.T) {
 	for i, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if width := StringWidth(c.input); width != c.width {
-				t.Errorf("test case %d failed: expected %d, got %d", i+1, c.width, width)
+				t.Errorf("测试用例 %d 失败: 预期 %d, 实际 %d", i+1, c.width, width)
 			}
 		})
 	}
 }
 
+// TestWcStringWidth 测试 StringWidthWc 函数的功能，该函数使用 wcwidth 计算字符串的显示宽度
 func TestWcStringWidth(t *testing.T) {
 	for i, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if width := StringWidthWc(c.input); width != c.wcwidth {
-				t.Errorf("test case %d failed: expected %d, got %d, value %q", i+1, c.wcwidth, width, c.input)
+				t.Errorf("测试用例 %d 失败: 预期 %d, 实际 %d, 输入值 %q", i+1, c.wcwidth, width, c.input)
 			}
 		})
 	}
 }
 
+// BenchmarkStringWidth 基准测试 StringWidth 函数的性能
 func BenchmarkStringWidth(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		b.ReportAllocs()

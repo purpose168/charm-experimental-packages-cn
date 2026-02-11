@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/ansi
+module github.com/purpose168/charm-experimental-packages-cn/ansi
 
 go 1.24.2
 

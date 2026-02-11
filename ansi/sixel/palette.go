@@ -7,40 +7,37 @@ import (
 	"math"
 )
 
-// sixelPalette is a palette of up to 256 colors that lists the colors that will be used by
-// a SixelImage. Most images, especially jpegs, have more than 256 colors, so creating a sixelPalette
-// requires the use of color quantization. For this we use the Median Cut algorithm.
+// sixelPalette 是一个最多包含 256 种颜色的调色板，列出了 SixelImage 将使用的颜色。
+// 大多数图像，特别是 jpeg，有超过 256 种颜色，因此创建 sixelPalette 需要使用颜色量化。
+// 为此，我们使用中位切割算法。
 //
-// Median cut requires all pixels in an image to be positioned in a 4D color cube, with one axis per channel.
-// The cube is sliced in half along its longest axis such that half the pixels in the cube end up in one of
-// the sub-cubes and half end up in the other. We continue slicing the cube with the longest axis in half
-// along that axis until there are 256 sub-cubes.  Then, the average of all pixels in each subcube is used
-// as that cube's color.
+// 中位切割要求将图像中的所有像素定位在 4D 颜色立方体中，每个通道一个轴。
+// 立方体沿其最长轴切成两半，使得立方体中的一半像素最终在一个子立方体中，
+// 另一半在另一个子立方体中。我们继续沿最长轴将立方体切成两半，
+// 直到有 256 个子立方体。然后，每个子立方体中所有像素的平均值用作该立方体的颜色。
 //
-// Colors are converted to palette colors based on which they are closest to (it's not
-// always their cube's color).
+// 颜色根据它们最接近的颜色转换为调色板颜色（不一定是它们立方体的颜色）。
 //
-// This implementation has a few minor (but seemingly very common) differences from the Official algorithm:
-//   - When determining the longest axis, the number of pixels in the cube are multiplied against axis length
-//     This improves color selection by quite a bit in cases where an image has a lot of space taken up by different
-//     shades of the same color.
-//   - If a single color sits on a cut line, all pixels of that color are assigned to one of the subcubes
-//     rather than try to split them up between the subcubes.  This allows us to use a slice of unique colors
-//     and a map of pixel counts rather than try to represent each pixel individually.
+// 此实现与官方算法有一些小的（但似乎非常常见的）差异：
+//   - 在确定最长轴时，立方体中的像素数乘以轴长度
+//     这在图像中有大量空间被相同颜色的不同色调占据的情况下，显著改善了颜色选择。
+//   - 如果单个颜色位于切割线上，则该颜色的所有像素都分配给一个子立方体
+//     而不是尝试在子立方体之间拆分它们。这允许我们使用唯一颜色的切片和像素计数映射，
+//     而不是尝试单独表示每个像素。
 type sixelPalette struct {
-	// Map used to convert colors from the image to palette colors
+	// 用于将颜色从图像转换为调色板颜色的映射
 	colorConvert map[sixelColor]sixelColor
-	// Lookup to get palette index from image color
+	// 从图像颜色获取调色板索引的查找
 	paletteIndexes map[sixelColor]int
 	PaletteColors  []sixelColor
 }
 
-// quantizationChannel is an enum type which indicates an axis in the color cube. Used to indicate which
-// axis in a cube is the longest.
+// quantizationChannel 是枚举类型，指示颜色立方体中的轴。用于指示
+// 立方体中的哪个轴最长。
 type quantizationChannel int
 
 const (
-	// MaxColors is the maximum number of colors a sixelPalette can contain.
+	// MaxColors 是 sixelPalette 可以包含的最大颜色数。
 	MaxColors int = 256
 
 	quantizationRed quantizationChannel = iota
@@ -49,22 +46,22 @@ const (
 	quantizationAlpha
 )
 
-// quantizationCube represents a single cube in the median cut algorithm.
+// quantizationCube 表示中位切割算法中的单个立方体。
 type quantizationCube struct {
-	// startIndex is the index in the uniqueColors slice where this cube starts
+	// startIndex 是此立方体在 uniqueColors 切片中开始的索引
 	startIndex int
-	// length is the number of elements in the uniqueColors slice this cube occupies
+	// length 是此立方体在 uniqueColors 切片中占用的元素数
 	length int
-	// sliceChannel is the axis that will be cut if this cube is cut in half
+	// sliceChannel 是如果此立方体被切成两半将被切割的轴
 	sliceChannel quantizationChannel
-	// score is a heuristic value: higher means this cube is more likely to be cut
+	// score 是启发式值：越高表示此立方体更有可能被切割
 	score uint64
-	// pixelCount is how many pixels are contained in this cube
+	// pixelCount 是此立方体中包含的像素数
 	pixelCount uint64
 }
 
-// cubePriorityQueue is a heap used to sort quantizationCube objects in order to select the correct
-// one to cut next. Pop will remove the queue with the highest score.
+// cubePriorityQueue 是一个堆，用于对 quantizationCube 对象进行排序，以选择正确的
+// 一个进行下一次切割。Pop 将移除具有最高分数的队列。
 type cubePriorityQueue []any
 
 func (p *cubePriorityQueue) Push(x any) {
@@ -85,7 +82,7 @@ func (p *cubePriorityQueue) Less(i, j int) bool {
 	left := (*p)[i].(quantizationCube)
 	right := (*p)[j].(quantizationCube)
 
-	// We want the largest channel variance
+	// 我们想要最大的通道方差
 	return left.score > right.score
 }
 
@@ -93,13 +90,13 @@ func (p *cubePriorityQueue) Swap(i, j int) {
 	(*p)[i], (*p)[j] = (*p)[j], (*p)[i]
 }
 
-// createCube is used to initialize a new quantizationCube containing a region of the uniqueColors slice.
+// createCube 用于初始化包含 uniqueColors 切片区域的新 quantizationCube。
 func (p *sixelPalette) createCube(uniqueColors []sixelColor, pixelCounts map[sixelColor]uint64, startIndex, bucketLength int) quantizationCube {
 	minRed, minGreen, minBlue, minAlpha := uint32(0xffff), uint32(0xffff), uint32(0xffff), uint32(0xffff)
 	maxRed, maxGreen, maxBlue, maxAlpha := uint32(0), uint32(0), uint32(0), uint32(0)
 	totalWeight := uint64(0)
 
-	// Figure out which channel has the greatest variance
+	// 找出哪个通道具有最大的方差
 	for i := startIndex; i < startIndex+bucketLength; i++ {
 		r, g, b, a := uniqueColors[i].Red, uniqueColors[i].Green, uniqueColors[i].Blue, uniqueColors[i].Alpha
 		totalWeight += pixelCounts[uniqueColors[i]]
@@ -155,20 +152,19 @@ func (p *sixelPalette) createCube(uniqueColors []sixelColor, pixelCounts map[six
 		cube.score = uint64(dAlpha)
 	}
 
-	// Boost the score of cubes with more pixels in them
+	// 提高包含更多像素的立方体的分数
 	cube.score *= totalWeight
 
 	return cube
 }
 
-// quantize is a method that will initialize the palette's colors and lookups, provided a set
-// of unique colors and a map containing pixel counts for those colors.
+// quantize 是一个方法，将初始化调色板的颜色和查找，提供一组
+// 唯一颜色和包含这些颜色的像素计数的映射。
 func (p *sixelPalette) quantize(uniqueColors []sixelColor, pixelCounts map[sixelColor]uint64, maxColors int) {
 	p.colorConvert = make(map[sixelColor]sixelColor)
 	p.paletteIndexes = make(map[sixelColor]int)
 
-	// We don't need to quantize if we don't even have more than the maximum colors, and in fact, this code will explode
-	// if we have fewer than maximum colors
+	// 如果我们甚至没有超过最大颜色数，则不需要量化，实际上，如果我们有少于最大颜色数，此代码会爆炸
 	if len(uniqueColors) <= maxColors {
 		p.PaletteColors = uniqueColors
 		return
@@ -176,17 +172,17 @@ func (p *sixelPalette) quantize(uniqueColors []sixelColor, pixelCounts map[sixel
 
 	cubeHeap := make(cubePriorityQueue, 0, maxColors)
 
-	// Start with a cube that contains all colors
+	// 从包含所有颜色的立方体开始
 	heap.Init(&cubeHeap)
 	heap.Push(&cubeHeap, p.createCube(uniqueColors, pixelCounts, 0, len(uniqueColors)))
 
-	// Slice the best cube into two cubes until we have max colors, then we have our palette
+	// 将最好的立方体切成两个立方体，直到我们有最大颜色数，然后我们有了调色板
 	for cubeHeap.Len() < maxColors {
 		cubeToSplit := heap.Pop(&cubeHeap).(quantizationCube)
 
 		//nolint:godox
-		// TODO: Use slices.SortFunc and cmp.Compare in the future (>=1.24)
-		// Then can delete palette_sort.go
+		// TODO: 将来使用 slices.SortFunc 和 cmp.Compare (>=1.24)
+		// 然后可以删除 palette_sort.go
 		sortFunc(uniqueColors[cubeToSplit.startIndex:cubeToSplit.startIndex+cubeToSplit.length],
 			func(left sixelColor, right sixelColor) int {
 				switch cubeToSplit.sliceChannel { //nolint:exhaustive // alpha channel not used
@@ -201,9 +197,9 @@ func (p *sixelPalette) quantize(uniqueColors []sixelColor, pixelCounts map[sixel
 				}
 			})
 
-		// We need to split up the colors in this cube so that the pixels are evenly split between the two,
-		// or at least as close as we can reasonably get. What we do is count up the pixels as we go through
-		// and place the cut point where around half of the pixels are on the left side
+		// 我们需要拆分此立方体中的颜色，使得像素在两个立方体之间均匀分配，
+		// 或者至少尽可能接近。我们所做的是在遍历时计算像素，
+		// 并在大约一半的像素在左侧时放置切割点
 		countSoFar := pixelCounts[uniqueColors[cubeToSplit.startIndex]]
 		targetCount := cubeToSplit.pixelCount / 2
 		leftLength := 1
@@ -224,20 +220,20 @@ func (p *sixelPalette) quantize(uniqueColors []sixelColor, pixelCounts map[sixel
 		heap.Push(&cubeHeap, p.createCube(uniqueColors, pixelCounts, rightIndex, rightLength))
 	}
 
-	// Once we've got max cubes in the heap, pull them all out and load them into the palette
+	// 一旦我们在堆中有最大立方体，就将它们全部取出并加载到调色板中
 	for cubeHeap.Len() > 0 {
 		bucketToLoad := heap.Pop(&cubeHeap).(quantizationCube)
 		p.loadColor(uniqueColors, pixelCounts, bucketToLoad.startIndex, bucketToLoad.length)
 	}
 }
 
-// ColorIndex accepts a raw image color (NOT a palette color) and provides the palette index of that color.
+// ColorIndex 接受原始图像颜色（不是调色板颜色）并提供该颜色的调色板索引。
 func (p *sixelPalette) ColorIndex(c sixelColor) int {
 	return p.paletteIndexes[c]
 }
 
-// loadColor accepts a range of colors representing a single median cut cube. It calculates the
-// average color in the cube and adds it to the palette.
+// loadColor 接受表示单个中位切割立方体的颜色范围。它计算
+// 立方体中的平均颜色并将其添加到调色板中。
 func (p *sixelPalette) loadColor(uniqueColors []sixelColor, pixelCounts map[sixelColor]uint64, startIndex, cubeLen int) {
 	totalRed, totalGreen, totalBlue, totalAlpha := uint64(0), uint64(0), uint64(0), uint64(0)
 	totalCount := uint64(0)
@@ -260,8 +256,8 @@ func (p *sixelPalette) loadColor(uniqueColors []sixelColor, pixelCounts map[sixe
 	p.PaletteColors = append(p.PaletteColors, averageColor)
 }
 
-// sixelColor is a flat struct that contains a single color: all channels are 0-100
-// instead of anything sensible.
+// sixelColor 是一个扁平结构，包含单个颜色：所有通道都是 0-100
+// 而不是任何合理的值。
 type sixelColor struct {
 	Red   uint32
 	Green uint32
@@ -269,8 +265,8 @@ type sixelColor struct {
 	Alpha uint32
 }
 
-// sixelConvertColor accepts an ordinary Go color and converts it to a sixelColor, which
-// has channels ranging from 0-100.
+// sixelConvertColor 接受普通的 Go 颜色并将其转换为 sixelColor，其
+// 通道范围从 0-100。
 func sixelConvertColor(c color.Color) sixelColor {
 	r, g, b, a := c.RGBA()
 	return sixelColor{
@@ -281,24 +277,23 @@ func sixelConvertColor(c color.Color) sixelColor {
 	}
 }
 
-// sixelConvertChannel converts a single color channel from go's standard 0-0xffff range to
-// sixel's 0-100 range.
+// sixelConvertChannel 将单个颜色通道从 go 的标准 0-0xffff 范围转换为
+// sixel 的 0-100 范围。
 func sixelConvertChannel(channel uint32) uint32 {
-	// We add 328 because that is about 0.5 in the sixel 0-100 color range, we're trying to
-	// round to the nearest value
+	// 我们加 328 是因为那大约是 sixel 0-100 颜色范围内的 0.5，我们试图
+	// 四舍五入到最近的值
 	return (channel + 328) * 100 / 0xffff
 }
 
-// newSixelPalette accepts an image and produces an N-color quantized color palette using the median cut
-// algorithm. The produced sixelPalette can convert colors from the image to the quantized palette
-// in O(1) time.
+// newSixelPalette 接受一个图像并使用中位切割算法生成 N 颜色量化调色板。
+// 生成的 sixelPalette 可以在 O(1) 时间内将颜色从图像转换为量化调色板。
 func newSixelPalette(image image.Image, maxColors int) sixelPalette {
 	pixelCounts := make(map[sixelColor]uint64)
 
 	height := image.Bounds().Dy()
 	width := image.Bounds().Dx()
 
-	// Record pixel counts for every color while also getting a set of all unique colors in the image
+	// 记录每种颜色的像素计数，同时获取图像中所有唯一颜色的集合
 	for y := range height {
 		for x := range width {
 			c := sixelConvertColor(image.At(x, y))
@@ -315,12 +310,12 @@ func newSixelPalette(image image.Image, maxColors int) sixelPalette {
 		uniqueColors = append(uniqueColors, c)
 	}
 
-	// Build up p.PaletteColors using the median cut algorithm
+	// 使用中位切割算法构建 p.PaletteColors
 	p.quantize(uniqueColors, pixelCounts, maxColors)
 
-	// The average color for a cube a color occupies is not always the closest palette color.  As a result,
-	// we need to use this very upsetting double loop to find the lookup palette color for each
-	// unique color in the image.
+	// 立方体中颜色的平均值并不总是最近的调色板颜色。因此，
+	// 我们需要使用这个非常令人不安的双重循环来查找图像中每个
+	// 唯一颜色的查找调色板颜色。
 	for _, c := range uniqueColors {
 		var bestColor sixelColor
 		var bestColorIndex int

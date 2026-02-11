@@ -1,4 +1,4 @@
-// Package teatest provides helper functions to test tea.Model's.
+// Package teatest 提供测试 tea.Model 的辅助函数。
 package teatest
 
 import (
@@ -12,24 +12,24 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/x/exp/golden"
+	tea "github.com/purpose168/bubbletea-cn"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
-// Program defines the subset of the tea.Program API we need for testing.
+// Program 定义了测试所需的 tea.Program API 子集。
 type Program interface {
 	Send(tea.Msg)
 }
 
-// TestModelOptions defines all options available to the test function.
+// TestModelOptions 定义了测试函数可用的所有选项。
 type TestModelOptions struct {
 	size tea.WindowSizeMsg
 }
 
-// TestOption is a functional option.
+// TestOption 是一个函数式选项。
 type TestOption func(opts *TestModelOptions)
 
-// WithInitialTermSize ...
+// WithInitialTermSize 设置初始终端大小。
 func WithInitialTermSize(x, y int) TestOption {
 	return func(opts *TestModelOptions) {
 		opts.size = tea.WindowSizeMsg{
@@ -39,33 +39,32 @@ func WithInitialTermSize(x, y int) TestOption {
 	}
 }
 
-// WaitingForContext is the context for a WaitFor.
+// WaitingForContext 是 WaitFor 的上下文。
 type WaitingForContext struct {
 	Duration      time.Duration
 	CheckInterval time.Duration
 }
 
-// WaitForOption changes how a WaitFor will behave.
+// WaitForOption 更改 WaitFor 的行为。
 type WaitForOption func(*WaitingForContext)
 
-// WithCheckInterval sets how much time a WaitFor should sleep between every
-// check.
+// WithCheckInterval 设置 WaitFor 在每次检查之间应睡眠的时间。
 func WithCheckInterval(d time.Duration) WaitForOption {
 	return func(wf *WaitingForContext) {
 		wf.CheckInterval = d
 	}
 }
 
-// WithDuration sets how much time a WaitFor will wait for the condition.
+// WithDuration 设置 WaitFor 等待条件的时间。
 func WithDuration(d time.Duration) WaitForOption {
 	return func(wf *WaitingForContext) {
 		wf.Duration = d
 	}
 }
 
-// WaitFor keeps reading from r until the condition matches.
-// Default duration is 1s, default check interval is 50ms.
-// These defaults can be changed with WithDuration and WithCheckInterval.
+// WaitFor 持续从 r 读取直到条件匹配。
+// 默认持续时间为 1 秒，默认检查间隔为 50 毫秒。
+// 这些默认值可以通过 WithDuration 和 WithCheckInterval 更改。
 func WaitFor(
 	tb testing.TB,
 	r io.Reader,
@@ -99,10 +98,10 @@ func doWaitFor(r io.Reader, condition func(bts []byte) bool, options ...WaitForO
 		}
 		time.Sleep(wf.CheckInterval)
 	}
-	return fmt.Errorf("WaitFor: condition not met after %s. Last output:\n%s", wf.Duration, b.String())
+	return fmt.Errorf("WaitFor: 条件在 %s 后未满足。最后输出:\n%s", wf.Duration, b.String())
 }
 
-// TestModel is a model that is being tested.
+// TestModel 是正在被测试的模型。
 type TestModel struct {
 	program *tea.Program
 
@@ -116,7 +115,7 @@ type TestModel struct {
 	doneCh chan bool
 }
 
-// NewTestModel makes a new TestModel which can be used for tests.
+// NewTestModel 创建一个新的 TestModel，可用于测试。
 func NewTestModel(tb testing.TB, m tea.Model, options ...TestOption) *TestModel {
 	tm := &TestModel{
 		in:      bytes.NewBuffer(nil),
@@ -131,7 +130,7 @@ func NewTestModel(tb testing.TB, m tea.Model, options ...TestOption) *TestModel 
 		tea.WithInput(tm.in),
 		tea.WithOutput(tm.out),
 		tea.WithoutSignals(),
-		tea.WithANSICompressor(), // this helps a bit to reduce drift between runs
+		tea.WithANSICompressor(), // 这有助于减少运行之间的差异
 	)
 
 	interruptions := make(chan os.Signal, 1)
@@ -139,7 +138,7 @@ func NewTestModel(tb testing.TB, m tea.Model, options ...TestOption) *TestModel 
 	go func() {
 		m, err := tm.program.Run()
 		if err != nil {
-			tb.Fatalf("app failed: %s", err)
+			tb.Fatalf("应用失败: %s", err)
 		}
 		tm.modelCh <- m
 		tm.doneCh <- true
@@ -147,7 +146,7 @@ func NewTestModel(tb testing.TB, m tea.Model, options ...TestOption) *TestModel 
 	go func() {
 		<-interruptions
 		signal.Stop(interruptions)
-		tb.Log("interrupted")
+		tb.Log("已中断")
 		tm.program.Kill()
 	}()
 
@@ -172,7 +171,7 @@ func (tm *TestModel) waitDone(tb testing.TB, opts []FinalOpt) {
 			select {
 			case <-time.After(fopts.timeout):
 				if fopts.onTimeout == nil {
-					tb.Fatalf("timeout after %s", fopts.timeout)
+					tb.Fatalf("超时后 %s", fopts.timeout)
 				}
 				fopts.onTimeout(tb)
 			case <-tm.doneCh:
@@ -183,40 +182,37 @@ func (tm *TestModel) waitDone(tb testing.TB, opts []FinalOpt) {
 	})
 }
 
-// FinalOpts represents the options for FinalModel and FinalOutput.
+// FinalOpts 表示 FinalModel 和 FinalOutput 的选项。
 type FinalOpts struct {
 	timeout   time.Duration
 	onTimeout func(tb testing.TB)
 }
 
-// FinalOpt changes FinalOpts.
+// FinalOpt 更改 FinalOpts。
 type FinalOpt func(opts *FinalOpts)
 
-// WithTimeoutFn allows to define what happens when WaitFinished times out.
+// WithTimeoutFn 允许定义 WaitFinished 超时时发生的情况。
 func WithTimeoutFn(fn func(tb testing.TB)) FinalOpt {
 	return func(opts *FinalOpts) {
 		opts.onTimeout = fn
 	}
 }
 
-// WithFinalTimeout allows to set a timeout for how long FinalModel and
-// FinalOuput should wait for the program to complete.
+// WithFinalTimeout 允许设置 FinalModel 和 FinalOutput 等待程序完成的超时时间。
 func WithFinalTimeout(d time.Duration) FinalOpt {
 	return func(opts *FinalOpts) {
 		opts.timeout = d
 	}
 }
 
-// WaitFinished waits for the app to finish.
-// This method only returns once the program has finished running or when it
-// times out.
+// WaitFinished 等待应用程序完成。
+// 此方法仅在程序完成运行或超时时返回。
 func (tm *TestModel) WaitFinished(tb testing.TB, opts ...FinalOpt) {
 	tm.waitDone(tb, opts)
 }
 
-// FinalModel returns the resulting model, resulting from program.Run().
-// This method only returns once the program has finished running or when it
-// times out.
+// FinalModel 返回 program.Run() 产生的结果模型。
+// 此方法仅在程序完成运行或超时时返回。
 func (tm *TestModel) FinalModel(tb testing.TB, opts ...FinalOpt) tea.Model {
 	tm.waitDone(tb, opts)
 	select {
@@ -230,31 +226,30 @@ func (tm *TestModel) FinalModel(tb testing.TB, opts ...FinalOpt) tea.Model {
 	}
 }
 
-// FinalOutput returns the program's final output io.Reader.
-// This method only returns once the program has finished running or when it
-// times out.
+// FinalOutput 返回程序的最终输出 io.Reader。
+// 此方法仅在程序完成运行或超时时返回。
 func (tm *TestModel) FinalOutput(tb testing.TB, opts ...FinalOpt) io.Reader {
 	tm.waitDone(tb, opts)
 	return tm.Output()
 }
 
-// Output returns the program's current output io.Reader.
+// Output 返回程序的当前输出 io.Reader。
 func (tm *TestModel) Output() io.Reader {
 	return tm.out
 }
 
-// Send sends messages to the underlying program.
+// Send 向底层程序发送消息。
 func (tm *TestModel) Send(m tea.Msg) {
 	tm.program.Send(m)
 }
 
-// Quit quits the program and releases the terminal.
+// Quit 退出程序并释放终端。
 func (tm *TestModel) Quit() error {
 	tm.program.Quit()
 	return nil
 }
 
-// Type types the given text into the given program.
+// Type 将给定文本输入到给定程序中。
 func (tm *TestModel) Type(s string) {
 	for _, c := range []byte(s) {
 		tm.Send(tea.KeyMsg{
@@ -264,17 +259,17 @@ func (tm *TestModel) Type(s string) {
 	}
 }
 
-// GetProgram gets the TestModel's program.
+// GetProgram 获取 TestModel 的程序。
 func (tm *TestModel) GetProgram() *tea.Program {
 	return tm.program
 }
 
-// RequireEqualOutput is a helper function to assert the given output is
-// the expected from the golden files, printing its diff in case it is not.
+// RequireEqualOutput 是一个辅助函数，用于断言给定输出与黄金文件中的预期输出匹配，
+// 如果不匹配则打印其差异。
 //
-// Important: this uses the system `diff` tool.
+// 重要：这使用系统的 `diff` 工具。
 //
-// You can update the golden files by running your tests with the -update flag.
+// 你可以通过使用 -update 标志运行测试来更新黄金文件。
 func RequireEqualOutput(tb testing.TB, out []byte) {
 	tb.Helper()
 	golden.RequireEqual(tb, out)
@@ -284,20 +279,20 @@ func safe(rw io.ReadWriter) io.ReadWriter {
 	return &safeReadWriter{rw: rw}
 }
 
-// safeReadWriter implements io.ReadWriter, but locks reads and writes.
+// safeReadWriter 实现 io.ReadWriter，但会锁定读写操作。
 type safeReadWriter struct {
 	rw io.ReadWriter
 	m  sync.RWMutex
 }
 
-// Read implements io.ReadWriter.
+// Read 实现 io.ReadWriter。
 func (s *safeReadWriter) Read(p []byte) (n int, err error) {
 	s.m.RLock()
 	defer s.m.RUnlock()
 	return s.rw.Read(p) //nolint: wrapcheck
 }
 
-// Write implements io.ReadWriter.
+// Write 实现 io.ReadWriter。
 func (s *safeReadWriter) Write(p []byte) (int, error) {
 	s.m.Lock()
 	defer s.m.Unlock()

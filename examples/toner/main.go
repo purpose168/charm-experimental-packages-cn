@@ -1,4 +1,4 @@
-// Package main demonstrates usage.
+// Package main 演示使用方法。
 package main
 
 import (
@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/charmbracelet/x/exp/toner"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/toner"
 )
 
 func main() {

@@ -4,58 +4,52 @@ import (
 	"unicode/utf8"
 	"unsafe"
 
-	"github.com/charmbracelet/x/ansi/parser"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 )
 
-// Parser represents a DEC ANSI compatible sequence parser.
+// Parser 表示一个兼容 DEC ANSI 的序列解析器。
 //
-// It uses a state machine to parse ANSI escape sequences and control
-// characters. The parser is designed to be used with a terminal emulator or
-// similar application that needs to parse ANSI escape sequences and control
-// characters.
-// See package [parser] for more information.
+// 它使用状态机来解析 ANSI 转义序列和控制字符。该解析器设计用于终端模拟器或
+// 需要解析 ANSI 转义序列和控制字符的类似应用程序。
+// 有关更多信息，请参见 [parser] 包。
 //
 //go:generate go run ./gen.go
 type Parser struct {
 	handler Handler
 
-	// params contains the raw parameters of the sequence.
-	// These parameters used when constructing CSI and DCS sequences.
+	// params 包含序列的原始参数。
+	// 这些参数用于构建 CSI 和 DCS 序列。
 	params []int
 
-	// data contains the raw data of the sequence.
-	// These data used when constructing OSC, DCS, SOS, PM, and APC sequences.
+	// data 包含序列的原始数据。
+	// 这些数据用于构建 OSC、DCS、SOS、PM 和 APC 序列。
 	data []byte
 
-	// dataLen keeps track of the length of the data buffer.
-	// If dataLen is -1, the data buffer is unlimited and will grow as needed.
-	// Otherwise, dataLen is limited by the size of the data buffer.
+	// dataLen 跟踪数据缓冲区的长度。
+	// 如果 dataLen 为 -1，则数据缓冲区是无限的，会根据需要增长。
+	// 否则，dataLen 受数据缓冲区大小的限制。
 	dataLen int
 
-	// paramsLen keeps track of the number of parameters.
-	// This is limited by the size of the params buffer.
+	// paramsLen 跟踪参数的数量。
+	// 这受 params 缓冲区大小的限制。
 	//
-	// This is also used when collecting UTF-8 runes to keep track of the
-	// number of rune bytes collected.
+	// 这也用于在收集 UTF-8 符文时跟踪已收集的符文字节数。
 	paramsLen int
 
-	// cmd contains the raw command along with the private prefix and
-	// intermediate bytes of the sequence.
-	// The first lower byte contains the command byte, the next byte contains
-	// the private prefix, and the next byte contains the intermediate byte.
+	// cmd 包含原始命令以及序列的私有前缀和中间字节。
+	// 第一个低字节包含命令字节，下一个字节包含私有前缀，
+	// 再下一个字节包含中间字节。
 	//
-	// This is also used when collecting UTF-8 runes treating it as a slice of
-	// 4 bytes.
+	// 这也用于在收集 UTF-8 符文时将其视为 4 字节的切片。
 	cmd int
 
-	// state is the current state of the parser.
+	// state 是解析器的当前状态。
 	state byte
 }
 
-// NewParser returns a new parser with the default settings.
-// The [Parser] uses a default size of 32 for the parameters and 64KB for the
-// data buffer. Use [Parser.SetParamsSize] and [Parser.SetDataSize] to set the
-// size of the parameters and data buffer respectively.
+// NewParser 返回一个具有默认设置的新解析器。
+// [Parser] 使用默认大小为 32 的参数缓冲区和 64KB 的数据缓冲区。
+// 使用 [Parser.SetParamsSize] 和 [Parser.SetDataSize] 分别设置参数和数据缓冲区的大小。
 func NewParser() *Parser {
 	p := new(Parser)
 	p.SetParamsSize(parser.MaxParamsSize)
@@ -63,16 +57,15 @@ func NewParser() *Parser {
 	return p
 }
 
-// SetParamsSize sets the size of the parameters buffer.
-// This is used when constructing CSI and DCS sequences.
+// SetParamsSize 设置参数缓冲区的大小。
+// 这用于构建 CSI 和 DCS 序列。
 func (p *Parser) SetParamsSize(size int) {
 	p.params = make([]int, size)
 }
 
-// SetDataSize sets the size of the data buffer.
-// This is used when constructing OSC, DCS, SOS, PM, and APC sequences.
-// If size is less than or equal to 0, the data buffer is unlimited and will
-// grow as needed.
+// SetDataSize 设置数据缓冲区的大小。
+// 这用于构建 OSC、DCS、SOS、PM 和 APC 序列。
+// 如果 size 小于或等于 0，则数据缓冲区是无限的，会根据需要增长。
 func (p *Parser) SetDataSize(size int) {
 	if size <= 0 {
 		size = 0
@@ -81,14 +74,13 @@ func (p *Parser) SetDataSize(size int) {
 	p.data = make([]byte, size)
 }
 
-// Params returns the list of parsed packed parameters.
+// Params 返回解析后的打包参数列表。
 func (p *Parser) Params() Params {
 	return unsafe.Slice((*Param)(unsafe.Pointer(&p.params[0])), p.paramsLen)
 }
 
-// Param returns the parameter at the given index and falls back to the default
-// value if the parameter is missing. If the index is out of bounds, it returns
-// the default value and false.
+// Param 返回给定索引处的参数，如果参数缺失则返回默认值。
+// 如果索引超出范围，则返回默认值和 false。
 func (p *Parser) Param(i, def int) (int, bool) {
 	if i < 0 || i >= p.paramsLen {
 		return def, false
@@ -96,13 +88,13 @@ func (p *Parser) Param(i, def int) (int, bool) {
 	return Param(p.params[i]).Param(def), true
 }
 
-// Command returns the packed command of the last dispatched sequence. Use
-// [Cmd] to unpack the command.
+// Command 返回最后分发的序列的打包命令。
+// 使用 [Cmd] 来解包命令。
 func (p *Parser) Command() int {
 	return p.cmd
 }
 
-// Rune returns the last dispatched sequence as a rune.
+// Rune 返回最后分发的序列作为一个 Unicode 符文。
 func (p *Parser) Rune() rune {
 	rw := utf8ByteLen(byte(p.cmd & 0xff))
 	if rw == -1 {
@@ -112,23 +104,23 @@ func (p *Parser) Rune() rune {
 	return r
 }
 
-// Control returns the last dispatched sequence as a control code.
+// Control 返回最后分发的序列作为控制代码。
 func (p *Parser) Control() byte {
 	return byte(p.cmd & 0xff)
 }
 
-// Data returns the raw data of the last dispatched sequence.
+// Data 返回最后分发的序列的原始数据。
 func (p *Parser) Data() []byte {
 	return p.data[:p.dataLen]
 }
 
-// Reset resets the parser to its initial state.
+// Reset 将解析器重置为初始状态。
 func (p *Parser) Reset() {
 	p.clear()
 	p.state = parser.GroundState
 }
 
-// clear clears the parser parameters and command.
+// clear 清除解析器参数和命令。
 func (p *Parser) clear() {
 	if len(p.params) > 0 {
 		p.params[0] = parser.MissingParam
@@ -137,36 +129,36 @@ func (p *Parser) clear() {
 	p.cmd = 0
 }
 
-// State returns the current state of the parser.
+// State 返回解析器的当前状态。
 func (p *Parser) State() parser.State {
 	return p.state
 }
 
-// StateName returns the name of the current state.
+// StateName 返回当前状态的名称。
 func (p *Parser) StateName() string {
 	return parser.StateNames[p.state]
 }
 
-// Parse parses the given dispatcher and byte buffer.
-// Deprecated: Loop over the buffer and call [Parser.Advance] instead.
+// Parse 解析给定的字节缓冲区。
+// 已弃用：请遍历缓冲区并调用 [Parser.Advance] 代替。
 func (p *Parser) Parse(b []byte) {
 	for i := range b {
 		p.Advance(b[i])
 	}
 }
 
-// Advance advances the parser using the given byte. It	returns the action
-// performed by the parser.
+// Advance 使用给定的字节推进解析器。它返回解析器执行的操作。
 func (p *Parser) Advance(b byte) parser.Action {
 	switch p.state {
 	case parser.Utf8State:
-		// We handle UTF-8 here.
+		// 处理 UTF-8 字符
 		return p.advanceUtf8(b)
 	default:
 		return p.advance(b)
 	}
 }
 
+// collectRune 收集 UTF-8 符文字节
 func (p *Parser) collectRune(b byte) {
 	if p.paramsLen >= utf8.UTFMax {
 		return
@@ -178,21 +170,22 @@ func (p *Parser) collectRune(b byte) {
 	p.paramsLen++
 }
 
+// advanceUtf8 处理 UTF-8 字符的解析
 func (p *Parser) advanceUtf8(b byte) parser.Action {
-	// Collect UTF-8 rune bytes.
+	// 收集 UTF-8 符文字节
 	p.collectRune(b)
 	rw := utf8ByteLen(byte(p.cmd & 0xff))
 	if rw == -1 {
-		// We panic here because the first byte comes from the state machine,
-		// if this panics, it means there is a bug in the state machine!
-		panic("invalid rune") // unreachable
+		// 这里 panic 是因为第一个字节来自状态机，
+		// 如果发生 panic，说明状态机存在 bug！
+		panic("无效的符文") // 不可达
 	}
 
 	if p.paramsLen < rw {
 		return parser.CollectAction
 	}
 
-	// We have enough bytes to decode the rune using unsafe
+	// 有足够的字节，可以使用 unsafe 解码符文
 	if p.handler.Print != nil {
 		p.handler.Print(p.Rune())
 	}
@@ -203,32 +196,31 @@ func (p *Parser) advanceUtf8(b byte) parser.Action {
 	return parser.PrintAction
 }
 
+// advance 处理非 UTF-8 字符的解析
 func (p *Parser) advance(b byte) parser.Action {
 	state, action := parser.Table.Transition(p.state, b)
 
-	// We need to clear the parser state if the state changes from EscapeState.
-	// This is because when we enter the EscapeState, we don't get a chance to
-	// clear the parser state. For example, when a sequence terminates with a
-	// ST (\x1b\\ or \x9c), we dispatch the current sequence and transition to
-	// EscapeState. However, the parser state is not cleared in this case and
-	// we need to clear it here before dispatching the esc sequence.
+	// 如果状态从 EscapeState 改变，需要清除解析器状态。
+	// 这是因为当我们进入 EscapeState 时，我们没有机会清除解析器状态。
+	// 例如，当序列以 ST (\x1b\\ 或 \x9c) 终止时，我们分发当前序列并转换到
+	// EscapeState。然而，在这种情况下解析器状态没有被清除，
+	// 我们需要在这里清除它，然后再分发 esc 序列。
 	if p.state != state {
 		if p.state == parser.EscapeState {
 			p.performAction(parser.ClearAction, state, b)
 		}
 		if action == parser.PutAction &&
 			p.state == parser.DcsEntryState && state == parser.DcsStringState {
-			// XXX: This is a special case where we need to start collecting
-			// non-string parameterized data i.e. doesn't follow the ECMA-48 §
-			// 5.4.1 string parameters format.
+			// XXX: 这是一个特殊情况，我们需要开始收集
+			// 非字符串参数化数据，即不遵循 ECMA-48 § 5.4.1 字符串参数格式的数据。
 			p.performAction(parser.StartAction, state, 0)
 		}
 	}
 
-	// Handle special cases
+	// 处理特殊情况
 	switch {
 	case b == ESC && p.state == parser.EscapeState:
-		// Two ESCs in a row
+		// 连续两个 ESC
 		p.performAction(parser.ExecuteAction, state, b)
 	default:
 		p.performAction(action, state, b)
@@ -240,7 +232,7 @@ func (p *Parser) advance(b byte) parser.Action {
 }
 
 func (p *Parser) parseStringCmd() {
-	// Try to parse the command
+	// 尝试解析命令
 	datalen := len(p.data)
 	if p.dataLen >= 0 {
 		datalen = p.dataLen
@@ -279,25 +271,25 @@ func (p *Parser) performAction(action parser.Action, state parser.State, b byte)
 		}
 
 	case parser.PrefixAction:
-		// Collect private prefix
-		// we only store the last prefix
+		// 收集私有前缀
+		// 我们只存储最后一个前缀
 		p.cmd &^= 0xff << parser.PrefixShift
 		p.cmd |= int(b) << parser.PrefixShift
 
 	case parser.CollectAction:
 		if state == parser.Utf8State {
-			// Reset the UTF-8 counter
+			// 重置 UTF-8 计数器
 			p.paramsLen = 0
 			p.collectRune(b)
 		} else {
-			// Collect intermediate bytes
-			// we only store the last intermediate byte
+			// 收集中间字节
+			// 我们只存储最后一个中间字节
 			p.cmd &^= 0xff << parser.IntermedShift
 			p.cmd |= int(b) << parser.IntermedShift
 		}
 
 	case parser.ParamAction:
-		// Collect parameters
+		// 收集参数
 		if p.paramsLen >= len(p.params) {
 			break
 		}
@@ -329,7 +321,7 @@ func (p *Parser) performAction(action parser.Action, state parser.State, b byte)
 			p.dataLen = 0
 		}
 		if p.state >= parser.DcsEntryState && p.state <= parser.DcsStringState {
-			// Collect the command byte for DCS
+			// 收集 DCS 的命令字节
 			p.cmd |= int(b)
 		} else {
 			p.cmd = parser.MissingCommand
@@ -353,14 +345,14 @@ func (p *Parser) performAction(action parser.Action, state parser.State, b byte)
 		}
 
 	case parser.DispatchAction:
-		// Increment the last parameter
+		// 增加最后一个参数
 		if p.paramsLen > 0 && p.paramsLen < len(p.params)-1 ||
 			p.paramsLen == 0 && len(p.params) > 0 && p.params[0] != parser.MissingParam {
 			p.paramsLen++
 		}
 
 		if p.state == parser.OscStringState && p.cmd == parser.MissingCommand {
-			// Ensure we have a command for OSC
+			// 确保我们有 OSC 的命令
 			p.parseStringCmd()
 		}
 

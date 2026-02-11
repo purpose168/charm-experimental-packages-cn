@@ -4,18 +4,14 @@ import (
 	"bytes"
 )
 
-// ScreenPassthrough wraps the given ANSI sequence in a DCS passthrough
-// sequence to be sent to the outer terminal. This is used to send raw escape
-// sequences to the outer terminal when running inside GNU Screen.
+// ScreenPassthrough 将给定的 ANSI 序列包装在 DCS 直通序列中，发送到外部终端。当在 GNU Screen 中运行时，用于将原始转义序列发送到外部终端。
 //
 //	DCS <data> ST
 //
-// Note: Screen limits the length of string sequences to 768 bytes (since 2014).
-// Use zero to indicate no limit, otherwise, this will chunk the returned
-// string into limit sized chunks.
+// 注意：Screen 限制字符串序列的长度为 768 字节（自 2014 年起）。使用零表示无限制，否则将返回的字符串分成指定大小的块。
 //
-// See: https://www.gnu.org/software/screen/manual/screen.html#String-Escapes
-// See: https://git.savannah.gnu.org/cgit/screen.git/tree/src/screen.h?id=c184c6ec27683ff1a860c45be5cf520d896fd2ef#n44
+// 请参阅：https://www.gnu.org/software/screen/manual/screen.html#String-Escapes
+// 请参阅：https://git.savannah.gnu.org/cgit/screen.git/tree/src/screen.h?id=c184c6ec27683ff1a860c45be5cf520d896fd2ef#n44
 func ScreenPassthrough(seq string, limit int) string {
 	var b bytes.Buffer
 	b.WriteString("\x1bP")
@@ -34,18 +30,15 @@ func ScreenPassthrough(seq string, limit int) string {
 	return b.String()
 }
 
-// TmuxPassthrough wraps the given ANSI sequence in a special DCS passthrough
-// sequence to be sent to the outer terminal. This is used to send raw escape
-// sequences to the outer terminal when running inside Tmux.
+// TmuxPassthrough 将给定的 ANSI 序列包装在特殊的 DCS 直通序列中，发送到外部终端。当在 Tmux 中运行时，用于将原始转义序列发送到外部终端。
 //
 //	DCS tmux ; <escaped-data> ST
 //
-// Where <escaped-data> is the given sequence in which all occurrences of ESC
-// (0x1b) are doubled i.e. replaced with ESC ESC (0x1b 0x1b).
+// 其中 <escaped-data> 是将所有 ESC (0x1b) 出现次数加倍的序列，即替换为 ESC ESC (0x1b 0x1b)。
 //
-// Note: this needs the `allow-passthrough` option to be set to `on`.
+// 注意：需要将 `allow-passthrough` 选项设置为 `on`。
 //
-// See: https://github.com/tmux/tmux/wiki/FAQ#what-is-the-passthrough-escape-sequence-and-how-do-i-use-it
+// 请参阅：https://github.com/tmux/tmux/wiki/FAQ#what-is-the-passthrough-escape-sequence-and-how-do-i-use-it
 func TmuxPassthrough(seq string) string {
 	var b bytes.Buffer
 	b.WriteString("\x1bPtmux;")

@@ -4,7 +4,7 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/charmbracelet/x/exp/golden"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
 func TestParseColor(t *testing.T) {
@@ -15,7 +15,7 @@ func TestParseColor(t *testing.T) {
 		check   func(color.Color) bool
 	}{
 		{
-			name:    "named color red",
+			name:    "命名颜色红色",
 			input:   "red",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -23,7 +23,7 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "hex color",
+			name:    "十六进制颜色",
 			input:   "#FF0000",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -31,7 +31,7 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "short hex color",
+			name:    "短十六进制颜色",
 			input:   "#f00",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -39,7 +39,7 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "rgb color",
+			name:    "RGB颜色",
 			input:   "rgb(255, 0, 0)",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -51,7 +51,7 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "ansi color code",
+			name:    "ANSI颜色代码",
 			input:   "196",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -59,7 +59,7 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "bright colors",
+			name:    "明亮颜色",
 			input:   "bright-red",
 			wantErr: false,
 			check: func(c color.Color) bool {
@@ -67,17 +67,17 @@ func TestParseColor(t *testing.T) {
 			},
 		},
 		{
-			name:    "invalid hex",
+			name:    "无效的十六进制颜色",
 			input:   "#GGGGGG",
 			wantErr: true,
 		},
 		{
-			name:    "invalid rgb",
+			name:    "无效的RGB颜色",
 			input:   "rgb(300, 0, 0)",
 			wantErr: true,
 		},
 		{
-			name:    "unknown named color",
+			name:    "未知的命名颜色",
 			input:   "notacolor",
 			wantErr: true,
 		},
@@ -123,7 +123,7 @@ func TestRenderBoxWithBorderStyle(t *testing.T) {
 	golden.RequireEqual(t, output)
 }
 
-// Test named colors coverage.
+// 测试命名颜色覆盖范围。
 func TestNamedColorsCoverage(t *testing.T) {
 	colors := []string{
 		"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white",
@@ -145,9 +145,9 @@ func TestNamedColorsCoverage(t *testing.T) {
 	}
 }
 
-// Test ANSI colors coverage.
+// 测试ANSI颜色覆盖范围。
 func TestAnsiColorsCoverage(t *testing.T) {
-	// Test different ANSI color ranges
+	// 测试不同的ANSI颜色范围
 	testCodes := []int{0, 7, 8, 15, 16, 100, 231, 232, 240, 255}
 
 	for _, code := range testCodes {
@@ -157,7 +157,7 @@ func TestAnsiColorsCoverage(t *testing.T) {
 		}
 	}
 
-	// Test out of range
+	// 测试超出范围的情况
 	if ansiColor(-1) != nil {
 		t.Error("ansiColor(-1) should return nil")
 	}

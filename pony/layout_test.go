@@ -3,7 +3,7 @@ package pony
 import (
 	"testing"
 
-	"github.com/charmbracelet/x/exp/golden"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
 func TestSizeConstraint(t *testing.T) {
@@ -84,7 +84,7 @@ func TestSizeConstraint(t *testing.T) {
 			sc := parseSizeConstraint(tt.input)
 			got := sc.Apply(tt.available, tt.content)
 			if got != tt.want {
-				t.Errorf("Apply(%d, %d) = %d, want %d (constraint: %s)",
+				t.Errorf("Apply(%d, %d) = %d, 期望 %d (constraint: %s)",
 					tt.available, tt.content, got, tt.want, sc.String())
 			}
 		})
@@ -113,65 +113,65 @@ func TestBoxWithWidth(t *testing.T) {
 }
 
 func TestZeroValueIsAuto(t *testing.T) {
-	// Test that zero value SizeConstraint behaves like auto
+	// 测试零值 SizeConstraint 是否表现得像 auto
 	sc := SizeConstraint{}
 
 	if !sc.IsAuto() {
-		t.Error("Zero value SizeConstraint should be auto")
+		t.Error("零值 SizeConstraint 应该是 auto")
 	}
 
 	got := sc.Apply(100, 50)
 	if got != 50 {
-		t.Errorf("Zero value Apply(100, 50) = %d, want 50 (content size)", got)
+		t.Errorf("零值 Apply(100, 50) = %d, 期望 50 (内容大小)", got)
 	}
 }
 
-// Test size constraint methods.
+// 测试尺寸约束方法。
 func TestSizeConstraintMethods(t *testing.T) {
 	// IsFixed
 	sc := NewFixedConstraint(10)
 	if !sc.IsFixed() {
-		t.Error("IsFixed should return true for fixed constraint")
+		t.Error("IsFixed 对于固定约束应该返回 true")
 	}
 
 	// IsPercent
 	sc = NewPercentConstraint(50)
 	if !sc.IsPercent() {
-		t.Error("IsPercent should return true for percent constraint")
+		t.Error("IsPercent 对于百分比约束应该返回 true")
 	}
 
 	// String - fixed
 	sc = NewFixedConstraint(10)
 	if sc.String() != "10" {
-		t.Errorf("String() = %s, want 10", sc.String())
+		t.Errorf("String() = %s, 期望 10", sc.String())
 	}
 
 	// String - percent
 	sc = NewPercentConstraint(50)
 	if sc.String() != "50%" {
-		t.Errorf("String() = %s, want 50%%", sc.String())
+		t.Errorf("String() = %s, 期望 50%%", sc.String())
 	}
 
 	// String - auto
 	sc = parseSizeConstraint("auto")
 	if sc.String() != "auto" {
-		t.Errorf("String() = %s, want auto", sc.String())
+		t.Errorf("String() = %s, 期望 auto", sc.String())
 	}
 
 	// String - min
 	sc = parseSizeConstraint("min")
 	if sc.String() != "min" {
-		t.Errorf("String() = %s, want min", sc.String())
+		t.Errorf("String() = %s, 期望 min", sc.String())
 	}
 
 	// String - max
 	sc = parseSizeConstraint("max")
 	if sc.String() != "max" {
-		t.Errorf("String() = %s, want max", sc.String())
+		t.Errorf("String() = %s, 期望 max", sc.String())
 	}
 }
 
-// Test VStack chaining methods.
+// 测试 VStack 链式方法。
 func TestVStackWithMethods(t *testing.T) {
 	vstack := NewVStack(NewText("a"), NewText("b"))
 
@@ -182,18 +182,18 @@ func TestVStackWithMethods(t *testing.T) {
 		Height(NewFixedConstraint(5))
 
 	if result == nil {
-		t.Error("Method chaining should return vstack")
+		t.Error("方法链式调用应该返回 vstack")
 	}
 }
 
-// Test HStack constructors and chaining methods.
+// 测试 HStack 构造函数和链式方法。
 func TestHStackConstructor(t *testing.T) {
 	hstack := NewHStack(NewText("a"), NewText("b"))
 	if hstack == nil {
-		t.Fatal("NewHStack returned nil")
+		t.Fatal("NewHStack 返回了 nil")
 	}
 	if len(hstack.Children()) != 2 {
-		t.Error("NewHStack items not set")
+		t.Error("NewHStack 项目未设置")
 	}
 
 	hstack.Spacing(2)
@@ -201,9 +201,9 @@ func TestHStackConstructor(t *testing.T) {
 	hstack.Width(NewFixedConstraint(10))
 	hstack.Height(NewFixedConstraint(5))
 
-	// Test Children
+	// 测试 Children
 	children := hstack.Children()
 	if len(children) != 2 {
-		t.Error("HStack Children should return items")
+		t.Error("HStack Children 应该返回项目")
 	}
 }

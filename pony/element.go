@@ -4,42 +4,41 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// Element represents a renderable component in the TUI. Elements implement
-// the UV Drawable interface and can be composed into trees.
+// Element 表示 TUI 中可渲染的组件。元素实现了 UV Drawable 接口，并且可以组合成树状结构。
 type Element interface {
 	uv.Drawable
 
-	// Layout calculates the element's desired size within the given constraints.
-	// It returns the actual size the element will occupy.
+	// Layout 计算元素在给定约束下的期望大小。
+	// 返回元素实际占据的大小。
 	Layout(constraints Constraints) Size
 
-	// Children returns the child elements for container types.
-	// Returns nil for leaf elements.
+	// Children 返回容器类型的子元素。
+	// 对于叶元素返回 nil。
 	Children() []Element
 
-	// ID returns a unique identifier for this element.
-	// Used for hit testing and event handling.
+	// ID 返回此元素的唯一标识符。
+	// 用于命中测试和事件处理。
 	ID() string
 
-	// SetID sets the element's identifier.
+	// SetID 设置元素的标识符。
 	SetID(id string)
 
-	// Bounds returns the element's last rendered screen coordinates.
-	// Updated during Draw() and used for mouse hit testing.
+	// Bounds 返回元素上次渲染的屏幕坐标。
+	// 在 Draw() 期间更新，用于鼠标命中测试。
 	Bounds() uv.Rectangle
 
-	// SetBounds records the element's rendered bounds.
-	// This should be called at the start of Draw().
+	// SetBounds 记录元素的渲染边界。
+	// 应在 Draw() 开始时调用。
 	SetBounds(bounds uv.Rectangle)
 }
 
-// Size represents dimensions in terminal cells.
+// Size 表示终端单元格中的尺寸。
 type Size struct {
 	Width  int
 	Height int
 }
 
-// Constraints define the size constraints for layout calculations.
+// Constraints 定义布局计算的尺寸约束。
 type Constraints struct {
 	MinWidth  int
 	MaxWidth  int
@@ -47,7 +46,7 @@ type Constraints struct {
 	MaxHeight int
 }
 
-// Constrain returns a size that satisfies the constraints.
+// Constrain 返回满足约束的尺寸。
 func (c Constraints) Constrain(size Size) Size {
 	w := size.Width
 	h := size.Height
@@ -68,7 +67,7 @@ func (c Constraints) Constrain(size Size) Size {
 	return Size{Width: w, Height: h}
 }
 
-// Unbounded returns constraints with no limits.
+// Unbounded 返回无限制的约束。
 func Unbounded() Constraints {
 	return Constraints{
 		MinWidth:  0,
@@ -78,7 +77,7 @@ func Unbounded() Constraints {
 	}
 }
 
-// Fixed returns constraints for a fixed size.
+// Fixed 返回固定尺寸的约束。
 func Fixed(width, height int) Constraints {
 	return Constraints{
 		MinWidth:  width,
@@ -88,16 +87,16 @@ func Fixed(width, height int) Constraints {
 	}
 }
 
-// Constraint represents a size constraint that can be applied.
+// Constraint 表示可以应用的尺寸约束。
 type Constraint interface {
-	// Apply applies the constraint to the given available size.
+	// Apply 将约束应用于给定的可用空间。
 	Apply(available int) int
 }
 
-// FixedConstraint represents a fixed size in cells.
+// FixedConstraint 表示单元格中的固定尺寸。
 type FixedConstraint int
 
-// Apply returns the fixed size, clamped to available space.
+// Apply 返回固定尺寸，限制在可用空间内。
 func (f FixedConstraint) Apply(available int) int {
 	if int(f) > available {
 		return available
@@ -108,10 +107,10 @@ func (f FixedConstraint) Apply(available int) int {
 	return int(f)
 }
 
-// PercentConstraint represents a percentage of available space (0-100).
+// PercentConstraint 表示可用空间的百分比 (0-100)。
 type PercentConstraint int
 
-// Apply returns the percentage of available space.
+// Apply 返回可用空间的百分比。
 func (p PercentConstraint) Apply(available int) int {
 	if p < 0 {
 		return 0
@@ -122,18 +121,18 @@ func (p PercentConstraint) Apply(available int) int {
 	return available * int(p) / 100
 }
 
-// AutoConstraint represents content-based sizing.
+// AutoConstraint 表示基于内容的尺寸调整。
 type AutoConstraint struct{}
 
-// Apply returns the available size (will be calculated based on content).
+// Apply 返回可用空间（将基于内容计算）。
 func (a AutoConstraint) Apply(available int) int {
 	return available
 }
 
-// Props is a map of properties passed to elements.
+// Props 是传递给元素的属性映射。
 type Props map[string]string
 
-// Get returns a property value or empty string if not found.
+// Get 返回属性值，如果未找到则返回空字符串。
 func (p Props) Get(key string) string {
 	if p == nil {
 		return ""
@@ -141,7 +140,7 @@ func (p Props) Get(key string) string {
 	return p[key]
 }
 
-// GetOr returns a property value or the default if not found.
+// GetOr 返回属性值，如果未找到则返回默认值。
 func (p Props) GetOr(key, defaultValue string) string {
 	if p == nil {
 		return defaultValue
@@ -152,7 +151,7 @@ func (p Props) GetOr(key, defaultValue string) string {
 	return defaultValue
 }
 
-// Has checks if a property exists.
+// Has 检查属性是否存在。
 func (p Props) Has(key string) bool {
 	if p == nil {
 		return false

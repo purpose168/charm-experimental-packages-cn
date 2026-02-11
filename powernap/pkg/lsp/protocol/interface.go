@@ -1,20 +1,19 @@
-// Package protocol provides types and functions for the Language Server
-// Protocol (LSP).
+// Package protocol 为语言服务器协议（Language Server Protocol，LSP）提供类型和函数。
 package protocol
 
 import "fmt"
 
-// WorkspaceSymbolResult is an interface for types that represent workspace symbols.
+// WorkspaceSymbolResult 是表示工作区符号的类型的接口。
 type WorkspaceSymbolResult interface {
 	GetName() string
 	GetLocation() Location
 	isWorkspaceSymbol() // marker method
 }
 
-// GetName returns the symbol name.
+// GetName 返回符号名称。
 func (ws *WorkspaceSymbol) GetName() string { return ws.Name }
 
-// GetLocation returns the symbol location.
+// GetLocation 返回符号位置。
 func (ws *WorkspaceSymbol) GetLocation() Location {
 	switch v := ws.Location.Value.(type) {
 	case Location:
@@ -33,7 +32,7 @@ func (si *SymbolInformation) GetName() string { return si.Name }
 func (si *SymbolInformation) GetLocation() Location { return si.Location }
 func (si *SymbolInformation) isWorkspaceSymbol()    {}
 
-// Results converts the Value to a slice of WorkspaceSymbolResult.
+// Results 将 Value 转换为 WorkspaceSymbolResult 切片。
 func (r Or_Result_workspace_symbol) Results() ([]WorkspaceSymbolResult, error) {
 	if r.Value == nil {
 		return make([]WorkspaceSymbolResult, 0), nil
@@ -56,27 +55,27 @@ func (r Or_Result_workspace_symbol) Results() ([]WorkspaceSymbolResult, error) {
 	}
 }
 
-// DocumentSymbolResult is an interface for types that represent document symbols.
+// DocumentSymbolResult 是表示文档符号的类型的接口。
 type DocumentSymbolResult interface {
 	GetRange() Range
 	GetName() string
 	isDocumentSymbol() // marker method
 }
 
-// GetRange returns the symbol range.
+// GetRange 返回符号范围。
 func (ds *DocumentSymbol) GetRange() Range { return ds.Range }
 
-// GetName returns the symbol name.
+// GetName 返回符号名称。
 func (ds *DocumentSymbol) GetName() string   { return ds.Name }
 func (ds *DocumentSymbol) isDocumentSymbol() {}
 
-// GetRange returns the symbol range from its location.
+// GetRange 从其位置返回符号范围。
 func (si *SymbolInformation) GetRange() Range { return si.Location.Range }
 
 // Note: SymbolInformation already has GetName() implemented above.
 func (si *SymbolInformation) isDocumentSymbol() {}
 
-// Results converts the Value to a slice of DocumentSymbolResult.
+// Results 将 Value 转换为 DocumentSymbolResult 切片。
 func (r Or_Result_textDocument_documentSymbol) Results() ([]DocumentSymbolResult, error) {
 	if r.Value == nil {
 		return make([]DocumentSymbolResult, 0), nil
@@ -99,21 +98,21 @@ func (r Or_Result_textDocument_documentSymbol) Results() ([]DocumentSymbolResult
 	}
 }
 
-// TextEditResult is an interface for types that can be used as text edits.
+// TextEditResult 是可以用作文本编辑的类型的接口。
 type TextEditResult interface {
 	GetRange() Range
 	GetNewText() string
 	isTextEdit() // marker method
 }
 
-// GetRange returns the edit range.
+// GetRange 返回编辑范围。
 func (te *TextEdit) GetRange() Range { return te.Range }
 
-// GetNewText returns the new text for the edit.
+// GetNewText 返回编辑的新文本。
 func (te *TextEdit) GetNewText() string { return te.NewText }
 func (te *TextEdit) isTextEdit()        {}
 
-// AsTextEdit converts Or_TextDocumentEdit_edits_Elem to TextEdit.
+// AsTextEdit 将 Or_TextDocumentEdit_edits_Elem 转换为 TextEdit。
 func (e Or_TextDocumentEdit_edits_Elem) AsTextEdit() (TextEdit, error) {
 	if e.Value == nil {
 		return TextEdit{}, fmt.Errorf("nil text edit")

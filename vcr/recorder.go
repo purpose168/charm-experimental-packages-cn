@@ -7,7 +7,7 @@ import (
 	"gopkg.in/dnaeon/go-vcr.v4/pkg/recorder"
 )
 
-// Recorder is an alias for the go-vcr Recorder.
+// Recorder 是go-vcr Recorder的别名。
 type Recorder = recorder.Recorder
 
 type options struct {
@@ -15,10 +15,10 @@ type options struct {
 	keepAllHeaders bool
 }
 
-// Option defines a functional option for configuring the VCR recorder.
+// Option 定义了用于配置VCR记录器的函数选项。
 type Option func(*options) error
 
-// WithMode sets the recorder mode.
+// WithMode 设置记录器模式。
 func WithMode(mode recorder.Mode) Option {
 	return func(o *options) error {
 		o.mode = mode
@@ -26,7 +26,7 @@ func WithMode(mode recorder.Mode) Option {
 	}
 }
 
-// WithKeepAllHeaders configures the recorder to keep all HTTP headers.
+// WithKeepAllHeaders 配置记录器保留所有HTTP头。
 func WithKeepAllHeaders() Option {
 	return func(o *options) error {
 		o.keepAllHeaders = true
@@ -34,7 +34,7 @@ func WithKeepAllHeaders() Option {
 	}
 }
 
-// NewRecorder creates a new VCR recorder for the given test with the provided options.
+// NewRecorder 使用提供的选项为给定测试创建一个新的VCR记录器。
 func NewRecorder(t *testing.T, opts ...Option) *Recorder {
 	o := options{
 		mode:           recorder.ModeRecordOnce,
@@ -53,7 +53,7 @@ func NewRecorder(t *testing.T, opts ...Option) *Recorder {
 		recorder.WithMode(o.mode),
 		recorder.WithMatcher(customMatcher(t)),
 		recorder.WithMarshalFunc(customMarshaler),
-		recorder.WithSkipRequestLatency(true), // disable sleep to simulate response time, makes tests faster
+		recorder.WithSkipRequestLatency(true), // 禁用睡眠来模拟响应时间，使测试更快
 		recorder.WithHook(hookRemoveHeaders(o.keepAllHeaders), recorder.AfterCaptureHook),
 	)
 	if err != nil {

@@ -9,12 +9,11 @@ import (
 	"testing"
 )
 
-// This test is mostly so ./.github/workflows/termios.yml can build the
-// tests for the platforms we want to support, and verify everything
-// is available for each of them.
+// 这个测试主要是为了让 ./.github/workflows/termios.yml 能够为我们想要支持的平台构建测试，
+// 并验证每个平台上的所有功能是否可用。
 func TestTermios(t *testing.T) {
 	if runtime.GOOS != "linux" {
-		// the way we open a pty below is the linux way.
+		// 我们下面打开 pty 的方式是 Linux 方式。
 		t.Skip()
 	}
 	p, err := os.OpenFile("/dev/ptmx", os.O_RDWR, 0)

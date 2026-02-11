@@ -2,20 +2,20 @@ package pony
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// ZStack represents a layered stack container where children are drawn on top of each other.
-// Later children in the stack are drawn on top of earlier children.
+// ZStack 表示一个分层堆栈容器，子元素会绘制在彼此之上。
+// 堆栈中后面的子元素会绘制在前面子元素的上面。
 type ZStack struct {
 	BaseElement
 	items             []Element
 	width             SizeConstraint
 	height            SizeConstraint
-	alignment         string // Horizontal alignment: leading, center, trailing
-	verticalAlignment string // Vertical alignment: top, center, bottom
+	alignment         string // 水平对齐方式：leading（左对齐）, center（居中）, trailing（右对齐）
+	verticalAlignment string // 垂直对齐方式：top（顶部）, center（居中）, bottom（底部）
 }
 
 var _ Element = (*ZStack)(nil)
 
-// NewZStack creates a new layered stack.
+// NewZStack 创建一个新的分层堆栈。
 func NewZStack(children ...Element) *ZStack {
 	return &ZStack{
 		items:             children,
@@ -24,31 +24,31 @@ func NewZStack(children ...Element) *ZStack {
 	}
 }
 
-// Alignment sets the horizontal alignment and returns the zstack for chaining.
+// Alignment 设置水平对齐方式并返回 zstack 以支持链式调用。
 func (z *ZStack) Alignment(alignment string) *ZStack {
 	z.alignment = alignment
 	return z
 }
 
-// VerticalAlignment sets the vertical alignment and returns the zstack for chaining.
+// VerticalAlignment 设置垂直对齐方式并返回 zstack 以支持链式调用。
 func (z *ZStack) VerticalAlignment(alignment string) *ZStack {
 	z.verticalAlignment = alignment
 	return z
 }
 
-// Width sets the width constraint and returns the zstack for chaining.
+// Width 设置宽度约束并返回 zstack 以支持链式调用。
 func (z *ZStack) Width(width SizeConstraint) *ZStack {
 	z.width = width
 	return z
 }
 
-// Height sets the height constraint and returns the zstack for chaining.
+// Height 设置高度约束并返回 zstack 以支持链式调用。
 func (z *ZStack) Height(height SizeConstraint) *ZStack {
 	z.height = height
 	return z
 }
 
-// Draw renders the layered stack to the screen.
+// Draw 将分层堆栈渲染到屏幕上。
 func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 	z.SetBounds(area)
 
@@ -56,7 +56,7 @@ func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 		return
 	}
 
-	// Layout all children first to get their sizes
+	// 首先布局所有子元素以获取它们的大小
 	childConstraints := Constraints{
 		MinWidth:  0,
 		MaxWidth:  area.Dx(),
@@ -69,9 +69,9 @@ func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 		childSizes[i] = child.Layout(childConstraints)
 	}
 
-	// Draw each child in order (later children draw on top)
+	// 按顺序绘制每个子元素（后面的子元素绘制在上面）
 	for i, child := range z.items {
-		// Positioned elements handle their own layout and positioning
+		// 定位元素自行处理布局和定位
 		if _, isPositioned := child.(*Positioned); isPositioned {
 			child.Draw(scr, area)
 			continue
@@ -79,10 +79,10 @@ func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 
 		childSize := childSizes[i]
 
-		// Calculate child area based on alignment using UV layout helpers
+		// 使用 UV 布局辅助函数基于对齐方式计算子元素区域
 		var childArea uv.Rectangle
 
-		// Determine positioning based on horizontal and vertical alignment
+		// 根据水平和垂直对齐方式确定定位
 		switch {
 		case z.alignment == AlignmentLeading && z.verticalAlignment == AlignmentTop:
 			childArea = uv.TopLeftRect(area, childSize.Width, childSize.Height)
@@ -103,7 +103,7 @@ func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 		case z.alignment == AlignmentTrailing && z.verticalAlignment == AlignmentBottom:
 			childArea = uv.BottomRightRect(area, childSize.Width, childSize.Height)
 		default:
-			// Fallback to top-left
+			// 默认为左上角
 			childArea = uv.TopLeftRect(area, childSize.Width, childSize.Height)
 		}
 
@@ -111,8 +111,8 @@ func (z *ZStack) Draw(scr uv.Screen, area uv.Rectangle) {
 	}
 }
 
-// Layout calculates the total size of the layered stack.
-// ZStack takes the maximum width and height of all children.
+// Layout 计算分层堆栈的总大小。
+// ZStack 取所有子元素的最大宽度和高度。
 func (z *ZStack) Layout(constraints Constraints) Size {
 	if len(z.items) == 0 {
 		return Size{Width: 0, Height: 0}
@@ -121,7 +121,7 @@ func (z *ZStack) Layout(constraints Constraints) Size {
 	maxWidth := 0
 	maxHeight := 0
 
-	// Find maximum dimensions
+	// 查找最大尺寸
 	for _, child := range z.items {
 		size := child.Layout(constraints)
 		if size.Width > maxWidth {
@@ -134,12 +134,12 @@ func (z *ZStack) Layout(constraints Constraints) Size {
 
 	result := Size{Width: maxWidth, Height: maxHeight}
 
-	// Apply width constraint if specified
+	// 如果指定了宽度约束，则应用它
 	if !z.width.IsAuto() {
 		result.Width = z.width.Apply(constraints.MaxWidth, result.Width)
 	}
 
-	// Apply height constraint if specified
+	// 如果指定了高度约束，则应用它
 	if !z.height.IsAuto() {
 		result.Height = z.height.Apply(constraints.MaxHeight, result.Height)
 	}
@@ -147,7 +147,7 @@ func (z *ZStack) Layout(constraints Constraints) Size {
 	return constraints.Constrain(result)
 }
 
-// Children returns the child elements.
+// Children 返回子元素。
 func (z *ZStack) Children() []Element {
 	return z.items
 }

@@ -1,4 +1,4 @@
-// Package mosaic provides a unicode image renderer.
+// Package mosaic 提供Unicode图像渲染器。
 package mosaic
 
 import (
@@ -9,112 +9,112 @@ import (
 	"math"
 	"strings"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 	xdraw "golang.org/x/image/draw"
 )
 
-// Blocks definition.
+// 块定义。
 var (
 	halfBlocks = []block{
-		{Char: '▀', Coverage: [4]bool{true, true, false, false}, CoverageMap: "██\n  "},   // Upper half block.
-		{Char: '▄', Coverage: [4]bool{false, false, true, true}, CoverageMap: "  \n██"},   // Lower half block.
-		{Char: ' ', Coverage: [4]bool{false, false, false, false}, CoverageMap: "  \n  "}, // Space.
-		{Char: '█', Coverage: [4]bool{true, true, true, true}, CoverageMap: "██\n██"},     // Full block.
+		{Char: '▀', Coverage: [4]bool{true, true, false, false}, CoverageMap: "██\n  "},   // 上半块。
+		{Char: '▄', Coverage: [4]bool{false, false, true, true}, CoverageMap: "  \n██"},   // 下半块。
+		{Char: ' ', Coverage: [4]bool{false, false, false, false}, CoverageMap: "  \n  "}, // 空格。
+		{Char: '█', Coverage: [4]bool{true, true, true, true}, CoverageMap: "██\n██"},     // 全块。
 	}
 	quarterBlocks = []block{
-		{Char: '▘', Coverage: [4]bool{true, false, false, false}, CoverageMap: "█ \n  "}, // Quadrant upper left.
-		{Char: '▝', Coverage: [4]bool{false, true, false, false}, CoverageMap: " █\n  "}, // Quadrant upper right.
-		{Char: '▖', Coverage: [4]bool{false, false, true, false}, CoverageMap: "  \n█ "}, // Quadrant lower left.
-		{Char: '▗', Coverage: [4]bool{false, false, false, true}, CoverageMap: "  \n █"}, // Quadrant lower right.
-		{Char: '▌', Coverage: [4]bool{true, false, true, false}, CoverageMap: "█ \n█ "},  // Left half block.
-		{Char: '▐', Coverage: [4]bool{false, true, false, true}, CoverageMap: " █\n █"},  // Right half block.
-		{Char: '▀', Coverage: [4]bool{true, true, false, false}, CoverageMap: "██\n  "},  // Upper half block (already added).
-		{Char: '▄', Coverage: [4]bool{false, false, true, true}, CoverageMap: "  \n██"},  // Lower half block (already added).
+		{Char: '▘', Coverage: [4]bool{true, false, false, false}, CoverageMap: "█ \n  "}, // 左上象限。
+		{Char: '▝', Coverage: [4]bool{false, true, false, false}, CoverageMap: " █\n  "}, // 右上象限。
+		{Char: '▖', Coverage: [4]bool{false, false, true, false}, CoverageMap: "  \n█ "}, // 左下象限。
+		{Char: '▗', Coverage: [4]bool{false, false, false, true}, CoverageMap: "  \n █"}, // 右下象限。
+		{Char: '▌', Coverage: [4]bool{true, false, true, false}, CoverageMap: "█ \n█ "},  // 左半块。
+		{Char: '▐', Coverage: [4]bool{false, true, false, true}, CoverageMap: " █\n █"},  // 右半块。
+		{Char: '▀', Coverage: [4]bool{true, true, false, false}, CoverageMap: "██\n  "},  // 上半块（已添加）。
+		{Char: '▄', Coverage: [4]bool{false, false, true, true}, CoverageMap: "  \n██"},  // 下半块（已添加）。
 	}
 	complexBlocks = []block{
-		{Char: '▙', Coverage: [4]bool{true, false, true, true}, CoverageMap: "█ \n██"},  // Quadrant upper left and lower half.
-		{Char: '▟', Coverage: [4]bool{false, true, true, true}, CoverageMap: " █\n██"},  // Quadrant upper right and lower half.
-		{Char: '▛', Coverage: [4]bool{true, true, true, false}, CoverageMap: "██\n█ "},  // Quadrant upper half and lower left.
-		{Char: '▜', Coverage: [4]bool{true, true, false, true}, CoverageMap: "██\n █"},  // Quadrant upper half and lower right.
-		{Char: '▚', Coverage: [4]bool{true, false, false, true}, CoverageMap: "█ \n █"}, // Quadrant upper left and lower right.
-		{Char: '▞', Coverage: [4]bool{false, true, true, false}, CoverageMap: " █\n█ "}, // Quadrant upper right and lower left.
+		{Char: '▙', Coverage: [4]bool{true, false, true, true}, CoverageMap: "█ \n██"},  // 左上象限和下半块。
+		{Char: '▟', Coverage: [4]bool{false, true, true, true}, CoverageMap: " █\n██"},  // 右上象限和下半块。
+		{Char: '▛', Coverage: [4]bool{true, true, true, false}, CoverageMap: "██\n█ "},  // 上半块和左下象限。
+		{Char: '▜', Coverage: [4]bool{true, true, false, true}, CoverageMap: "██\n █"},  // 上半块和右下象限。
+		{Char: '▚', Coverage: [4]bool{true, false, false, true}, CoverageMap: "█ \n █"}, // 左上象限和右下象限。
+		{Char: '▞', Coverage: [4]bool{false, true, true, false}, CoverageMap: " █\n█ "}, // 右上象限和左下象限。
 	}
 )
 
-// Block represents different Unicode block characters.
+// Block 表示不同的Unicode块字符。
 type block struct {
 	Char        rune
-	Coverage    [4]bool // Which parts of the block are filled (true = filled).
-	CoverageMap string  // Visual representation of coverage for debugging.
+	Coverage    [4]bool // 块的哪些部分被填充（true = 填充）。
+	CoverageMap string  // 用于调试的覆盖范围的可视化表示。
 }
 
-// Symbol represents the symbol type to use when rendering the image.
+// Symbol 表示渲染图像时使用的符号类型。
 type Symbol uint8
 
-// Symbol types.
+// 符号类型。
 const (
-	All Symbol = iota
-	Half
-	Quarter
+	All     Symbol = iota // 所有符号
+	Half                  // 半块符号
+	Quarter               // 四分之一块符号
 )
 
-// In many contexts, a default threshold level is often set to 0.5 (or 50%),
-// which means that values above this threshold are considered positive,
-// while those below are considered negative.
-// The value 128 represents the 0.5 of 0..255.
+// 在许多情况下，默认阈值级别通常设置为0.5（或50%），
+// 这意味着高于此阈值的值被视为正数，
+// 而低于此阈值的值被视为负数。
+// 值128表示0..255的0.5。
 const middleThresholdLevel = 128
 
-// Render mosaic with default values.
+// 使用默认值渲染马赛克。
 func Render(img image.Image, width int, height int) string {
 	m := New().Width(width).Height(height)
 	return m.Render(img)
 }
 
-// Mosaic represents a Unicode image renderer.
+// Mosaic 表示Unicode图像渲染器。
 //
-// Example:
+// 示例：
 //
 //	```go
-//	art := mosaic.New().Width(100). // Limit to 100 cells
-//	    Scale(mosaic.Fit).          // Fit to width
+//	art := mosaic.New().Width(100). // 限制为100个单元格
+//	    Scale(mosaic.Fit).          // 适应宽度
 //	    Render()
 //	```
 type Mosaic struct {
-	outputWidth    int    // Output width.
-	outputHeight   int    // Output height (0 for auto).
-	thresholdLevel uint8  // Threshold for considering a pixel as set (0-255).
-	dither         bool   // Enable Dithering (false as default).
-	useFgBgOnly    bool   // Use only foreground/background colors (no block symbols).
-	invertColors   bool   // Invert colors.
-	scale          int    // Scale level
-	symbols        Symbol // Which symbols to use: "half", "quarter", "all".
+	outputWidth    int    // 输出宽度。
+	outputHeight   int    // 输出高度（0表示自动）。
+	thresholdLevel uint8  // 考虑像素为设置的阈值（0-255）。
+	dither         bool   // 启用抖动（默认为false）。
+	useFgBgOnly    bool   // 仅使用前景/背景颜色（无块符号）。
+	invertColors   bool   // 反转颜色。
+	scale          int    // 缩放级别
+	symbols        Symbol // 使用哪些符号："half"（半块）, "quarter"（四分之一块）, "all"（所有）。
 }
 
-// New creates and returns a [Renderer].
+// New 创建并返回一个[Renderer]。
 func New() Mosaic {
 	return Mosaic{
-		outputWidth:    0,                    // Override width.
-		outputHeight:   0,                    // Override height.
-		thresholdLevel: middleThresholdLevel, // Middle threshold.
-		dither:         false,                // Enable dithering.
-		useFgBgOnly:    false,                // Use block symbols.
-		invertColors:   false,                // Don't invert.
-		scale:          1,                    // Don't scale.
-		symbols:        Half,                 // Use half blocks.
+		outputWidth:    0,                    // 覆盖宽度。
+		outputHeight:   0,                    // 覆盖高度。
+		thresholdLevel: middleThresholdLevel, // 中间阈值。
+		dither:         false,                // 启用抖动。
+		useFgBgOnly:    false,                // 使用块符号。
+		invertColors:   false,                // 不反转。
+		scale:          1,                    // 不缩放。
+		symbols:        Half,                 // 使用半块。
 	}
 }
 
-// PixelBlock represents a 2x2 pixel block from the image.
+// PixelBlock 表示图像中的2x2像素块。
 type pixelBlock struct {
-	Pixels      [2][2]color.Color // 2x2 pixel grid.
-	AvgFg       color.Color       // Average foreground color.
-	AvgBg       color.Color       // Average background color.
-	BestSymbol  rune              // Best matching character.
-	BestFgColor color.Color       // Best foreground color.
-	BestBgColor color.Color       // Best background color.
+	Pixels      [2][2]color.Color // 2x2像素网格。
+	AvgFg       color.Color       // 平均前景颜色。
+	AvgBg       color.Color       // 平均背景颜色。
+	BestSymbol  rune              // 最佳匹配字符。
+	BestFgColor color.Color       // 最佳前景颜色。
+	BestBgColor color.Color       // 最佳背景颜色。
 }
 
-// Represents 255.
+// 表示255。
 const u8MaxValue = 0xff
 
 type shiftable interface {
@@ -128,26 +128,26 @@ func shift[T shiftable](x T) T {
 	return x
 }
 
-// Scale sets the [ScaleMode] on [Mosaic].
+// Scale 设置[Mosaic]上的[ScaleMode]。
 func (m Mosaic) Scale(scale int) Mosaic {
 	m.scale = scale
 	return m
 }
 
-// IgnoreBlockSymbols set UseFgBgOnly on [Mosaic].
+// IgnoreBlockSymbols 设置[Mosaic]上的UseFgBgOnly。
 func (m Mosaic) IgnoreBlockSymbols(fgOnly bool) Mosaic {
 	m.useFgBgOnly = fgOnly
 	return m
 }
 
-// Dither sets the dither level on [Mosaic].
+// Dither 设置[Mosaic]上的抖动级别。
 func (m Mosaic) Dither(dither bool) Mosaic {
 	m.dither = dither
 	return m
 }
 
-// Threshold sets the threshold level on [Mosaic].
-// It expects a value between 0-255, anything else will be ignored.
+// Threshold 设置[Mosaic]上的阈值级别。
+// 它期望一个0-255之间的值，其他值将被忽略。
 func (m Mosaic) Threshold(threshold int) Mosaic {
 	if threshold >= 0 && threshold <= u8MaxValue {
 		m.thresholdLevel = uint8(threshold)
@@ -156,31 +156,31 @@ func (m Mosaic) Threshold(threshold int) Mosaic {
 	return m
 }
 
-// InvertColors whether to invert the colors of the mosaic image.
+// InvertColors 是否反转马赛克图像的颜色。
 func (m Mosaic) InvertColors(invertColors bool) Mosaic {
 	m.invertColors = invertColors
 	return m
 }
 
-// Width sets the maximum width the image can have. Defaults to the image width.
+// Width 设置图像可以拥有的最大宽度。默认为图像宽度。
 func (m Mosaic) Width(width int) Mosaic {
 	m.outputWidth = width
 	return m
 }
 
-// Height sets the maximum height the image can have. Defaults to the image height.
+// Height 设置图像可以拥有的最大高度。默认为图像高度。
 func (m Mosaic) Height(height int) Mosaic {
 	m.outputHeight = height
 	return m
 }
 
-// Symbol sets the mosaic symbol type.
+// Symbol 设置马赛克符号类型。
 func (m Mosaic) Symbol(symbol Symbol) Mosaic {
 	m.symbols = symbol
 	return m
 }
 
-// Render renders the image to a string.
+// Render 将图像渲染为字符串。
 func (m *Mosaic) Render(img image.Image) string {
 	// Calculate dimensions.
 	bounds := img.Bounds()
@@ -259,7 +259,7 @@ func (m *Mosaic) Render(img image.Image) string {
 	return output.String()
 }
 
-// createPixelBlock extracts a 2x2 block of pixels from the image.
+// createPixelBlock 从图像中提取2x2像素块。
 func (m *Mosaic) createPixelBlock(img image.Image, x, y int) *pixelBlock {
 	block := &pixelBlock{}
 
@@ -273,7 +273,7 @@ func (m *Mosaic) createPixelBlock(img image.Image, x, y int) *pixelBlock {
 	return block
 }
 
-// findBestRepresentation finds the best block character and colors for a 2x2 pixel block.
+// findBestRepresentation 为2x2像素块找到最佳的块字符和颜色。
 func (m *Mosaic) findBestRepresentation(block *pixelBlock, availableBlocks []block) {
 	// Simple case: use only foreground/background colors.
 	if m.useFgBgOnly {
@@ -353,7 +353,7 @@ func (m *Mosaic) findBestRepresentation(block *pixelBlock, availableBlocks []blo
 	block.BestSymbol = bestChar
 }
 
-// averageColors calculates the average color from a slice of colors.
+// averageColors 计算颜色切片的平均颜色。
 func (m *Mosaic) averageColors(colors ...color.Color) color.Color {
 	if len(colors) == 0 {
 		return color.Black
@@ -379,7 +379,7 @@ func (m *Mosaic) averageColors(colors ...color.Color) color.Color {
 	}
 }
 
-// getPixelSafe returns the color at (x,y) or black if out of bounds.
+// getPixelSafe 返回(x,y)处的颜色，如果越界则返回黑色。
 func (m *Mosaic) getPixelSafe(img image.Image, x, y int) color.RGBA {
 	bounds := img.Bounds()
 	if x < bounds.Min.X || x >= bounds.Max.X || y < bounds.Min.Y || y >= bounds.Max.Y {
@@ -395,7 +395,7 @@ func (m *Mosaic) getPixelSafe(img image.Image, x, y int) color.RGBA {
 	}
 }
 
-// applyScaling resizes an image to the specified dimensions.
+// applyScaling 将图像调整为指定的尺寸。
 func (m *Mosaic) applyScaling(img image.Image, width, height int) image.Image {
 	rect := image.Rect(0, 0, width, height)
 	dst := image.NewRGBA(rect)
@@ -403,7 +403,7 @@ func (m *Mosaic) applyScaling(img image.Image, width, height int) image.Image {
 	return dst
 }
 
-// applyDithering applies Floyd-Steinberg dithering.
+// applyDithering 应用Floyd-Steinberg抖动。
 func (m *Mosaic) applyDithering(img image.Image) image.Image {
 	b := img.Bounds()
 	pm := image.NewPaletted(b, palette.Plan9)
@@ -411,7 +411,7 @@ func (m *Mosaic) applyDithering(img image.Image) image.Image {
 	return pm
 }
 
-// invertImage inverts the colors of an image.
+// invertImage 反转图像的颜色。
 func (m *Mosaic) invertImage(img image.Image) image.Image {
 	bounds := img.Bounds()
 	width := bounds.Max.X - bounds.Min.X
@@ -433,12 +433,12 @@ func (m *Mosaic) invertImage(img image.Image) image.Image {
 	return result
 }
 
-// rgbaToLuminance converts RGBA color to luminance (brightness).
+// rgbaToLuminance 将RGBA颜色转换为亮度（brightness）。
 func rgbaToLuminance(c color.Color) uint8 {
 	r, g, b, _ := c.RGBA()
 	r, g, b = shift(r), shift(g), shift(b)
-	// Weighted RGB to account for human perception
-	// source: https://www.w3.org/TR/AERT/#color-contrast
-	// context: https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
+	// 加权RGB以考虑人类感知
+	// 来源：https://www.w3.org/TR/AERT/#color-contrast
+	// 上下文：https://stackoverflow.com/questions/596216/formula-to-determine-perceived-brightness-of-rgb-color
 	return uint8(float64(r)*0.299 + float64(g)*0.587 + float64(b)*0.114)
 }

@@ -2,108 +2,99 @@ package kitty
 
 import "errors"
 
-// ErrMissingFile is returned when the file path is missing.
+// ErrMissingFile 在文件路径缺失时返回。
 var ErrMissingFile = errors.New("missing file path")
 
-// MaxChunkSize is the maximum chunk size for the image data.
+// MaxChunkSize 是图像数据的最大块大小。
 const MaxChunkSize = 1024 * 4
 
-// Placeholder is a special Unicode character that can be used as a placeholder
-// for an image.
+// Placeholder 是一个特殊的 Unicode 字符，可以用作图像的占位符。
 const Placeholder = '\U0010EEEE'
 
-// Graphics image format.
+// 图形图像格式。
 const (
-	// 32-bit RGBA format.
+	// 32 位 RGBA 格式。
 	RGBA = 32
 
-	// 24-bit RGB format.
+	// 24 位 RGB 格式。
 	RGB = 24
 
-	// PNG format.
+	// PNG 格式。
 	PNG = 100
 )
 
-// Compression types.
+// 压缩类型。
 const (
 	Zlib = 'z'
 )
 
-// Transmission types.
+// 传输类型。
 const (
-	// The data transmitted directly in the escape sequence.
+	// 数据直接在转义序列中传输。
 	Direct = 'd'
 
-	// The data transmitted in a regular file.
+	// 数据在常规文件中传输。
 	File = 'f'
 
-	// A temporary file is used and deleted after transmission.
+	// 使用临时文件并在传输后删除。
 	TempFile = 't'
 
-	// A shared memory object.
-	// For POSIX see https://pubs.opengroup.org/onlinepubs/9699919799/functions/shm_open.html
-	// For Windows see https://docs.microsoft.com/en-us/windows/win32/memory/creating-named-shared-memory
+	// 共享内存对象。
+	// 对于 POSIX，请参阅 https://pubs.opengroup.org/onlinepubs/9699919799/functions/shm_open.html
+	// 对于 Windows，请参阅 https://docs.microsoft.com/en-us/windows/win32/memory/creating-named-shared-memory
 	SharedMemory = 's'
 )
 
-// Action types.
+// 操作类型。
 const (
-	// Transmit image data.
+	// 传输图像数据。
 	Transmit = 't'
-	// TransmitAndPut transmit image data and display (put) it.
+	// TransmitAndPut 传输图像数据并显示（放置）它。
 	TransmitAndPut = 'T'
-	// Query terminal for image info.
+	// 查询终端获取图像信息。
 	Query = 'q'
-	// Put (display) previously transmitted image.
+	// 放置（显示）先前传输的图像。
 	Put = 'p'
-	// Delete image.
+	// 删除图像。
 	Delete = 'd'
-	// Frame transmits data for animation frames.
+	// Frame 传输动画帧的数据。
 	Frame = 'f'
-	// Animate controls animation.
+	// Animate 控制动画。
 	Animate = 'a'
-	// Compose composes animation frames.
+	// Compose 组合动画帧。
 	Compose = 'c'
 )
 
-// Delete types.
+// 删除类型。
 const (
-	// Delete all placements visible on screen.
+	// 删除屏幕上可见的所有放置。
 	DeleteAll = 'a'
-	// Delete all images with the specified id, specified using the i key. If
-	// you specify a p key for the placement id as well, then only the
-	// placement with the specified image id and placement id will be deleted.
+	// 删除具有指定 id 的所有图像，使用 i 键指定。
+	// 如果您同时为放置 id 指定 p 键，则只会删除具有指定图像 id 和放置 id 的放置。
 	DeleteID = 'i'
-	// Delete newest image with the specified number, specified using the I
-	// key. If you specify a p key for the placement id as well, then only the
-	// placement with the specified number and placement id will be deleted.
+	// 删除具有指定编号的最新图像，使用 I 键指定。
+	// 如果您同时为放置 id 指定 p 键，则只会删除具有指定编号和放置 id 的放置。
 	DeleteNumber = 'n'
-	// Delete all placements that intersect with the current cursor position.
+	// 删除与当前光标位置相交的所有放置。
 	DeleteCursor = 'c'
-	// Delete animation frames.
+	// 删除动画帧。
 	DeleteFrames = 'f'
-	// Delete all placements that intersect a specific cell, the cell is
-	// specified using the x and y keys.
+	// 删除与特定单元格相交的所有放置，单元格使用 x 和 y 键指定。
 	DeleteCell = 'p'
-	// Delete all placements that intersect a specific cell having a specific
-	// z-index. The cell and z-index is specified using the x, y and z keys.
+	// 删除与具有特定 z-index 的特定单元格相交的所有放置。
+	// 单元格和 z-index 使用 x、y 和 z 键指定。
 	DeleteCellZ = 'q'
-	// Delete all images whose id is greater than or equal to the value of the x
-	// key and less than or equal to the value of the y.
+	// 删除 id 大于或等于 x 键值且小于或等于 y 键值的所有图像。
 	DeleteRange = 'r'
-	// Delete all placements that intersect the specified column, specified using
-	// the x key.
+	// 删除与指定列相交的所有放置，使用 x 键指定。
 	DeleteColumn = 'x'
-	// Delete all placements that intersect the specified row, specified using
-	// the y key.
+	// 删除与指定行相交的所有放置，使用 y 键指定。
 	DeleteRow = 'y'
-	// Delete all placements that have the specified z-index, specified using the
-	// z key.
+	// 删除具有指定 z-index 的所有放置，使用 z 键指定。
 	DeleteZ = 'z'
 )
 
-// Diacritic returns the diacritic rune at the specified index. If the index is
-// out of bounds, the first diacritic rune is returned.
+// Diacritic 返回指定索引处的变音符号字符。如果索引超出范围，则返回第一个变音符号字符。
 func Diacritic(i int) rune {
 	if i < 0 || i >= len(diacritics) {
 		return diacritics[0]
@@ -111,8 +102,8 @@ func Diacritic(i int) rune {
 	return diacritics[i]
 }
 
-// From https://sw.kovidgoyal.net/kitty/_downloads/f0a0de9ec8d9ff4456206db8e0814937/rowcolumn-diacritics.txt
-// See https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders for further explanation.
+// 来自 https://sw.kovidgoyal.net/kitty/_downloads/f0a0de9ec8d9ff4456206db8e0814937/rowcolumn-diacritics.txt
+// 有关进一步解释，请参阅 https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders。
 var diacritics = []rune{
 	'\u0305',
 	'\u030D',

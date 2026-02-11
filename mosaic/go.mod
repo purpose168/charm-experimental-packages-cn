@@ -1,9 +1,9 @@
-module github.com/charmbracelet/x/mosaic
+module github.com/purpose168/charm-experimental-packages-cn/mosaic
 
 go 1.24.2
 
 require (
-	github.com/charmbracelet/x/ansi v0.11.6
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.6
 	golang.org/x/image v0.35.0
 )
 

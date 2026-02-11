@@ -1,14 +1,14 @@
-// Package conpty implements Windows Console Pseudo-terminal support.
+// conpty 包实现 Windows 控制台伪终端支持。
 //
-// https://learn.microsoft.com/en-us/windows/console/creating-a-pseudoconsole-session
+// https://learn.microsoft.com/zh-cn/windows/console/creating-a-pseudoconsole-session
 package conpty
 
 import "errors"
 
-// ErrUnsupported is returned when the current platform is not supported.
-var ErrUnsupported = errors.New("conpty: unsupported platform")
+// ErrUnsupported 当当前平台不支持时返回的错误
+var ErrUnsupported = errors.New("conpty: 不支持的平台")
 
-// Default size.
+// 默认尺寸
 const (
 	DefaultWidth  = 80
 	DefaultHeight = 25

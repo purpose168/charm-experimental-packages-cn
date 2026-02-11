@@ -2,11 +2,10 @@ package vt
 
 import (
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// handleSgr handles SGR escape sequences.
-// handleSgr handles Select Graphic Rendition (SGR) escape sequences.
+// handleSgr 处理 SGR（选择图形渲染）转义序列。
 func (e *Emulator) handleSgr(params ansi.Params) {
 	uv.ReadStyle(params, &e.scr.cur.Pen)
 }

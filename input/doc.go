@@ -1,6 +1,4 @@
-// Package input provides a set of utilities for handling input events in a
-// terminal environment. It includes support for reading input events, parsing
-// escape sequences, and handling clipboard events.
-// The package is designed to work with various terminal types and supports
-// customization through flags and options.
+// input 包提供了一套用于在终端环境中处理输入事件的工具。
+// 它包括对读取输入事件、解析转义序列和处理剪贴板事件的支持。
+// 该包设计用于各种终端类型，并通过标志和选项支持自定义。
 package input

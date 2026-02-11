@@ -4,7 +4,7 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// Button represents a clickable button element.
+// Button 表示一个可点击的按钮元素。
 type Button struct {
 	BaseElement
 	text        string
@@ -19,7 +19,7 @@ type Button struct {
 
 var _ Element = (*Button)(nil)
 
-// NewButton creates a new button element.
+// NewButton 创建一个新的按钮元素。
 func NewButton(text string) *Button {
 	return &Button{
 		text:    text,
@@ -28,56 +28,56 @@ func NewButton(text string) *Button {
 	}
 }
 
-// Style sets the button style and returns the button for chaining.
+// Style 设置按钮样式并返回按钮以支持链式调用。
 func (b *Button) Style(style uv.Style) *Button {
 	b.style = style
 	return b
 }
 
-// HoverStyle sets the hover style and returns the button for chaining.
+// HoverStyle 设置悬停样式并返回按钮以支持链式调用。
 func (b *Button) HoverStyle(style uv.Style) *Button {
 	b.hoverStyle = style
 	return b
 }
 
-// ActiveStyle sets the active (pressed) style and returns the button for chaining.
+// ActiveStyle 设置激活（按下）样式并返回按钮以支持链式调用。
 func (b *Button) ActiveStyle(style uv.Style) *Button {
 	b.activeStyle = style
 	return b
 }
 
-// Border sets the border type and returns the button for chaining.
+// Border 设置边框类型并返回按钮以支持链式调用。
 func (b *Button) Border(border string) *Button {
 	b.border = border
 	return b
 }
 
-// Padding sets the padding and returns the button for chaining.
+// Padding 设置内边距并返回按钮以支持链式调用。
 func (b *Button) Padding(padding int) *Button {
 	b.padding = padding
 	return b
 }
 
-// Width sets the width constraint and returns the button for chaining.
+// Width 设置宽度约束并返回按钮以支持链式调用。
 func (b *Button) Width(width SizeConstraint) *Button {
 	b.width = width
 	return b
 }
 
-// Height sets the height constraint and returns the button for chaining.
+// Height 设置高度约束并返回按钮以支持链式调用。
 func (b *Button) Height(height SizeConstraint) *Button {
 	b.height = height
 	return b
 }
 
-// Draw renders the button to the screen.
+// Draw 将按钮渲染到屏幕上。
 func (b *Button) Draw(scr uv.Screen, area uv.Rectangle) {
 	b.SetBounds(area)
 
-	// Create text element
+	// 创建文本元素
 	textElem := NewText(b.text).Alignment(AlignmentCenter)
 	if !b.style.IsZero() {
-		// Apply style to text content
+		// 应用样式到文本内容
 		if b.style.Fg != nil {
 			textElem = textElem.ForegroundColor(b.style.Fg)
 		}
@@ -89,7 +89,7 @@ func (b *Button) Draw(scr uv.Screen, area uv.Rectangle) {
 		}
 	}
 
-	// Wrap in box with border and padding
+	// 用带边框和内边距的盒子包裹
 	box := NewBox(textElem).
 		Border(b.border).
 		Padding(b.padding)
@@ -101,13 +101,13 @@ func (b *Button) Draw(scr uv.Screen, area uv.Rectangle) {
 	box.Draw(scr, area)
 }
 
-// Layout calculates button size.
+// Layout 计算按钮大小。
 func (b *Button) Layout(constraints Constraints) Size {
-	// Create text element for sizing
+	// 创建用于计算大小的文本元素
 	textElem := NewText(b.text)
 	textSize := textElem.Layout(Unbounded())
 
-	// Add padding and border
+	// 添加内边距和边框
 	borderSize := 2
 	if b.border == BorderNone || b.border == BorderHidden {
 		borderSize = 0
@@ -120,12 +120,12 @@ func (b *Button) Layout(constraints Constraints) Size {
 
 	result := Size{Width: width, Height: height}
 
-	// Apply width constraint if specified
+	// 如果指定了宽度约束，则应用
 	if !b.width.IsAuto() {
 		result.Width = b.width.Apply(constraints.MaxWidth, result.Width)
 	}
 
-	// Apply height constraint if specified
+	// 如果指定了高度约束，则应用
 	if !b.height.IsAuto() {
 		result.Height = b.height.Apply(constraints.MaxHeight, result.Height)
 	}
@@ -133,12 +133,12 @@ func (b *Button) Layout(constraints Constraints) Size {
 	return constraints.Constrain(result)
 }
 
-// Children returns nil for buttons.
+// Children 为按钮返回 nil。
 func (b *Button) Children() []Element {
 	return nil
 }
 
-// NewButtonFromProps creates a button from props (for parser).
+// NewButtonFromProps 从属性创建按钮（用于解析器）。
 func NewButtonFromProps(props Props, children []Element) Element {
 	text := props.Get("text")
 	if text == "" && len(children) > 0 {
@@ -149,7 +149,7 @@ func NewButtonFromProps(props Props, children []Element) Element {
 
 	btn := NewButton(text)
 
-	// Parse foreground color for button text/border
+	// 解析按钮文本/边框的前景色
 	if fgColor := props.Get("foreground-color"); fgColor != "" {
 		if c, err := parseColor(fgColor); err == nil {
 			style := uv.Style{Fg: c}

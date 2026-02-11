@@ -6,69 +6,67 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
-// Color is a color that can be used in a terminal. ANSI (including
-// ANSI256) and 24-bit "true colors" fall under this category.
+// Color 是可以在终端中使用的颜色。ANSI（包括 ANSI256）和 24 位"真彩色"都属于此类。
 type Color interface {
 	color.Color
 }
 
-// BasicColor is an ANSI 3-bit or 4-bit color with a value from 0 to 15.
+// BasicColor 是 ANSI 3 位或 4 位颜色，值范围为 0 到 15。
 type BasicColor uint8
 
 var _ Color = BasicColor(0)
 
 const (
-	// Black is the ANSI black color.
+	// Black 是 ANSI 黑色。
 	Black BasicColor = iota
 
-	// Red is the ANSI red color.
+	// Red 是 ANSI 红色。
 	Red
 
-	// Green is the ANSI green color.
+	// Green 是 ANSI 绿色。
 	Green
 
-	// Yellow is the ANSI yellow color.
+	// Yellow 是 ANSI 黄色。
 	Yellow
 
-	// Blue is the ANSI blue color.
+	// Blue 是 ANSI 蓝色。
 	Blue
 
-	// Magenta is the ANSI magenta color.
+	// Magenta 是 ANSI 洋红色。
 	Magenta
 
-	// Cyan is the ANSI cyan color.
+	// Cyan 是 ANSI 青色。
 	Cyan
 
-	// White is the ANSI white color.
+	// White 是 ANSI 白色。
 	White
 
-	// BrightBlack is the ANSI bright black color.
+	// BrightBlack 是 ANSI 亮黑色。
 	BrightBlack
 
-	// BrightRed is the ANSI bright red color.
+	// BrightRed 是 ANSI 亮红色。
 	BrightRed
 
-	// BrightGreen is the ANSI bright green color.
+	// BrightGreen 是 ANSI 亮绿色。
 	BrightGreen
 
-	// BrightYellow is the ANSI bright yellow color.
+	// BrightYellow 是 ANSI 亮黄色。
 	BrightYellow
 
-	// BrightBlue is the ANSI bright blue color.
+	// BrightBlue 是 ANSI 亮蓝色。
 	BrightBlue
 
-	// BrightMagenta is the ANSI bright magenta color.
+	// BrightMagenta 是 ANSI 亮洋红色。
 	BrightMagenta
 
-	// BrightCyan is the ANSI bright cyan color.
+	// BrightCyan 是 ANSI 亮青色。
 	BrightCyan
 
-	// BrightWhite is the ANSI bright white color.
+	// BrightWhite 是 ANSI 亮白色。
 	BrightWhite
 )
 
-// RGBA returns the red, green, blue and alpha components of the color. It
-// satisfies the color.Color interface.
+// RGBA 返回颜色的红、绿、蓝和 alpha 分量。它满足 color.Color 接口。
 func (c BasicColor) RGBA() (uint32, uint32, uint32, uint32) {
 	ansi := uint32(c)
 	if ansi > 15 {
@@ -78,77 +76,71 @@ func (c BasicColor) RGBA() (uint32, uint32, uint32, uint32) {
 	return ansiToRGB(byte(ansi)).RGBA()
 }
 
-// IndexedColor is an ANSI 256 (8-bit) color with a value from 0 to 255.
+// IndexedColor 是 ANSI 256（8 位）颜色，值范围为 0 到 255。
 type IndexedColor uint8
 
 var _ Color = IndexedColor(0)
 
-// RGBA returns the red, green, blue and alpha components of the color. It
-// satisfies the color.Color interface.
+// RGBA 返回颜色的红、绿、蓝和 alpha 分量。它满足 color.Color 接口。
 func (c IndexedColor) RGBA() (uint32, uint32, uint32, uint32) {
 	return ansiToRGB(byte(c)).RGBA()
 }
 
-// ExtendedColor is an ANSI 256 (8-bit) color with a value from 0 to 255.
+// ExtendedColor 是 ANSI 256（8 位）颜色，值范围为 0 到 255。
 //
-// Deprecated: use [IndexedColor] instead.
+// 已弃用：请使用 [IndexedColor] 代替。
 type ExtendedColor = IndexedColor
 
-// TrueColor is a 24-bit color that can be used in the terminal.
-// This can be used to represent RGB colors.
+// TrueColor 是可以在终端中使用的 24 位颜色。
+// 可用于表示 RGB 颜色。
 //
-// For example, the color red can be represented as:
+// 例如，红色可以表示为：
 //
 //	TrueColor(0xff0000)
 //
-// Deprecated: use [RGBColor] instead.
+// 已弃用：请使用 [RGBColor] 代替。
 type TrueColor uint32
 
 var _ Color = TrueColor(0)
 
-// RGBA returns the red, green, blue and alpha components of the color. It
-// satisfies the color.Color interface.
+// RGBA 返回颜色的红、绿、蓝和 alpha 分量。它满足 color.Color 接口。
 func (c TrueColor) RGBA() (uint32, uint32, uint32, uint32) {
 	r, g, b := hexToRGB(uint32(c))
 	return toRGBA(r, g, b)
 }
 
-// RGBColor is a 24-bit color that can be used in the terminal.
-// This can be used to represent RGB colors.
+// RGBColor 是可以在终端中使用的 24 位颜色。
+// 可用于表示 RGB 颜色。
 type RGBColor struct {
 	R uint8
 	G uint8
 	B uint8
 }
 
-// RGBA returns the red, green, blue and alpha components of the color. It
-// satisfies the color.Color interface.
+// RGBA 返回颜色的红、绿、蓝和 alpha 分量。它满足 color.Color 接口。
 func (c RGBColor) RGBA() (uint32, uint32, uint32, uint32) {
 	return toRGBA(uint32(c.R), uint32(c.G), uint32(c.B))
 }
 
-// ansiToRGB converts an ANSI color to a 24-bit RGB color.
+// ansiToRGB 将 ANSI 颜色转换为 24 位 RGB 颜色。
 //
 //	r, g, b := ansiToRGB(57)
 func ansiToRGB(ansi byte) color.Color {
 	return ansiHex[ansi]
 }
 
-// hexToRGB converts a number in hexadecimal format to red, green, and blue
-// values.
+// hexToRGB 将十六进制格式的数字转换为红、绿、蓝值。
 //
 //	r, g, b := hexToRGB(0x0000FF)
 func hexToRGB(hex uint32) (uint32, uint32, uint32) {
 	return hex >> 16 & 0xff, hex >> 8 & 0xff, hex & 0xff
 }
 
-// toRGBA converts an RGB 8-bit color values to 32-bit color values suitable
-// for color.Color.
+// toRGBA 将 RGB 8 位颜色值转换为适合 color.Color 的 32 位颜色值。
 //
-// color.Color requires 16-bit color values, so we duplicate the 8-bit values
-// to fill the 16-bit values.
+// color.Color 需要 16 位颜色值，因此我们复制 8 位值以填充 16 位值。
 //
-// This always returns 0xffff (opaque) for the alpha channel.
+// 对于 alpha 通道，始终返回 0xffff（不透明）。
 func toRGBA(r, g, b uint32) (uint32, uint32, uint32, uint32) {
 	r |= r << 8
 	g |= g << 8
@@ -161,6 +153,7 @@ func distSq(r1, g1, b1, r2, g2, b2 int) int {
 	return ((r1-r2)*(r1-r2) + (g1-g2)*(g1-g2) + (b1-b2)*(b1-b2))
 }
 
+// to6Cube 将值转换为 6 立方体索引。
 func to6Cube[T int | float64](v T) int {
 	if v < 48 {
 		return 0
@@ -171,24 +164,22 @@ func to6Cube[T int | float64](v T) int {
 	return int((v - 35) / 40)
 }
 
-// Convert256 converts a [color.Color], usually a 24-bit color, to xterm(1) 256
-// color palette.
+// Convert256 将 [color.Color]（通常是 24 位颜色）转换为 xterm(1) 256 色调色板。
 //
-// xterm provides a 6x6x6 color cube (16 - 231) and 24 greys (232 - 255). We
-// map our RGB color to the closest in the cube, also work out the closest
-// grey, and use the nearest of the two based on the lightness of the color.
+// xterm 提供一个 6x6x6 颜色立方体（16 - 231）和 24 个灰色（232 - 255）。我们
+// 将 RGB 颜色映射到立方体中最接近的颜色，同时计算最接近的灰色，
+// 并根据颜色的亮度使用两者中更接近的一个。
 //
-// Note that the xterm has much lower resolution for darker colors (they are
-// not evenly spread out), so our 6 levels are not evenly spread: 0x0, 0x5f
-// (95), 0x87 (135), 0xaf (175), 0xd7 (215) and 0xff (255). Greys are more
-// evenly spread (8, 18, 28 ... 238).
+// 请注意，xterm 对于较暗的颜色分辨率较低（它们不是均匀分布的），
+// 因此我们的 6 个级别也不是均匀分布的：0x0, 0x5f (95), 0x87 (135), 0xaf (175), 0xd7 (215) 和 0xff (255)。
+// 灰色分布更均匀（8, 18, 28 ... 238）。
 func Convert256(c color.Color) IndexedColor {
-	// If the color is already an IndexedColor, return it.
+	// 如果颜色已经是 IndexedColor，直接返回。
 	if i, ok := c.(IndexedColor); ok {
 		return i
 	}
 
-	// Note: this is mostly ported from tmux/colour.c.
+	// 注意：这主要是从 tmux/colour.c 移植的。
 	col, ok := colorful.MakeColor(c)
 	if !ok {
 		return IndexedColor(0)
@@ -200,7 +191,7 @@ func Convert256(c color.Color) IndexedColor {
 
 	q2c := [6]int{0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff}
 
-	// Map RGB to 6x6x6 cube.
+	// 将 RGB 映射到 6x6x6 立方体。
 	qr := to6Cube(r)
 	cr := q2c[qr]
 	qg := to6Cube(g)
@@ -208,13 +199,13 @@ func Convert256(c color.Color) IndexedColor {
 	qb := to6Cube(b)
 	cb := q2c[qb]
 
-	// If we have hit the color exactly, return early.
+	// 如果正好命中颜色，提前返回。
 	ci := (36 * qr) + (6 * qg) + qb
 	if cr == int(r) && cg == int(g) && cb == int(b) {
 		return IndexedColor(16 + ci) //nolint:gosec
 	}
 
-	// Work out the closest grey (average of RGB).
+	// 计算最接近的灰色（RGB 的平均值）。
 	greyAvg := int(r+g+b) / 3
 	var greyIdx int
 	if greyAvg > 238 {
@@ -224,10 +215,8 @@ func Convert256(c color.Color) IndexedColor {
 	}
 	grey := 8 + (10 * greyIdx)
 
-	// Return the one which is nearer to the original input rgb value
-	// XXX: This is where it differs from tmux's implementation, we prefer the
-	// closer color to the original in terms of light distances rather than the
-	// cube distance.
+	// 返回更接近原始输入 RGB 值的那个
+	// XXX: 这与 tmux 的实现不同，我们根据亮度距离而不是立方体距离来选择更接近原始颜色的选项。
 	c2 := colorful.Color{R: float64(cr) / 255.0, G: float64(cg) / 255.0, B: float64(cb) / 255.0}
 	g2 := colorful.Color{R: float64(grey) / 255.0, G: float64(grey) / 255.0, B: float64(grey) / 255.0}
 	colorDist := col.DistanceHSLuv(c2)
@@ -238,7 +227,7 @@ func Convert256(c color.Color) IndexedColor {
 	}
 	return IndexedColor(232 + greyIdx) //nolint:gosec
 
-	// // Is grey or 6x6x6 color closest?
+	// // 灰色还是 6x6x6 颜色更接近？
 	// d := distSq(cr, cg, cb, int(r), int(g), int(b))
 	// if distSq(grey, grey, grey, int(r), int(g), int(b)) < d {
 	// 	return IndexedColor(232 + greyIdx) //nolint:gosec
@@ -246,17 +235,16 @@ func Convert256(c color.Color) IndexedColor {
 	// return IndexedColor(16 + ci) //nolint:gosec
 }
 
-// Convert16 converts a [color.Color] to a 16-color ANSI color. It will first
-// try to find a match in the 256 xterm(1) color palette, and then map that to
-// the 16-color ANSI palette.
+// Convert16 将 [color.Color] 转换为 16 色 ANSI 颜色。它会首先
+// 尝试在 256 色 xterm(1) 调色板中找到匹配项，然后将其映射到
+// 16 色 ANSI 调色板。
 func Convert16(c color.Color) BasicColor {
 	switch c := c.(type) {
 	case BasicColor:
-		// If the color is already a BasicColor, return it.
+		// 如果颜色已经是 BasicColor，直接返回。
 		return c
 	case IndexedColor:
-		// If the color is already an IndexedColor, return the corresponding
-		// BasicColor.
+		// 如果颜色已经是 IndexedColor，返回对应的 BasicColor。
 		return ansi256To16[c]
 	default:
 		c256 := Convert256(c)
@@ -264,7 +252,7 @@ func Convert16(c color.Color) BasicColor {
 	}
 }
 
-// RGB values of ANSI colors (0-255).
+// ANSI 颜色的 RGB 值 (0-255)。
 var ansiHex = [...]color.RGBA{
 	0:   {R: 0x00, G: 0x00, B: 0x00, A: 0xff}, //   "#000000"
 	1:   {R: 0x80, G: 0x00, B: 0x00, A: 0xff}, //   "#800000"

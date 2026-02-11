@@ -4,9 +4,9 @@
 
 package protocol
 
-// This file declares URI, DocumentUri, and its methods.
+// 此文件声明了 URI、DocumentUri 及其方法。
 //
-// For the LSP definition of these types, see
+// 有关这些类型的 LSP 定义，请参阅
 // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#uri
 
 import (
@@ -16,68 +16,60 @@ import (
 	"strings"
 )
 
-// A DocumentURI is the URI of a client editor document.
+// DocumentURI 是客户端编辑器文档的 URI。
 //
-// According to the LSP specification:
+// 根据 LSP 规范：
 //
-//	Care should be taken to handle encoding in URIs. For
-//	example, some clients (such as VS Code) may encode colons
-//	in drive letters while others do not. The URIs below are
-//	both valid, but clients and servers should be consistent
-//	with the form they use themselves to ensure the other party
-//	doesn’t interpret them as distinct URIs. Clients and
-//	servers should not assume that each other are encoding the
-//	same way (for example a client encoding colons in drive
-//	letters cannot assume server responses will have encoded
-//	colons). The same applies to casing of drive letters - one
-//	party should not assume the other party will return paths
-//	with drive letters cased the same as it.
+//	应注意处理 URI 中的编码。例如，
+//	一些客户端（如 VS Code）可能会对驱动器号中的冒号进行编码，
+//	而其他客户端则不会。下面的 URI 都是有效的，
+//	但客户端和服务器应在自己使用的形式上保持一致，
+//	以确保另一方不会将它们解释为不同的 URI。
+//	客户端和服务器不应假设对方以相同的方式编码
+//	（例如，编码驱动器号中冒号的客户端不能假设
+//	服务器响应会有编码的冒号）。同样适用于驱动器号的大小写 - 
+//	一方不应假设另一方会返回与自己大小写相同的驱动器号路径。
 //
 //	file:///c:/project/readme.md
 //	file:///C%3A/project/readme.md
 //
-// This is done during JSON unmarshalling;
-// see [DocumentURI.UnmarshalText] for details.
+// 这是在 JSON 反序列化期间完成的；
+// 有关详细信息，请参阅 [DocumentURI.UnmarshalText]。
 type DocumentURI string
 
-// A URI is an arbitrary URL (e.g. https), not necessarily a file.
+// URI 是任意 URL（例如 https），不一定是文件。
 type URI = string
 
-// UnmarshalText implements decoding of DocumentUri values.
+// UnmarshalText 实现 DocumentUri 值的解码。
 //
-// In particular, it implements a systematic correction of various odd
-// features of the definition of DocumentUri in the LSP spec that
-// appear to be workarounds for bugs in VS Code. For example, it may
-// URI-encode the URI itself, so that colon becomes %3A, and it may
-// send file://foo.go URIs that have two slashes (not three) and no
-// hostname.
+// 特别是，它实现了对 LSP 规范中 DocumentUri 定义的各种奇怪特性的系统纠正，
+// 这些特性似乎是为了解决 VS Code 中的错误。例如，它可能会对 URI 本身进行 URI 编码，
+// 使冒号变为 %3A，并且可能会发送只有两个斜杠（不是三个）且没有主机名的 file://foo.go URI。
 //
-// We use UnmarshalText, not UnmarshalJSON, because it is called even
-// for non-addressable values such as keys and values of map[K]V,
-// where there is no pointer of type *K or *V on which to call
-// UnmarshalJSON. (See Go issue #28189 for more detail.)
+// 我们使用 UnmarshalText 而不是 UnmarshalJSON，因为即使对于不可寻址的值，
+// 如 map[K]V 的键和值，也会调用它，而这些值没有可调用 UnmarshalJSON 的 *K 或 *V 类型指针。
+// （有关更多详细信息，请参阅 Go 问题 #28189。）
 //
-// Non-empty DocumentUris are valid "file"-scheme URIs.
-// The empty DocumentUri is valid.
+// 非空的 DocumentUris 是有效的 "file" 方案 URI。
+// 空的 DocumentUri 是有效的。
 func (uri *DocumentURI) UnmarshalText(data []byte) (err error) {
 	*uri, err = ParseDocumentURI(string(data))
 	return err
 }
 
-// Path returns the file path for the given URI.
+// Path 返回给定 URI 的文件路径。
 //
-// DocumentUri("").Path() returns the empty string.
+// DocumentUri("").Path() 返回空字符串。
 //
-// Path panics if called on a URI that is not a valid filename.
+// 如果对不是有效文件名的 URI 调用 Path，会导致恐慌。
 func (uri DocumentURI) Path() (string, error) {
 	filename, err := filename(uri)
 	if err != nil {
-		// e.g. ParseRequestURI failed.
+		// 例如，ParseRequestURI 失败。
 		//
-		// This can only affect DocumentUris created by
-		// direct string manipulation; all DocumentUris
-		// received from the client pass through
-		// ParseRequestURI, which ensures validity.
+		// 这只会影响通过直接字符串操作创建的 DocumentUris；
+		// 从客户端接收的所有 DocumentUris 都经过 ParseRequestURI，
+		// 这确保了有效性。
 		return "", fmt.Errorf("invalid URI %q: %w", uri, err)
 	}
 	return filepath.FromSlash(filename), nil
@@ -88,18 +80,17 @@ func filename(uri DocumentURI) (string, error) {
 		return "", nil
 	}
 
-	// This conservative check for the common case
-	// of a simple non-empty absolute POSIX filename
-	// avoids the allocation of a net.URL.
+	// 这种对简单非空绝对 POSIX 文件名常见情况的保守检查
+	// 避免了分配 net.URL。
 	if strings.HasPrefix(string(uri), "file:///") {
 		rest := string(uri)[len("file://"):] // leave one slash
 		for i := range len(rest) {
 			b := rest[i]
-			// Reject these cases:
-			if b < ' ' || b == 0x7f || // control character
-				b == '%' || b == '+' || // URI escape
-				b == ':' || // Windows drive letter
-				b == '@' || b == '&' || b == '?' { // authority or query
+			// 拒绝这些情况：
+			if b < ' ' || b == 0x7f || // 控制字符
+				b == '%' || b == '+' || // URI 转义
+				b == ':' || // Windows 驱动器号
+				b == '@' || b == '&' || b == '?' { // 权限或查询
 				goto slow
 			}
 		}
@@ -123,8 +114,8 @@ slow:
 	return u.Path, nil
 }
 
-// ParseDocumentURI interprets a string as a DocumentUri, applying VS
-// Code workarounds; see [DocumentURI.UnmarshalText] for details.
+// ParseDocumentURI 将字符串解释为 DocumentUri，应用 VS Code 变通方法；
+// 有关详细信息，请参阅 [DocumentURI.UnmarshalText]。
 func ParseDocumentURI(s string) (DocumentURI, error) {
 	if s == "" {
 		return "", nil
@@ -134,23 +125,21 @@ func ParseDocumentURI(s string) (DocumentURI, error) {
 		return "", fmt.Errorf("DocumentUri scheme is not 'file': %s", s)
 	}
 
-	// VS Code sends URLs with only two slashes,
-	// which are invalid. golang/go#39789.
+	// VS Code 发送只有两个斜杠的 URL，这是无效的。golang/go#39789。
 	if !strings.HasPrefix(s, "file:///") {
 		s = "file:///" + s[len("file://"):]
 	}
 
-	// Even though the input is a URI, it may not be in canonical form. VS Code
-	// in particular over-escapes :, @, etc. Unescape and re-encode to canonicalize.
+	// 尽管输入是 URI，但它可能不是规范形式。特别是 VS Code 会过度转义 :、@ 等字符。
+	// 解转义并重新编码以规范化。
 	path, err := url.PathUnescape(s[len("file://"):])
 	if err != nil {
 		return "", fmt.Errorf("unescaping URI path %q: %w", s, err)
 	}
 
-	// File URIs from Windows may have lowercase drive letters.
-	// Since drive letters are guaranteed to be case insensitive,
-	// we change them to uppercase to remain consistent.
-	// For example, file:///c:/x/y/z becomes file:///C:/x/y/z.
+	// 来自 Windows 的文件 URI 可能有小写的驱动器号。
+	// 由于驱动器号保证不区分大小写，我们将它们更改为大写以保持一致性。
+	// 例如，file:///c:/x/y/z 变为 file:///C:/x/y/z。
 	if isWindowsDrivePath(path) {
 		path = path[:1] + strings.ToUpper(string(path[1])) + path[2:]
 	}
@@ -158,8 +147,8 @@ func ParseDocumentURI(s string) (DocumentURI, error) {
 	return DocumentURI(u.String()), nil
 }
 
-// URIFromPath returns DocumentUri for the supplied file path.
-// Given "", it returns "".
+// URIFromPath 为提供的文件路径返回 DocumentUri。
+// 给定 ""，它返回 ""。
 func URIFromPath(path string) DocumentURI {
 	if path == "" {
 		return ""
@@ -181,9 +170,9 @@ func URIFromPath(path string) DocumentURI {
 
 const fileScheme = "file"
 
-// isWindowsDrivePath returns true if the file path is of the form used by
-// Windows. We check if the path begins with a drive letter, followed by a ":".
-// For example: C:/x/y/z.
+// isWindowsDrivePath 如果文件路径采用 Windows 使用的形式，则返回 true。
+// 我们检查路径是否以驱动器号开头，后跟 ":"。
+// 例如：C:/x/y/z。
 func isWindowsDrivePath(path string) bool {
 	return filepath.VolumeName(path) != ""
 }

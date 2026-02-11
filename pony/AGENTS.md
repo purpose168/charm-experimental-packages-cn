@@ -7,10 +7,10 @@ This file documents essential information for AI agents working in the pony code
 **pony** is a declarative, type-safe markup language for building terminal user interfaces. It uses [Ultraviolet](https://github.com/charmbracelet/ultraviolet) as the rendering engine and integrates with [Bubble Tea](https://github.com/charmbracelet/bubbletea).
 
 - **Language**: Go 1.24.2
-- **Module**: `github.com/charmbracelet/x/pony`
-- **Primary dependencies**: 
+- **Module**: `github.com/purpose168/charm-experimental-packages-cn/pony`
+- **Primary dependencies**:
   - `github.com/charmbracelet/ultraviolet` (UV rendering)
-  - `github.com/charmbracelet/x/ansi` (ANSI parsing)
+  - `github.com/purpose168/charm-experimental-packages-cn/ansi` (ANSI parsing)
   - `golang.org/x/text` (text processing)
 - **Experimental**: This is primarily AI-generated and experimental
 
@@ -327,7 +327,7 @@ func TestElement(t *testing.T) {
         {name: "case1", ...},
         {name: "case2", ...},
     }
-    
+
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
             // test logic

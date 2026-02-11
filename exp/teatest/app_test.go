@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/x/exp/teatest"
+	tea "github.com/purpose168/bubbletea-cn"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/teatest"
 )
 
+// TestApp 测试基本的应用程序测试功能
 func TestApp(t *testing.T) {
 	m := model(10)
 	tm := teatest.NewTestModel(
@@ -25,8 +26,8 @@ func TestApp(t *testing.T) {
 	})
 
 	time.Sleep(time.Second + time.Millisecond*200)
-	tm.Type("I'm typing things, but it'll be ignored by my program")
-	tm.Send("ignored msg")
+	tm.Type("我在输入内容，但我的程序会忽略它")
+	tm.Send("被忽略的消息")
 	tm.Send(tea.KeyMsg{
 		Type: tea.KeyEnter,
 	})
@@ -37,20 +38,21 @@ func TestApp(t *testing.T) {
 
 	out := readBts(t, tm.FinalOutput(t, teatest.WithFinalTimeout(time.Second)))
 	if !regexp.MustCompile(`This program will exit in \d+ seconds`).Match(out) {
-		t.Fatalf("output does not match the given regular expression: %s", string(out))
+		t.Fatalf("输出与给定的正则表达式不匹配: %s", string(out))
 	}
 	teatest.RequireEqualOutput(t, out)
 
 	fm := tm.FinalModel(t)
 	if fm == nil {
-		t.Fatal("expected a model, got nil")
+		t.Fatal("期望一个模型，得到 nil")
 	}
 
 	if fmm, ok := fm.(model); !ok || fmm != 9 {
-		t.Errorf("expected model to be 9, was %d", m)
+		t.Errorf("期望模型为 9, 实际为 %d", m)
 	}
 }
 
+// TestAppInteractive 测试交互式应用程序测试功能
 func TestAppInteractive(t *testing.T) {
 	m := model(10)
 	tm := teatest.NewTestModel(
@@ -59,10 +61,10 @@ func TestAppInteractive(t *testing.T) {
 	)
 
 	time.Sleep(time.Second + time.Millisecond*200)
-	tm.Send("ignored msg")
+	tm.Send("被忽略的消息")
 
 	if bts := readBts(t, tm.Output()); !bytes.Contains(bts, []byte("This program will exit in 9 seconds")) {
-		t.Fatalf("output does not match: expected %q", string(bts))
+		t.Fatalf("输出不匹配: 期望 %q", string(bts))
 	}
 
 	teatest.WaitFor(t, tm.Output(), func(out []byte) bool {
@@ -79,14 +81,15 @@ func TestAppInteractive(t *testing.T) {
 
 	fm := tm.FinalModel(t)
 	if fm == nil {
-		t.Fatal("expected a model, got nil")
+		t.Fatal("期望一个模型，得到 nil")
 	}
 
 	if fmm, ok := fm.(model); !ok || fmm != 7 {
-		t.Errorf("expected model to be 7, was %d", m)
+		t.Errorf("期望模型为 7, 实际为 %d", m)
 	}
 }
 
+// readBts 从 io.Reader 读取所有字节
 func readBts(tb testing.TB, r io.Reader) []byte {
 	tb.Helper()
 	bts, err := io.ReadAll(r)
@@ -96,20 +99,19 @@ func readBts(tb testing.TB, r io.Reader) []byte {
 	return bts
 }
 
-// A model can be more or less any type of data. It holds all the data for a
-// program, so often it's a struct. For this simple example, however, all
-// we'll need is a simple integer.
+// model 可以是任何类型的数据。它保存程序的所有数据，
+// 所以通常它是一个结构体。但在这个简单的例子中，
+// 我们只需要一个简单的整数。
 type model int
 
-// Init optionally returns an initial command we should run. In this case we
-// want to start the timer.
+// Init 可选地返回我们应该运行的初始命令。在这种情况下，
+// 我们想启动计时器。
 func (m model) Init() tea.Cmd {
 	return tick
 }
 
-// Update is called when messages are received. The idea is that you inspect the
-// message and send back an updated model accordingly. You can also return
-// a command, which is a function that performs I/O and returns a message.
+// Update 在收到消息时被调用。其思想是检查消息并相应地返回更新后的模型。
+// 你还可以返回一个命令，这是一个执行 I/O 并返回消息的函数。
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg.(type) {
 	case tea.KeyMsg:
@@ -124,14 +126,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// View returns a string based on data in the model. That string which will be
-// rendered to the terminal.
+// View 根据模型中的数据返回一个字符串。该字符串将被渲染到终端。
 func (m model) View() string {
 	return fmt.Sprintf("Hi. This program will exit in %d seconds. To quit sooner press any key.\n", m)
 }
 
-// Messages are events that we respond to in our Update function. This
-// particular one indicates that the timer has ticked.
+// 消息是我们在 Update 函数中响应的事件。
+// 这个特定的消息表示计时器已经滴答作响。
 type tickMsg time.Time
 
 func tick() tea.Msg {

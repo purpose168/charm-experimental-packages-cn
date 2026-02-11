@@ -1,6 +1,6 @@
 package config
 
-// singleFileSupport lists servers that can work without a project root.
+// singleFileSupport 列出可以在没有项目根目录的情况下工作的服务器。
 var singleFileSupport = map[string]struct{}{
 	"asm_lsp":      {},
 	"bashls":       {},
@@ -29,7 +29,7 @@ var singleFileSupport = map[string]struct{}{
 	"zls":          {},
 }
 
-// snippetSupport lists servers that support snippets.
+// snippetSupport 列出支持代码片段的服务器。
 var snippetSupport = map[string]struct{}{
 	"ansiblels":              {},
 	"asm_lsp":                {},

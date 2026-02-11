@@ -1,10 +1,10 @@
 package cellbuf
 
 import (
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// hash returns the hash value of a [Line].
+// hash 返回 [Line] 的哈希值。
 func hash(l Line) (h uint64) {
 	for _, c := range l {
 		var r rune
@@ -18,21 +18,21 @@ func hash(l Line) (h uint64) {
 	return h
 }
 
-// hashmap represents a single [Line] hash.
+// hashmap 表示单个 [Line] 的哈希。
 type hashmap struct {
 	value              uint64
 	oldcount, newcount int
 	oldindex, newindex int
 }
 
-// The value used to indicate lines created by insertions and scrolls.
+// 用于指示通过插入和滚动创建的行的值。
 const newIndex = -1
 
-// updateHashmap updates the hashmap with the new hash value.
+// updateHashmap 用新的哈希值更新哈希表。
 func (s *Screen) updateHashmap() {
 	height := s.newbuf.Height()
 	if len(s.oldhash) >= height && len(s.newhash) >= height {
-		// rehash changed lines
+		// 重新哈希已更改的行
 		for i := range height {
 			_, ok := s.touch[i]
 			if ok {
@@ -41,7 +41,7 @@ func (s *Screen) updateHashmap() {
 			}
 		}
 	} else {
-		// rehash all
+		// 重新哈希所有行
 		if len(s.oldhash) != height {
 			s.oldhash = make([]uint64, height)
 		}
@@ -58,7 +58,7 @@ func (s *Screen) updateHashmap() {
 	for i := range height {
 		hashval := s.oldhash[i]
 
-		// Find matching hash or empty slot
+		// 查找匹配的哈希或空槽
 		idx := 0
 		for idx < len(s.hashtab) && s.hashtab[idx].value != 0 {
 			if s.hashtab[idx].value == hashval {
@@ -67,14 +67,14 @@ func (s *Screen) updateHashmap() {
 			idx++
 		}
 
-		s.hashtab[idx].value = hashval // in case this is a new hash
+		s.hashtab[idx].value = hashval // 以防这是新哈希
 		s.hashtab[idx].oldcount++
 		s.hashtab[idx].oldindex = i
 	}
 	for i := range height {
 		hashval := s.newhash[i]
 
-		// Find matching hash or empty slot
+		// 查找匹配的哈希或空槽
 		idx := 0
 		for idx < len(s.hashtab) && s.hashtab[idx].value != 0 {
 			if s.hashtab[idx].value == hashval {
@@ -83,14 +83,14 @@ func (s *Screen) updateHashmap() {
 			idx++
 		}
 
-		s.hashtab[idx].value = hashval // in case this is a new hash
+		s.hashtab[idx].value = hashval // 以防这是新哈希
 		s.hashtab[idx].newcount++
 		s.hashtab[idx].newindex = i
 
-		s.oldnum[i] = newIndex // init old indices slice
+		s.oldnum[i] = newIndex // 初始化旧索引切片
 	}
 
-	// Mark line pair corresponding to unique hash pairs.
+	// 标记对应于唯一哈希对的行对。
 	for i := 0; i < len(s.hashtab) && s.hashtab[i].value != 0; i++ {
 		hsp := &s.hashtab[i]
 		if hsp.oldcount == 1 && hsp.newcount == 1 && hsp.oldindex != hsp.newindex {
@@ -100,9 +100,8 @@ func (s *Screen) updateHashmap() {
 
 	s.growHunks()
 
-	// Eliminate bad or impossible shifts. This includes removing those hunks
-	// which could not grow because of conflicts, as well those which are to be
-	// moved too far, they are likely to destroy more than carry.
+	// 消除不良或不可能的偏移。这包括移除那些因冲突而无法增长的块，
+	// 以及那些要移动太远的块，它们可能会破坏多于携带的内容。
 	for i := 0; i < height; {
 		var start, shift, size int
 		for i < height && s.oldnum[i] == newIndex {
@@ -126,11 +125,11 @@ func (s *Screen) updateHashmap() {
 		}
 	}
 
-	// After clearing invalid hunks, try grow the rest.
+	// 清除无效块后，尝试增长其余块。
 	s.growHunks()
 }
 
-// scrollOldhash.
+// scrollOldhash 滚动旧哈希。
 func (s *Screen) scrollOldhash(n, top, bot int) {
 	if len(s.oldhash) == 0 {
 		return
@@ -138,16 +137,16 @@ func (s *Screen) scrollOldhash(n, top, bot int) {
 
 	size := bot - top + 1 - abs(n)
 	if n > 0 {
-		// Move existing hashes up
+		// 将现有哈希向上移动
 		copy(s.oldhash[top:], s.oldhash[top+n:top+n+size])
-		// Recalculate hashes for newly shifted-in lines
+		// 重新计算新移入行的哈希
 		for i := bot; i > bot-n; i-- {
 			s.oldhash[i] = hash(s.curbuf.Line(i))
 		}
 	} else {
-		// Move existing hashes down
+		// 将现有哈希向下移动
 		copy(s.oldhash[top-n:], s.oldhash[top:top+size])
-		// Recalculate hashes for newly shifted-in lines
+		// 重新计算新移入行的哈希
 		for i := top; i < top-n; i++ {
 			s.oldhash[i] = hash(s.curbuf.Line(i))
 		}
@@ -156,8 +155,8 @@ func (s *Screen) scrollOldhash(n, top, bot int) {
 
 func (s *Screen) growHunks() {
 	var (
-		backLimit    int // limits for cells to fill
-		backRefLimit int // limit for references
+		backLimit    int // 要填充的单元格的限制
+	backRefLimit int // 引用的限制
 		i            int
 		nextHunk     int
 	)
@@ -175,7 +174,7 @@ func (s *Screen) growHunks() {
 			shift           = s.oldnum[i] - i
 		)
 
-		// get forward limit
+		// 获取前向限制
 		i = start + 1
 		for i < height &&
 			s.oldnum[i] != newIndex &&
@@ -198,7 +197,7 @@ func (s *Screen) growHunks() {
 
 		i = start - 1
 
-		// grow back
+		// 向后增长
 		if shift < 0 {
 			backLimit = backRefLimit + (-shift)
 		}
@@ -235,8 +234,8 @@ func (s *Screen) growHunks() {
 	}
 }
 
-// costEffective returns true if the cost of moving line 'from' to line 'to' seems to be
-// cost effective. 'blank' indicates whether the line 'to' would become blank.
+// costEffective 如果将行 'from' 移动到行 'to' 的成本似乎是有效的，则返回 true。
+// 'blank' 指示行 'to' 是否会变为空白。
 func (s *Screen) costEffective(from, to int, blank bool) bool {
 	if from == to {
 		return false
@@ -247,36 +246,35 @@ func (s *Screen) costEffective(from, to int, blank bool) bool {
 		newFrom = from
 	}
 
-	// On the left side of >= is the cost before moving. On the right side --
-	// cost after moving.
+	// >= 左侧是移动前的成本。右侧是移动后的成本。
 
-	// Calculate costs before moving.
+	// 计算移动前的成本。
 	var costBeforeMove int
 	if blank {
-		// Cost of updating blank line at destination.
+		// 更新目标处空白行的成本。
 		costBeforeMove = s.updateCostBlank(s.newbuf.Line(to))
 	} else {
-		// Cost of updating exiting line at destination.
+		// 更新目标处现有行的成本。
 		costBeforeMove = s.updateCost(s.curbuf.Line(to), s.newbuf.Line(to))
 	}
 
-	// Add cost of updating source line
+	// 添加更新源行的成本
 	costBeforeMove += s.updateCost(s.curbuf.Line(newFrom), s.newbuf.Line(from))
 
-	// Calculate costs after moving.
+	// 计算移动后的成本。
 	var costAfterMove int
 	if newFrom == from {
-		// Source becomes blank after move
+		// 移动后源变为空白
 		costAfterMove = s.updateCostBlank(s.newbuf.Line(from))
 	} else {
-		// Source gets updated from another line
+		// 源从另一行获取更新
 		costAfterMove = s.updateCost(s.curbuf.Line(newFrom), s.newbuf.Line(from))
 	}
 
-	// Add cost of moving source line to destination
+	// 添加将源行移动到目标的成本
 	costAfterMove += s.updateCost(s.curbuf.Line(from), s.newbuf.Line(to))
 
-	// Return true if moving is cost effective (costs less or equal)
+	// 如果移动成本有效（成本更低或相等），则返回 true
 	return costBeforeMove >= costAfterMove
 }
 

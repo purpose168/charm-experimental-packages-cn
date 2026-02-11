@@ -5,7 +5,7 @@ import (
 	"log"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 // Clickable list item
@@ -22,7 +22,7 @@ func NewListItem(id, text string) *ListItem {
 
 func (l *ListItem) Render() pony.Element {
 	text := pony.NewText(l.text)
-	
+
 	if l.selected {
 		text = text.BackgroundColor(pony.RGB(0, 0, 255)).
 			ForegroundColor(pony.RGB(255, 255, 255)).
@@ -130,7 +130,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Approximate: each item is ~5 lines tall
 		contentHeight := len(m.items) * 5
 		maxOffset := max(0, contentHeight-viewportHeight)
-		
+
 		switch mouse.Button {
 		case tea.MouseWheelUp:
 			m.scrollOffset = max(0, m.scrollOffset-3)

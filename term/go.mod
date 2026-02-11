@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/term
+module github.com/purpose168/charm-experimental-packages-cn/term
 
 go 1.24.0
 

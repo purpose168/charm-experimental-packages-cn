@@ -9,16 +9,16 @@ import (
 	"testing"
 )
 
-// taken from "image/png" package
+// 取自 "image/png" 包
 const pngHeader = "\x89PNG\r\n\x1a\n"
 
-// testImage creates a simple test image with a red and blue pattern
+// testImage 创建一个带有红色和蓝色图案的简单测试图像
 func testImage() *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, 2, 2))
-	img.Set(0, 0, color.RGBA{R: 255, G: 0, B: 0, A: 255}) // Red
-	img.Set(1, 0, color.RGBA{R: 0, G: 0, B: 255, A: 255}) // Blue
-	img.Set(0, 1, color.RGBA{R: 0, G: 0, B: 255, A: 255}) // Blue
-	img.Set(1, 1, color.RGBA{R: 255, G: 0, B: 0, A: 255}) // Red
+	img.Set(0, 0, color.RGBA{R: 255, G: 0, B: 0, A: 255}) // 红色
+	img.Set(1, 0, color.RGBA{R: 0, G: 0, B: 255, A: 255}) // 蓝色
+	img.Set(0, 1, color.RGBA{R: 0, G: 0, B: 255, A: 255}) // 蓝色
+	img.Set(1, 1, color.RGBA{R: 255, G: 0, B: 0, A: 255}) // 红色
 	return img
 }
 
@@ -31,7 +31,7 @@ func TestEncoder_Encode(t *testing.T) {
 		verify  func([]byte) error
 	}{
 		{
-			name: "nil image",
+			name: "nil 图像",
 			encoder: Encoder{
 				Format: RGBA,
 			},
@@ -39,13 +39,13 @@ func TestEncoder_Encode(t *testing.T) {
 			wantErr: false,
 			verify: func(got []byte) error {
 				if len(got) != 0 {
-					t.Errorf("expected empty output for nil image, got %d bytes", len(got))
+					t.Errorf("预期 nil 图像输出为空，得到 %d 字节", len(got))
 				}
 				return nil
 			},
 		},
 		{
-			name: "RGBA format",
+			name: "RGBA 格式",
 			encoder: Encoder{
 				Format: RGBA,
 			},
@@ -53,19 +53,19 @@ func TestEncoder_Encode(t *testing.T) {
 			wantErr: false,
 			verify: func(got []byte) error {
 				expected := []byte{
-					255, 0, 0, 255, // Red pixel
-					0, 0, 255, 255, // Blue pixel
-					0, 0, 255, 255, // Blue pixel
-					255, 0, 0, 255, // Red pixel
+					255, 0, 0, 255, // 红色像素
+					0, 0, 255, 255, // 蓝色像素
+					0, 0, 255, 255, // 蓝色像素
+					255, 0, 0, 255, // 红色像素
 				}
 				if !bytes.Equal(got, expected) {
-					t.Errorf("unexpected RGBA output\ngot:  %v\nwant: %v", got, expected)
+					t.Errorf("意外的 RGBA 输出\n得到:  %v\n预期: %v", got, expected)
 				}
 				return nil
 			},
 		},
 		{
-			name: "RGB format",
+			name: "RGB 格式",
 			encoder: Encoder{
 				Format: RGB,
 			},
@@ -73,44 +73,43 @@ func TestEncoder_Encode(t *testing.T) {
 			wantErr: false,
 			verify: func(got []byte) error {
 				expected := []byte{
-					255, 0, 0, // Red pixel
-					0, 0, 255, // Blue pixel
-					0, 0, 255, // Blue pixel
-					255, 0, 0, // Red pixel
+					255, 0, 0, // 红色像素
+					0, 0, 255, // 蓝色像素
+					0, 0, 255, // 蓝色像素
+					255, 0, 0, // 红色像素
 				}
 				if !bytes.Equal(got, expected) {
-					t.Errorf("unexpected RGB output\ngot:  %v\nwant: %v", got, expected)
+					t.Errorf("意外的 RGB 输出\n得到:  %v\n预期: %v", got, expected)
 				}
 				return nil
 			},
 		},
 		{
-			name: "PNG format",
+			name: "PNG 格式",
 			encoder: Encoder{
 				Format: PNG,
 			},
 			img:     testImage(),
 			wantErr: false,
 			verify: func(got []byte) error {
-				// Verify PNG header
-				// if len(got) < 8 || !bytes.Equal(got[:8], []byte{137, 80, 78, 71, 13, 10, 26, 10}) {
+				// 验证 PNG 头部
 				if len(got) < 8 || !bytes.Equal(got[:8], []byte(pngHeader)) {
-					t.Error("invalid PNG header")
+					t.Error("无效的 PNG 头部")
 				}
 				return nil
 			},
 		},
 		{
-			name: "invalid format",
+			name: "无效格式",
 			encoder: Encoder{
-				Format: 999, // Invalid format
+				Format: 999, // 无效格式
 			},
 			img:     testImage(),
 			wantErr: true,
 			verify:  nil,
 		},
 		{
-			name: "RGBA with compression",
+			name: "RGBA 带压缩",
 			encoder: Encoder{
 				Format:   RGBA,
 				Compress: true,
@@ -118,7 +117,7 @@ func TestEncoder_Encode(t *testing.T) {
 			img:     testImage(),
 			wantErr: false,
 			verify: func(got []byte) error {
-				// Decompress the data
+				// 解压缩数据
 				r, err := zlib.NewReader(bytes.NewReader(got))
 				if err != nil {
 					return err //nolint:wrapcheck
@@ -131,19 +130,19 @@ func TestEncoder_Encode(t *testing.T) {
 				}
 
 				expected := []byte{
-					255, 0, 0, 255, // Red pixel
-					0, 0, 255, 255, // Blue pixel
-					0, 0, 255, 255, // Blue pixel
-					255, 0, 0, 255, // Red pixel
+					255, 0, 0, 255, // 红色像素
+					0, 0, 255, 255, // 蓝色像素
+					0, 0, 255, 255, // 蓝色像素
+					255, 0, 0, 255, // 红色像素
 				}
 				if !bytes.Equal(decompressed, expected) {
-					t.Errorf("unexpected decompressed output\ngot:  %v\nwant: %v", decompressed, expected)
+					t.Errorf("意外的解压缩输出\n得到:  %v\n预期: %v", decompressed, expected)
 				}
 				return nil
 			},
 		},
 		{
-			name: "zero format defaults to RGBA",
+			name: "零格式默认为 RGBA",
 			encoder: Encoder{
 				Format: 0,
 			},
@@ -151,13 +150,13 @@ func TestEncoder_Encode(t *testing.T) {
 			wantErr: false,
 			verify: func(got []byte) error {
 				expected := []byte{
-					255, 0, 0, 255, // Red pixel
-					0, 0, 255, 255, // Blue pixel
-					0, 0, 255, 255, // Blue pixel
-					255, 0, 0, 255, // Red pixel
+					255, 0, 0, 255, // 红色像素
+					0, 0, 255, 255, // 蓝色像素
+					0, 0, 255, 255, // 蓝色像素
+					255, 0, 0, 255, // 红色像素
 				}
 				if !bytes.Equal(got, expected) {
-					t.Errorf("unexpected RGBA output\ngot:  %v\nwant: %v", got, expected)
+					t.Errorf("意外的 RGBA 输出\n得到:  %v\n预期: %v", got, expected)
 				}
 				return nil
 			},
@@ -184,7 +183,7 @@ func TestEncoder_Encode(t *testing.T) {
 }
 
 func TestEncoder_EncodeWithDifferentImageTypes(t *testing.T) {
-	// Create different image types for testing
+	// 创建不同类型的图像用于测试
 	rgba := image.NewRGBA(image.Rect(0, 0, 1, 1))
 	rgba.Set(0, 0, color.RGBA{R: 255, G: 0, B: 0, A: 255})
 
@@ -198,28 +197,28 @@ func TestEncoder_EncodeWithDifferentImageTypes(t *testing.T) {
 		wantLen int
 	}{
 		{
-			name:    "RGBA image to RGBA format",
+			name:    "RGBA 图像转换为 RGBA 格式",
 			img:     rgba,
 			format:  RGBA,
-			wantLen: 4, // 4 bytes per pixel
+			wantLen: 4, // 每像素 4 字节
 		},
 		{
-			name:    "Gray image to RGBA format",
+			name:    "Gray 图像转换为 RGBA 格式",
 			img:     gray,
 			format:  RGBA,
-			wantLen: 4, // 4 bytes per pixel
+			wantLen: 4, // 每像素 4 字节
 		},
 		{
-			name:    "RGBA image to RGB format",
+			name:    "RGBA 图像转换为 RGB 格式",
 			img:     rgba,
 			format:  RGB,
-			wantLen: 3, // 3 bytes per pixel
+			wantLen: 3, // 每像素 3 字节
 		},
 		{
-			name:    "Gray image to RGB format",
+			name:    "Gray 图像转换为 RGB 格式",
 			img:     gray,
 			format:  RGB,
-			wantLen: 3, // 3 bytes per pixel
+			wantLen: 3, // 每像素 3 字节
 		},
 	}
 

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/exp/golden"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
 func TestFlexibleSpacerBasic(t *testing.T) {

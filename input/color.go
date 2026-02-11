@@ -6,47 +6,41 @@ import (
 	"math"
 )
 
-// ForegroundColorEvent represents a foreground color event. This event is
-// emitted when the terminal requests the terminal foreground color using
-// [ansi.RequestForegroundColor].
+// ForegroundColorEvent 表示前景色事件。当终端使用 [ansi.RequestForegroundColor] 请求终端前景色时，会发出此事件。
 type ForegroundColorEvent struct{ color.Color }
 
-// String returns the hex representation of the color.
+// String 返回颜色的十六进制表示。
 func (e ForegroundColorEvent) String() string {
 	return colorToHex(e.Color)
 }
 
-// IsDark returns whether the color is dark.
+// IsDark 返回颜色是否为深色。
 func (e ForegroundColorEvent) IsDark() bool {
 	return isDarkColor(e.Color)
 }
 
-// BackgroundColorEvent represents a background color event. This event is
-// emitted when the terminal requests the terminal background color using
-// [ansi.RequestBackgroundColor].
+// BackgroundColorEvent 表示背景色事件。当终端使用 [ansi.RequestBackgroundColor] 请求终端背景色时，会发出此事件。
 type BackgroundColorEvent struct{ color.Color }
 
-// String returns the hex representation of the color.
+// String 返回颜色的十六进制表示。
 func (e BackgroundColorEvent) String() string {
 	return colorToHex(e)
 }
 
-// IsDark returns whether the color is dark.
+// IsDark 返回颜色是否为深色。
 func (e BackgroundColorEvent) IsDark() bool {
 	return isDarkColor(e.Color)
 }
 
-// CursorColorEvent represents a cursor color change event. This event is
-// emitted when the program requests the terminal cursor color using
-// [ansi.RequestCursorColor].
+// CursorColorEvent 表示光标颜色变化事件。当程序使用 [ansi.RequestCursorColor] 请求终端光标颜色时，会发出此事件。
 type CursorColorEvent struct{ color.Color }
 
-// String returns the hex representation of the color.
+// String 返回颜色的十六进制表示。
 func (e CursorColorEvent) String() string {
 	return colorToHex(e)
 }
 
-// IsDark returns whether the color is dark.
+// IsDark 返回颜色是否为深色。
 func (e CursorColorEvent) IsDark() bool {
 	return isDarkColor(e)
 }
@@ -90,18 +84,18 @@ func round(x float64) float64 {
 	return math.Round(x*1000) / 1000
 }
 
-// rgbToHSL converts an RGB triple to an HSL triple.
+// rgbToHSL 将 RGB 三元组转换为 HSL 三元组。
 func rgbToHSL(r, g, b uint8) (h, s, l float64) {
-	// convert uint32 pre-multiplied value to uint8
-	// The r,g,b values are divided by 255 to change the range from 0..255 to 0..1:
+	// 将 uint32 预乘值转换为 uint8
+	// r,g,b 值除以 255，将范围从 0..255 更改为 0..1：
 	Rnot := float64(r) / 255
 	Gnot := float64(g) / 255
 	Bnot := float64(b) / 255
 	Cmax, Cmin := getMaxMin(Rnot, Gnot, Bnot)
 	Δ := Cmax - Cmin
-	// Lightness calculation:
+	// 亮度计算：
 	l = (Cmax + Cmin) / 2
-	// Hue and Saturation Calculation:
+	// 色相和饱和度计算：
 	if Δ == 0 {
 		h = 0
 		s = 0
@@ -124,7 +118,7 @@ func rgbToHSL(r, g, b uint8) (h, s, l float64) {
 	return h, round(s), round(l)
 }
 
-// isDarkColor returns whether the given color is dark.
+// isDarkColor 返回给定颜色是否为深色。
 func isDarkColor(c color.Color) bool {
 	if c == nil {
 		return true

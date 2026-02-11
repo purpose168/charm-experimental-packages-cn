@@ -1,13 +1,13 @@
 package vt
 
 import (
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/ansi/parser"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 )
 
-// handleEsc handles an escape sequence.
+// handleEsc 处理 ESC 转义序列。
 func (e *Emulator) handleEsc(cmd ansi.Cmd) {
-	e.flushGrapheme() // Flush any pending grapheme before handling ESC sequences.
+	e.flushGrapheme() // 在处理 ESC 序列之前，先刷新任何待处理的字形。
 	if !e.handlers.handleEsc(int(cmd)) {
 		var str string
 		if inter := cmd.Intermediate(); inter != 0 {
@@ -16,17 +16,17 @@ func (e *Emulator) handleEsc(cmd ansi.Cmd) {
 		if final := cmd.Final(); final != 0 {
 			str += string(final)
 		}
-		e.logf("unhandled sequence: ESC %q", str)
+		e.logf("未处理的序列: ESC %q", str)
 	}
 }
 
-// fullReset performs a full terminal reset as in [ansi.RIS].
+// fullReset 执行完整的终端重置，如 [ansi.RIS] 中所述。
 func (e *Emulator) fullReset() {
 	e.scrs[0].Reset()
 	e.scrs[1].Reset()
 	e.resetTabStops()
 
-	// XXX: Do we reset all modes here? Investigate.
+	// XXX: 我们是否在这里重置所有模式？需要调查。
 	e.resetModes()
 
 	e.gl, e.gr = 0, 1

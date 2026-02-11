@@ -26,8 +26,8 @@ import (
 	"image/jpeg"
 	"os"
 
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/mosaic"
+	"github.com/purpose168/lipgloss-cn"
+	"github.com/purpose168/charm-experimental-packages-cn/mosaic"
 )
 
 func main() {
@@ -52,7 +52,7 @@ func loadImage(path string) (image.Image, error) {
 }
 ```
 
-Check out all of the mosaic [examples](https://github.com/charmbracelet/x/tree/main/examples/mosaic)!
+Check out all of the mosaic [examples](https://github.com/purpose168/charm-experimental-packages-cn/tree/main/examples/mosaic)!
 
 ## Feedback
 
@@ -65,7 +65,7 @@ We'd love to hear your thoughts on this project. Feel free to drop us a note!
 
 ## License
 
-[MIT](https://github.com/charmbracelet/x/raw/main/LICENSE)
+[MIT](https://github.com/purpose168/charm-experimental-packages-cn/raw/main/LICENSE)
 
 ---
 

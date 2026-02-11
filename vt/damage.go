@@ -2,69 +2,69 @@ package vt
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// Damage represents a damaged area.
+// Damage 表示一个损坏的区域。
 type Damage interface {
-	// Bounds returns the bounds of the damaged area.
+	// Bounds 返回损坏区域的边界。
 	Bounds() uv.Rectangle
 }
 
-// CellDamage represents a damaged cell.
+// CellDamage 表示一个损坏的单元格。
 type CellDamage struct {
 	X, Y  int
 	Width int
 }
 
-// Bounds returns the bounds of the damaged area.
+// Bounds 返回损坏区域的边界。
 func (d CellDamage) Bounds() uv.Rectangle {
 	return uv.Rect(d.X, d.Y, d.Width, 1)
 }
 
-// RectDamage represents a damaged rectangle.
+// RectDamage 表示一个损坏的矩形。
 type RectDamage uv.Rectangle
 
-// Bounds returns the bounds of the damaged area.
+// Bounds 返回损坏区域的边界。
 func (d RectDamage) Bounds() uv.Rectangle {
 	return uv.Rectangle(d)
 }
 
-// X returns the x-coordinate of the damaged area.
+// X 返回损坏区域的 x 坐标。
 func (d RectDamage) X() int {
 	return uv.Rectangle(d).Min.X
 }
 
-// Y returns the y-coordinate of the damaged area.
+// Y 返回损坏区域的 y 坐标。
 func (d RectDamage) Y() int {
 	return uv.Rectangle(d).Min.Y
 }
 
-// Width returns the width of the damaged area.
+// Width 返回损坏区域的宽度。
 func (d RectDamage) Width() int {
 	return uv.Rectangle(d).Dx()
 }
 
-// Height returns the height of the damaged area.
+// Height 返回损坏区域的高度。
 func (d RectDamage) Height() int {
 	return uv.Rectangle(d).Dy()
 }
 
-// ScreenDamage represents a damaged screen.
+// ScreenDamage 表示一个损坏的屏幕。
 type ScreenDamage struct {
 	Width, Height int
 }
 
-// Bounds returns the bounds of the damaged area.
+// Bounds 返回损坏区域的边界。
 func (d ScreenDamage) Bounds() uv.Rectangle {
 	return uv.Rect(0, 0, d.Width, d.Height)
 }
 
-// MoveDamage represents a moved area.
-// The area is moved from the source to the destination.
+// MoveDamage 表示一个移动的区域。
+// 该区域从源位置移动到目标位置。
 type MoveDamage struct {
 	Src, Dst uv.Rectangle
 }
 
-// ScrollDamage represents a scrolled area.
-// The area is scrolled by the given deltas.
+// ScrollDamage 表示一个滚动的区域。
+// 该区域按给定的增量滚动。
 type ScrollDamage struct {
 	uv.Rectangle
 	Dx, Dy int

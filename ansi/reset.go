@@ -1,10 +1,10 @@
 package ansi
 
-// ResetInitialState (RIS) resets the terminal to its initial state.
+// ResetInitialState (RIS) 将终端重置为初始状态。
 //
 //	ESC c
 //
-// See: https://vt100.net/docs/vt510-rm/RIS.html
+// 参见：https://vt100.net/docs/vt510-rm/RIS.html
 const (
 	ResetInitialState = "\x1bc"
 	RIS               = ResetInitialState

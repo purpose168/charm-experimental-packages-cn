@@ -6,7 +6,7 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// Divider represents a horizontal or vertical line.
+// Divider 表示一条水平或垂直线。
 type Divider struct {
 	BaseElement
 	vertical bool
@@ -16,29 +16,29 @@ type Divider struct {
 
 var _ Element = (*Divider)(nil)
 
-// NewDivider creates a new divider element.
+// NewDivider 创建一个新的分隔线元素。
 func NewDivider() *Divider {
 	return &Divider{}
 }
 
-// NewVerticalDivider creates a new vertical divider.
+// NewVerticalDivider 创建一个新的垂直分隔线。
 func NewVerticalDivider() *Divider {
 	return &Divider{vertical: true}
 }
 
-// ForegroundColor sets the color and returns the divider for chaining.
+// ForegroundColor 设置颜色并返回分隔线以支持链式调用。
 func (d *Divider) ForegroundColor(c color.Color) *Divider {
 	d.color = c
 	return d
 }
 
-// Char sets the character and returns the divider for chaining.
+// Char 设置字符并返回分隔线以支持链式调用。
 func (d *Divider) Char(char string) *Divider {
 	d.char = char
 	return d
 }
 
-// Draw renders the divider to the screen.
+// Draw 将分隔线渲染到屏幕上。
 func (d *Divider) Draw(scr uv.Screen, area uv.Rectangle) {
 	d.SetBounds(area)
 
@@ -67,7 +67,7 @@ func (d *Divider) Draw(scr uv.Screen, area uv.Rectangle) {
 	}
 }
 
-// Layout calculates the divider size.
+// Layout 计算分隔线的大小。
 func (d *Divider) Layout(constraints Constraints) Size {
 	if d.vertical {
 		return Size{Width: 1, Height: constraints.MaxHeight}
@@ -75,7 +75,7 @@ func (d *Divider) Layout(constraints Constraints) Size {
 	return Size{Width: constraints.MaxWidth, Height: 1}
 }
 
-// Children returns nil for dividers.
+// Children 为分隔线返回 nil。
 func (d *Divider) Children() []Element {
 	return nil
 }

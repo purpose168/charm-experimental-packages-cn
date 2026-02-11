@@ -3,17 +3,17 @@ package vt
 import (
 	"io"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// Focus sends the terminal a focus event if focus events mode is enabled.
-// This is the opposite of [Blur].
+// Focus 如果启用了焦点事件模式，则向终端发送焦点事件。
+// 这与 [Blur] 相反。
 func (e *Emulator) Focus() {
 	e.focus(true)
 }
 
-// Blur sends the terminal a blur event if focus events mode is enabled.
-// This is the opposite of [Focus].
+// Blur 如果启用了焦点事件模式，则向终端发送失焦事件。
+// 这与 [Focus] 相反。
 func (e *Emulator) Blur() {
 	e.focus(false)
 }

@@ -1,10 +1,10 @@
-module github.com/charmbracelet/x/input
+module github.com/purpose168/charm-experimental-packages-cn/input
 
 go 1.24.2
 
 require (
-	github.com/charmbracelet/x/ansi v0.11.6
-	github.com/charmbracelet/x/windows v0.2.2
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.6
+	github.com/purpose168/charm-experimental-packages-cn/windows v0.2.2
 	github.com/muesli/cancelreader v0.2.2
 	github.com/rivo/uniseg v0.4.7
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e

@@ -3,17 +3,17 @@ package xpty
 import (
 	"os/exec"
 
-	"github.com/charmbracelet/x/conpty"
+	"github.com/purpose168/charm-experimental-packages-cn/conpty"
 )
 
-// ConPty is a Windows console pty.
+// ConPty 是一个 Windows 控制台伪终端。
 type ConPty struct {
 	*conpty.ConPty
 }
 
 var _ Pty = &ConPty{}
 
-// NewConPty creates a new ConPty.
+// NewConPty 创建一个新的 ConPty。
 func NewConPty(width, height int, opts ...PtyOption) (*ConPty, error) {
 	var opt Options
 	for _, o := range opts {
@@ -28,13 +28,13 @@ func NewConPty(width, height int, opts ...PtyOption) (*ConPty, error) {
 	return &ConPty{c}, nil
 }
 
-// Name returns the name of the ConPty.
+// Name 返回 ConPty 的名称。
 func (c *ConPty) Name() string {
 	return "windows-pty"
 }
 
-// Start starts a command on the ConPty.
-// This is a wrapper around conpty.Spawn.
+// Start 在 ConPty 上启动一个命令。
+// 这是对 conpty.Spawn 的封装。
 func (c *ConPty) Start(cmd *exec.Cmd) error {
 	return c.start(cmd)
 }

@@ -9,8 +9,8 @@ import (
 	"os"
 	"sync"
 
-	xwindows "github.com/charmbracelet/x/windows"
 	"github.com/muesli/cancelreader"
+	xwindows "github.com/purpose168/charm-experimental-packages-cn/windows"
 	"golang.org/x/sys/windows"
 )
 

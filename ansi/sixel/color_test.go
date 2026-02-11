@@ -17,13 +17,13 @@ func TestWriteColor(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "simple color number",
+			name:     "简单颜色编号",
 			pc:       1,
 			pu:       0,
 			expected: "#1",
 		},
 		{
-			name:     "RGB color",
+			name:     "RGB 颜色",
 			pc:       1,
 			pu:       2,
 			px:       50,
@@ -32,7 +32,7 @@ func TestWriteColor(t *testing.T) {
 			expected: "#1;2;50;60;70",
 		},
 		{
-			name:     "HLS color",
+			name:     "HLS 颜色",
 			pc:       2,
 			pu:       1,
 			px:       180,
@@ -41,7 +41,7 @@ func TestWriteColor(t *testing.T) {
 			expected: "#2;1;180;50;100",
 		},
 		{
-			name:     "invalid pu > 2",
+			name:     "无效 pu > 2",
 			pc:       1,
 			pu:       3,
 			expected: "#1",
@@ -53,14 +53,14 @@ func TestWriteColor(t *testing.T) {
 			buf := &bytes.Buffer{}
 			n, err := WriteColor(buf, tt.pc, tt.pu, tt.px, tt.py, tt.pz)
 			if err != nil {
-				t.Errorf("WriteColor() unexpected error = %v", err)
+				t.Errorf("WriteColor() 出现意外错误 = %v", err)
 				return
 			}
 			if got := buf.String(); got != tt.expected {
-				t.Errorf("WriteColor() = %v, want %v", got, tt.expected)
+				t.Errorf("WriteColor() = %v，期望 %v", got, tt.expected)
 			}
 			if n != len(tt.expected) {
-				t.Errorf("WriteColor() returned length = %v, want %v", n, len(tt.expected))
+				t.Errorf("WriteColor() 返回长度 = %v，期望 %v", n, len(tt.expected))
 			}
 		})
 	}
@@ -74,37 +74,37 @@ func TestDecodeColor(t *testing.T) {
 		wantN int
 	}{
 		{
-			name:  "simple color number",
+			name:  "简单颜色编号",
 			input: []byte("#1"),
 			wantC: Color{Pc: 1},
 			wantN: 2,
 		},
 		{
-			name:  "RGB color",
+			name:  "RGB 颜色",
 			input: []byte("#1;2;50;60;70"),
 			wantC: Color{Pc: 1, Pu: 2, Px: 50, Py: 60, Pz: 70},
 			wantN: 13,
 		},
 		{
-			name:  "HLS color",
+			name:  "HLS 颜色",
 			input: []byte("#2;1;180;50;100"),
 			wantC: Color{Pc: 2, Pu: 1, Px: 180, Py: 50, Pz: 100},
 			wantN: 15,
 		},
 		{
-			name:  "empty input",
+			name:  "空输入",
 			input: []byte{},
 			wantC: Color{},
 			wantN: 0,
 		},
 		{
-			name:  "invalid introducer",
+			name:  "无效引导符",
 			input: []byte("X1"),
 			wantC: Color{},
 			wantN: 0,
 		},
 		{
-			name:  "incomplete sequence",
+			name:  "不完整序列",
 			input: []byte("#"),
 			wantC: Color{},
 			wantN: 0,
@@ -115,10 +115,10 @@ func TestDecodeColor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotC, gotN := DecodeColor(tt.input)
 			if gotC != tt.wantC {
-				t.Errorf("DecodeColor() gotColor = %v, want %v", gotC, tt.wantC)
+				t.Errorf("DecodeColor() 得到颜色 = %v，期望 %v", gotC, tt.wantC)
 			}
 			if gotN != tt.wantN {
-				t.Errorf("DecodeColor() gotN = %v, want %v", gotN, tt.wantN)
+				t.Errorf("DecodeColor() 得到 N = %v，期望 %v", gotN, tt.wantN)
 			}
 		})
 	}
@@ -134,7 +134,7 @@ func TestColor_RGBA(t *testing.T) {
 		wantA uint32
 	}{
 		{
-			name:  "default color map 0 (black)",
+			name:  "默认颜色映射 0（黑色）",
 			color: Color{Pc: 0},
 			wantR: 0x0000,
 			wantG: 0x0000,
@@ -142,7 +142,7 @@ func TestColor_RGBA(t *testing.T) {
 			wantA: 0xFFFF,
 		},
 		{
-			name:  "RGB mode (50%, 60%, 70%)",
+			name:  "RGB 模式（50%，60%，70%）",
 			color: Color{Pc: 1, Pu: 2, Px: 50, Py: 60, Pz: 70},
 			wantR: 0x8080,
 			wantG: 0x9999,
@@ -150,7 +150,7 @@ func TestColor_RGBA(t *testing.T) {
 			wantA: 0xFFFF,
 		},
 		{
-			name:  "HLS mode (180°, 50%, 100%)",
+			name:  "HLS 模式（180°，50%，100%）",
 			color: Color{Pc: 1, Pu: 1, Px: 180, Py: 50, Pz: 100},
 			wantR: 0x0000,
 			wantG: 0xFFFF,
@@ -163,16 +163,16 @@ func TestColor_RGBA(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			gotR, gotG, gotB, gotA := tt.color.RGBA()
 			if gotR != tt.wantR {
-				t.Errorf("Color.RGBA() gotR = %v, want %v", gotR, tt.wantR)
+				t.Errorf("Color.RGBA() 得到 R = %v，期望 %v", gotR, tt.wantR)
 			}
 			if gotG != tt.wantG {
-				t.Errorf("Color.RGBA() gotG = %v, want %v", gotG, tt.wantG)
+				t.Errorf("Color.RGBA() 得到 G = %v，期望 %v", gotG, tt.wantG)
 			}
 			if gotB != tt.wantB {
-				t.Errorf("Color.RGBA() gotB = %v, want %v", gotB, tt.wantB)
+				t.Errorf("Color.RGBA() 得到 B = %v，期望 %v", gotB, tt.wantB)
 			}
 			if gotA != tt.wantA {
-				t.Errorf("Color.RGBA() gotA = %v, want %v", gotA, tt.wantA)
+				t.Errorf("Color.RGBA() 得到 A = %v，期望 %v", gotA, tt.wantA)
 			}
 		})
 	}
@@ -187,28 +187,28 @@ func TestSixelRGB(t *testing.T) {
 		want color.Color
 	}{
 		{
-			name: "black",
+			name: "黑色",
 			r:    0,
 			g:    0,
 			b:    0,
 			want: color.NRGBA{R: 0, G: 0, B: 0, A: 255},
 		},
 		{
-			name: "white",
+			name: "白色",
 			r:    100,
 			g:    100,
 			b:    100,
 			want: color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		},
 		{
-			name: "red",
+			name: "红色",
 			r:    100,
 			g:    0,
 			b:    0,
 			want: color.NRGBA{R: 255, G: 0, B: 0, A: 255},
 		},
 		{
-			name: "half intensity",
+			name: "半强度",
 			r:    50,
 			g:    50,
 			b:    50,
@@ -222,7 +222,7 @@ func TestSixelRGB(t *testing.T) {
 			gotR, gotG, gotB, gotA := got.RGBA()
 			wantR, wantG, wantB, wantA := tt.want.RGBA()
 			if gotR != wantR || gotG != wantG || gotB != wantB || gotA != wantA {
-				t.Errorf("sixelRGB() = %v, want %v", got, tt.want)
+				t.Errorf("sixelRGB() = %v，期望 %v", got, tt.want)
 			}
 		})
 	}
@@ -237,35 +237,35 @@ func TestSixelHLS(t *testing.T) {
 		want color.Color
 	}{
 		{
-			name: "black",
+			name: "黑色",
 			h:    0,
 			l:    0,
 			s:    0,
 			want: color.NRGBA{R: 0, G: 0, B: 0, A: 255},
 		},
 		{
-			name: "white",
+			name: "白色",
 			h:    0,
 			l:    100,
 			s:    0,
 			want: color.NRGBA{R: 255, G: 255, B: 255, A: 255},
 		},
 		{
-			name: "pure red",
+			name: "纯红色",
 			h:    0,
 			l:    50,
 			s:    100,
 			want: color.NRGBA{R: 255, G: 0, B: 0, A: 255},
 		},
 		{
-			name: "pure green",
+			name: "纯绿色",
 			h:    120,
 			l:    50,
 			s:    100,
 			want: color.NRGBA{R: 0, G: 255, B: 0, A: 255},
 		},
 		{
-			name: "pure blue",
+			name: "纯蓝色",
 			h:    240,
 			l:    50,
 			s:    100,
@@ -279,7 +279,7 @@ func TestSixelHLS(t *testing.T) {
 			gotR, gotG, gotB, gotA := got.RGBA()
 			wantR, wantG, wantB, wantA := tt.want.RGBA()
 			if gotR != wantR || gotG != wantG || gotB != wantB || gotA != wantA {
-				t.Errorf("sixelHLS() = %v, want %v", got, tt.want)
+				t.Errorf("sixelHLS() = %v，期望 %v", got, tt.want)
 			}
 		})
 	}

@@ -1,4 +1,4 @@
-// Package main demonstrates usage.
+// 包 main 演示了使用方法。
 package main
 
 import (
@@ -7,8 +7,8 @@ import (
 	"image/jpeg"
 	"os"
 
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/x/mosaic"
+	"github.com/purpose168/charm-experimental-packages-cn/mosaic"
+	"github.com/purpose168/lipgloss-cn"
 )
 
 func main() {

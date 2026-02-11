@@ -7,31 +7,30 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/exp/charmtone"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/charmtone"
 )
 
-// Strings returns a colorized string representation of the input byte slice or
-// string.
+// Strings 返回输入字节切片或字符串的彩色字符串表示。
 func Strings(s string) string {
 	var buf bytes.Buffer
 	_, _ = writeColorize(&buf, s)
 	return buf.String()
 }
 
-// Bytes returns a colorized byte slice representation of the input byte slice.
+// Bytes 返回输入字节切片的彩色字节切片表示。
 func Bytes(b []byte) []byte {
 	var buf bytes.Buffer
 	_, _ = writeColorize(&buf, b)
 	return buf.Bytes()
 }
 
-// Writer encapsulates a [io.Writer] that colorizes the output using charm tones.
+// Writer 封装了一个 [io.Writer]，使用 charm 色调对输出进行着色。
 type Writer struct {
 	io.Writer
 }
 
-// Write writes the colorized output to the underlying writer.
+// Write 将彩色输出写入到底层写入器。
 func (w Writer) Write(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
@@ -40,7 +39,7 @@ func (w Writer) Write(p []byte) (n int, err error) {
 	return writeColorize(w, p)
 }
 
-// WriteString writes the colorized output of the input string to the underlying writer.
+// WriteString 将输入字符串的彩色输出写入到底层写入器。
 func (w Writer) WriteString(s string) (n int, err error) {
 	if len(s) == 0 {
 		return 0, nil

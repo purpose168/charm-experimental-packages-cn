@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/x/term"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
 func getSize() (int, int) {
@@ -15,7 +15,6 @@ func getSize() (int, int) {
 	}
 	return width, height
 }
-
 
 func main() {
 	const tmpl = `

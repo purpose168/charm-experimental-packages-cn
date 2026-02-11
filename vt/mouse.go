@@ -4,29 +4,29 @@ import (
 	"io"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// MouseButton represents the button that was pressed during a mouse message.
+// MouseButton 表示鼠标消息期间按下的按钮。
 type MouseButton = uv.MouseButton
 
-// Mouse event buttons
+// 鼠标事件按钮
 //
-// This is based on X11 mouse button codes.
+// 这基于 X11 鼠标按钮代码。
 //
-//	1 = left button
-//	2 = middle button (pressing the scroll wheel)
-//	3 = right button
-//	4 = turn scroll wheel up
-//	5 = turn scroll wheel down
-//	6 = push scroll wheel left
-//	7 = push scroll wheel right
-//	8 = 4th button (aka browser backward button)
-//	9 = 5th button (aka browser forward button)
+//	1 = 左键
+//	2 = 中键（按下滚轮）
+//	3 = 右键
+//	4 = 向上滚动滚轮
+//	5 = 向下滚动滚轮
+//	6 = 向左推动滚轮
+//	7 = 向右推动滚轮
+//	8 = 第4个按钮（又名浏览器后退按钮）
+//	9 = 第5个按钮（又名浏览器前进按钮）
 //	10
 //	11
 //
-// Other buttons are not supported.
+// 其他按钮不受支持。
 const (
 	MouseNone       = uv.MouseNone
 	MouseLeft       = uv.MouseLeft
@@ -42,37 +42,37 @@ const (
 	MouseButton11   = uv.MouseButton11
 )
 
-// Mouse represents a mouse event.
+// Mouse 表示鼠标事件。
 type Mouse = uv.MouseEvent
 
-// MouseClick represents a mouse click event.
+// MouseClick 表示鼠标点击事件。
 type MouseClick = uv.MouseClickEvent
 
-// MouseRelease represents a mouse release event.
+// MouseRelease 表示鼠标释放事件。
 type MouseRelease = uv.MouseReleaseEvent
 
-// MouseWheel represents a mouse wheel event.
+// MouseWheel 表示鼠标滚轮事件。
 type MouseWheel = uv.MouseWheelEvent
 
-// MouseMotion represents a mouse motion event.
+// MouseMotion 表示鼠标移动事件。
 type MouseMotion = uv.MouseMotionEvent
 
-// SendMouse sends a mouse event to the terminal. This can be any kind of mouse
-// events such as [MouseClick], [MouseRelease], [MouseWheel], or [MouseMotion].
+// SendMouse 向终端发送鼠标事件。这可以是任何类型的鼠标事件，
+// 例如 [MouseClick]、[MouseRelease]、[MouseWheel] 或 [MouseMotion]。
 func (e *Emulator) SendMouse(m Mouse) {
-	// XXX: Support [Utf8ExtMouseMode], [UrxvtExtMouseMode], and
-	// [SgrPixelExtMouseMode].
+	// XXX: 支持 [Utf8ExtMouseMode]、[UrxvtExtMouseMode] 和
+	// [SgrPixelExtMouseMode]。
 	var (
 		enc  ansi.Mode
 		mode ansi.Mode
 	)
 
 	for _, m := range []ansi.DECMode{
-		ansi.X10MouseMode,         // Button press
-		ansi.NormalMouseMode,      // Button press/release
-		ansi.HighlightMouseMode,   // Button press/release/hilight
-		ansi.ButtonEventMouseMode, // Button press/release/cell motion
-		ansi.AnyEventMouseMode,    // Button press/release/all motion
+		ansi.X10MouseMode,         // 按钮按下
+		ansi.NormalMouseMode,      // 按钮按下/释放
+		ansi.HighlightMouseMode,   // 按钮按下/释放/高亮
+		ansi.ButtonEventMouseMode, // 按钮按下/释放/单元格移动
+		ansi.AnyEventMouseMode,    // 按钮按下/释放/所有移动
 	} {
 		if e.isModeSet(m) {
 			mode = m
@@ -94,7 +94,7 @@ func (e *Emulator) SendMouse(m Mouse) {
 		}
 	}
 
-	// Encode button
+	// 编码按钮
 	mouse := m.Mouse()
 	_, isMotion := m.(MouseMotion)
 	_, isRelease := m.(MouseRelease)
@@ -104,12 +104,12 @@ func (e *Emulator) SendMouse(m Mouse) {
 		mouse.Mod.Contains(ModCtrl))
 
 	switch enc {
-	// XXX: Support [ansi.HighlightMouseMode].
-	// XXX: Support [ansi.Utf8ExtMouseMode], [ansi.UrxvtExtMouseMode], and
-	// [ansi.SgrPixelExtMouseMode].
-	case nil: // X10 mouse encoding
+	// XXX: 支持 [ansi.HighlightMouseMode]。
+	// XXX: 支持 [ansi.Utf8ExtMouseMode]、[ansi.UrxvtExtMouseMode] 和
+	// [ansi.SgrPixelExtMouseMode]。
+	case nil: // X10 鼠标编码
 		_, _ = io.WriteString(e.pw, ansi.MouseX10(b, mouse.X, mouse.Y))
-	case ansi.SgrExtMouseMode: // SGR mouse encoding
+	case ansi.SgrExtMouseMode: // SGR 鼠标编码
 		_, _ = io.WriteString(e.pw, ansi.MouseSgr(b, mouse.X, mouse.Y, isRelease))
 	}
 }

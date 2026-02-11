@@ -8,115 +8,92 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/ansi/parser"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 	"github.com/rivo/uniseg"
 )
 
-// Flags to control the behavior of the parser.
+// 控制解析器行为的标志。
 const (
-	// When this flag is set, the driver will treat both Ctrl+Space and Ctrl+@
-	// as the same key sequence.
+	// 当设置此标志时，驱动程序会将 Ctrl+Space 和 Ctrl+@ 视为相同的按键序列。
 	//
-	// Historically, the ANSI specs generate NUL (0x00) on both the Ctrl+Space
-	// and Ctrl+@ key sequences. This flag allows the driver to treat both as
-	// the same key sequence.
+	// 历史上，ANSI 规范在 Ctrl+Space 和 Ctrl+@ 按键序列上都会生成 NUL (0x00)。
+	// 此标志允许驱动程序将两者视为相同的按键序列。
 	FlagCtrlAt = 1 << iota
 
-	// When this flag is set, the driver will treat the Tab key and Ctrl+I as
-	// the same key sequence.
+	// 当设置此标志时，驱动程序会将 Tab 键和 Ctrl+I 视为相同的按键序列。
 	//
-	// Historically, the ANSI specs generate HT (0x09) on both the Tab key and
-	// Ctrl+I. This flag allows the driver to treat both as the same key
-	// sequence.
+	// 历史上，ANSI 规范在 Tab 键和 Ctrl+I 上都会生成 HT (0x09)。
+	// 此标志允许驱动程序将两者视为相同的按键序列。
 	FlagCtrlI
 
-	// When this flag is set, the driver will treat the Enter key and Ctrl+M as
-	// the same key sequence.
+	// 当设置此标志时，驱动程序会将 Enter 键和 Ctrl+M 视为相同的按键序列。
 	//
-	// Historically, the ANSI specs generate CR (0x0D) on both the Enter key
-	// and Ctrl+M. This flag allows the driver to treat both as the same key.
+	// 历史上，ANSI 规范在 Enter 键和 Ctrl+M 上都会生成 CR (0x0D)。
+	// 此标志允许驱动程序将两者视为相同的按键。
 	FlagCtrlM
 
-	// When this flag is set, the driver will treat Escape and Ctrl+[ as
-	// the same key sequence.
+	// 当设置此标志时，驱动程序会将 Escape 和 Ctrl+[ 视为相同的按键序列。
 	//
-	// Historically, the ANSI specs generate ESC (0x1B) on both the Escape key
-	// and Ctrl+[. This flag allows the driver to treat both as the same key
-	// sequence.
+	// 历史上，ANSI 规范在 Escape 键和 Ctrl+[ 上都会生成 ESC (0x1B)。
+	// 此标志允许驱动程序将两者视为相同的按键序列。
 	FlagCtrlOpenBracket
 
-	// When this flag is set, the driver will send a BS (0x08 byte) character
-	// instead of a DEL (0x7F byte) character when the Backspace key is
-	// pressed.
+	// 当设置此标志时，驱动程序会在按下 Backspace 键时发送 BS (0x08 字节) 字符
+	// 而不是 DEL (0x7F 字节) 字符。
 	//
-	// The VT100 terminal has both a Backspace and a Delete key. The VT220
-	// terminal dropped the Backspace key and replaced it with the Delete key.
-	// Both terminals send a DEL character when the Delete key is pressed.
-	// Modern terminals and PCs later readded the Delete key but used a
-	// different key sequence, and the Backspace key was standardized to send a
-	// DEL character.
+	// VT100 终端同时有 Backspace 和 Delete 键。VT220 终端去掉了 Backspace 键，
+	// 用 Delete 键取而代之。两个终端在按下 Delete 键时都会发送 DEL 字符。
+	// 现代终端和 PC 后来重新添加了 Delete 键，但使用了不同的按键序列，
+	// 而 Backspace 键被标准化为发送 DEL 字符。
 	FlagBackspace
 
-	// When this flag is set, the driver will recognize the Find key instead of
-	// treating it as a Home key.
+	// 当设置此标志时，驱动程序会识别 Find 键，而不是将其视为 Home 键。
 	//
-	// The Find key was part of the VT220 keyboard, and is no longer used in
-	// modern day PCs.
+	// Find 键是 VT220 键盘的一部分，在现代 PC 中不再使用。
 	FlagFind
 
-	// When this flag is set, the driver will recognize the Select key instead
-	// of treating it as a End key.
+	// 当设置此标志时，驱动程序会识别 Select 键，而不是将其视为 End 键。
 	//
-	// The Symbol key was part of the VT220 keyboard, and is no longer used in
-	// modern day PCs.
+	// Symbol 键是 VT220 键盘的一部分，在现代 PC 中不再使用。
 	FlagSelect
 
-	// When this flag is set, the driver will use Terminfo databases to
-	// overwrite the default key sequences.
+	// 当设置此标志时，驱动程序会使用 Terminfo 数据库覆盖默认按键序列。
 	FlagTerminfo
 
-	// When this flag is set, the driver will preserve function keys (F13-F63)
-	// as symbols.
+	// 当设置此标志时，驱动程序会将功能键 (F13-F63) 保留为符号。
 	//
-	// Since these keys are not part of today's standard 20th century keyboard,
-	// we treat them as F1-F12 modifier keys i.e. ctrl/shift/alt + Fn combos.
-	// Key definitions come from Terminfo, this flag is only useful when
-	// FlagTerminfo is not set.
+	// 由于这些键不是当今标准 20 世纪键盘的一部分，
+	// 我们将它们视为 F1-F12 修饰键，即 ctrl/shift/alt + Fn 组合键。
+	// 键定义来自 Terminfo，此标志仅在未设置 FlagTerminfo 时有用。
 	FlagFKeys
 
-	// When this flag is set, the driver will enable mouse mode on Windows.
-	// This is only useful on Windows and has no effect on other platforms.
+	// 当设置此标志时，驱动程序会在 Windows 上启用鼠标模式。
+	// 这仅在 Windows 上有用，在其他平台上没有效果。
 	FlagMouseMode
 )
 
-// Parser is a parser for input escape sequences.
+// Parser 是输入转义序列的解析器。
 type Parser struct {
 	flags int
 }
 
-// NewParser returns a new input parser. This is a low-level parser that parses
-// escape sequences into human-readable events.
-// This differs from [ansi.Parser] and [ansi.DecodeSequence] in which it
-// recognizes incorrect sequences that some terminals may send.
+// NewParser 返回一个新的输入解析器。这是一个低级解析器，将转义序列解析为人类可读的事件。
+// 这与 [ansi.Parser] 和 [ansi.DecodeSequence] 不同，因为它能识别一些终端可能发送的不正确序列。
 //
-// For instance, the X10 mouse protocol sends a `CSI M` sequence followed by 3
-// bytes. If the parser doesn't recognize the 3 bytes, they might be echoed to
-// the terminal output causing a mess.
+// 例如，X10 鼠标协议发送一个 `CSI M` 序列，后跟 3 个字节。如果解析器不识别这 3 个字节，
+// 它们可能会被回显到终端输出，造成混乱。
 //
-// Another example is how URxvt sends invalid sequences for modified keys using
-// invalid CSI final characters like '$'.
+// 另一个例子是 URxvt 如何使用无效的 CSI 最终字符（如 '$'）为修饰键发送无效序列。
 //
-// Use flags to control the behavior of ambiguous key sequences.
+// 使用标志来控制模糊按键序列的行为。
 func NewParser(flags int) *Parser {
 	return &Parser{flags: flags}
 }
 
-// parseSequence finds the first recognized event sequence and returns it along
-// with its length.
+// parseSequence 查找第一个被识别的事件序列并返回它及其长度。
 //
-// It will return zero and nil no sequence is recognized or when the buffer is
-// empty. If a sequence is not supported, an UnknownEvent is returned.
+// 如果没有识别到序列或缓冲区为空，它将返回零和 nil。如果序列不受支持，将返回 UnknownEvent。
 func (p *Parser) parseSequence(buf []byte) (n int, Event Event) {
 	if len(buf) == 0 {
 		return 0, nil
@@ -202,12 +179,12 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		i++
 	}
 
-	// Initial CSI byte
+	// 初始 CSI 字节
 	if i < len(b) && b[i] >= '<' && b[i] <= '?' {
 		cmd |= ansi.Cmd(b[i]) << parser.PrefixShift
 	}
 
-	// Scan parameter bytes in the range 0x30-0x3F
+	// 扫描参数字节在 0x30-0x3F 范围内
 	var j int
 	for j = 0; i < len(b) && paramsLen < len(params) && b[i] >= 0x30 && b[i] <= 0x3F; i, j = i+1, j+1 {
 		if b[i] >= '0' && b[i] <= '9' {
@@ -223,31 +200,30 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		if b[i] == ';' || b[i] == ':' {
 			paramsLen++
 			if paramsLen < len(params) {
-				// Don't overflow the params slice
+				// 不要溢出 params 切片
 				params[paramsLen] = parser.MissingParam
 			}
 		}
 	}
 
 	if j > 0 && paramsLen < len(params) {
-		// has parameters
+		// 有参数
 		paramsLen++
 	}
 
-	// Scan intermediate bytes in the range 0x20-0x2F
+	// 扫描中间字节在 0x20-0x2F 范围内
 	var intermed byte
 	for ; i < len(b) && b[i] >= 0x20 && b[i] <= 0x2F; i++ {
 		intermed = b[i]
 	}
 
-	// Set the intermediate byte
+	// 设置中间字节
 	cmd |= ansi.Cmd(intermed) << parser.IntermedShift
 
-	// Scan final byte in the range 0x40-0x7E
+	// 扫描最终字节在 0x40-0x7E 范围内
 	if i >= len(b) || b[i] < 0x40 || b[i] > 0x7E {
-		// Special case for URxvt keys
-		// CSI <number> $ is an invalid sequence, but URxvt uses it for
-		// shift modified keys.
+		// URxvt 键的特殊情况
+		// CSI <number> $ 是无效序列，但 URxvt 用它来表示 shift 修饰的键。
 		if b[i-1] == '$' {
 			n, ev := p.parseCsi(append(b[:i-1], '~'))
 			if k, ok := ev.(KeyPressEvent); ok {
@@ -258,14 +234,14 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		return i, UnknownEvent(b[:i-1])
 	}
 
-	// Add the final byte
+	// 添加最终字节
 	cmd |= ansi.Cmd(b[i])
 	i++
 
 	pa := ansi.Params(params[:paramsLen])
 	switch cmd {
 	case 'y' | '?'<<parser.PrefixShift | '$'<<parser.IntermedShift:
-		// Report Mode (DECRPM)
+		// 报告模式 (DECRPM)
 		mode, _, ok := pa.Param(0, -1)
 		if !ok || mode == -1 {
 			break
@@ -276,18 +252,17 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		}
 		return i, ModeReportEvent{Mode: ansi.DECMode(mode), Value: ansi.ModeSetting(value)}
 	case 'c' | '?'<<parser.PrefixShift:
-		// Primary Device Attributes
+		// 主要设备属性
 		return i, parsePrimaryDevAttrs(pa)
 	case 'u' | '?'<<parser.PrefixShift:
-		// Kitty keyboard flags
+		// Kitty 键盘标志
 		flags, _, ok := pa.Param(0, -1)
 		if !ok || flags == -1 {
 			break
 		}
 		return i, KittyEnhancementsEvent(flags)
 	case 'R' | '?'<<parser.PrefixShift:
-		// This report may return a third parameter representing the page
-		// number, but we don't really need it.
+		// 此报告可能会返回表示页码的第三个参数，但我们实际上不需要它。
 		row, _, ok := pa.Param(0, 1)
 		if !ok {
 			break
@@ -298,7 +273,7 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		}
 		return i, CursorPositionEvent{Y: row - 1, X: col - 1}
 	case 'm' | '<'<<parser.PrefixShift, 'M' | '<'<<parser.PrefixShift:
-		// Handle SGR mouse
+		// 处理 SGR 鼠标
 		if paramsLen == 3 {
 			return i, parseSGRMouseEvent(cmd, pa)
 		}
@@ -318,18 +293,16 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 	case 'O':
 		return i, BlurEvent{}
 	case 'R':
-		// Cursor position report OR modified F3
+		// 光标位置报告或修改的 F3
 		row, _, rok := pa.Param(0, 1)
 		col, _, cok := pa.Param(1, 1)
 		if paramsLen == 2 && rok && cok {
 			m := CursorPositionEvent{Y: row - 1, X: col - 1}
 			if row == 1 && col-1 <= int(ModMeta|ModShift|ModAlt|ModCtrl) {
-				// XXX: We cannot differentiate between cursor position report and
-				// CSI 1 ; <mod> R (which is modified F3) when the cursor is at the
-				// row 1. In this case, we report both messages.
-				//
-				// For a non ambiguous cursor position report, use
-				// [ansi.RequestExtendedCursorPosition] (DECXCPR) instead.
+			// XXX: 当光标在第 1 行时，我们无法区分光标位置报告和 CSI 1 ; <mod> R（修改的 F3）。
+			// 在这种情况下，我们报告两种消息。
+			//
+			// 对于无歧义的光标位置报告，请改用 [ansi.RequestExtendedCursorPosition] (DECXCPR)。
 				return i, MultiEvent{KeyPressEvent{Code: KeyF3, Mod: KeyMod(col - 1)}, m}
 			}
 
@@ -340,7 +313,7 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 			break
 		}
 
-		// Unmodified key F3 (CSI R)
+		// 未修改的键 F3 (CSI R)
 		fallthrough
 	case 'a', 'b', 'c', 'd', 'A', 'B', 'C', 'D', 'E', 'F', 'H', 'P', 'Q', 'S', 'Z':
 		var k KeyPressEvent
@@ -369,19 +342,19 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 			mod = 1
 		}
 		if paramsLen > 1 && id == 1 && mod != -1 {
-			// CSI 1 ; <modifiers> A
-			k.Mod |= KeyMod(mod - 1)
-		}
-		// Don't forget to handle Kitty keyboard protocol
+				// CSI 1 ; <修饰键> A
+				k.Mod |= KeyMod(mod - 1)
+			}
+			// 不要忘记处理 Kitty 键盘协议
 		return i, parseKittyKeyboardExt(pa, k)
 	case 'M':
-		// Handle X10 mouse
+		// 处理 X10 鼠标
 		if i+3 > len(b) {
 			return i, UnknownEvent(b[:i])
 		}
 		return i + 3, parseX10MouseEvent(append(b[:i], b[i:i+3]...))
 	case 'y' | '$'<<parser.IntermedShift:
-		// Report Mode (DECRPM)
+		// 报告模式 (DECRPM)
 		mode, _, ok := pa.Param(0, -1)
 		if !ok || mode == -1 {
 			break
@@ -392,13 +365,13 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 		}
 		return i, ModeReportEvent{Mode: ansi.ANSIMode(mode), Value: ansi.ModeSetting(val)}
 	case 'u':
-		// Kitty keyboard protocol & CSI u (fixterms)
+		// Kitty 键盘协议 & CSI u (fixterms)
 		if paramsLen == 0 {
 			return i, UnknownEvent(b[:i])
 		}
 		return i, parseKittyKeyboard(pa)
 	case '_':
-		// Win32 Input Mode
+		// Win32 输入模式
 		if paramsLen != 6 {
 			return i, UnknownEvent(b[:i])
 		}
@@ -445,11 +418,11 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 				}
 				return i, parseXTermModifyOtherKeys(pa)
 			case 200:
-				// bracketed-paste start
-				return i, PasteStartEvent{}
-			case 201:
-				// bracketed-paste end
-				return i, PasteEndEvent{}
+					// 括号粘贴开始
+					return i, PasteStartEvent{}
+				case 201:
+					// 括号粘贴结束
+					return i, PasteEndEvent{}
 			}
 		}
 
@@ -497,16 +470,16 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 				k = KeyPressEvent{Code: KeyF17 + rune(param-31)}
 			}
 
-			// modifiers
+			// 修饰键
 			mod, _, _ := pa.Param(1, -1)
 			if paramsLen > 1 && mod != -1 {
 				k.Mod |= KeyMod(mod - 1)
 			}
 
-			// Handle URxvt weird keys
+			// 处理 URxvt 奇怪的键
 			switch cmd {
 			case '~':
-				// Don't forget to handle Kitty keyboard protocol
+				// 不要忘记处理 Kitty 键盘协议
 				return i, parseKittyKeyboardExt(pa, k)
 			case '^':
 				k.Mod |= ModCtrl
@@ -537,11 +510,11 @@ func (p *Parser) parseCsi(b []byte) (int, Event) {
 	return i, UnknownEvent(b[:i])
 }
 
-// parseSs3 parses a SS3 sequence.
-// See https://vt100.net/docs/vt220-rm/chapter4.html#S4.4.4.2
+// parseSs3 解析 SS3 序列。
+// 请参阅 https://vt100.net/docs/vt220-rm/chapter4.html#S4.4.4.2
 func (p *Parser) parseSs3(b []byte) (int, Event) {
 	if len(b) == 2 && b[0] == ansi.ESC {
-		// short cut if this is an alt+O key
+		// 如果这是 alt+O 键的快捷键
 		return 2, KeyPressEvent{Code: rune(b[1]), Mod: ModAlt}
 	}
 
@@ -553,21 +526,21 @@ func (p *Parser) parseSs3(b []byte) (int, Event) {
 		i++
 	}
 
-	// Scan numbers from 0-9
+	// 扫描 0-9 的数字
 	var mod int
 	for ; i < len(b) && b[i] >= '0' && b[i] <= '9'; i++ {
 		mod *= 10
 		mod += int(b[i]) - '0'
 	}
 
-	// Scan a GL character
-	// A GL character is a single byte in the range 0x21-0x7E
-	// See https://vt100.net/docs/vt220-rm/chapter2.html#S2.3.2
+	// 扫描 GL 字符
+	// GL 字符是范围在 0x21-0x7E 之间的单个字节
+	// 请参阅 https://vt100.net/docs/vt220-rm/chapter2.html#S2.3.2
 	if i >= len(b) || b[i] < 0x21 || b[i] > 0x7E {
 		return i, UnknownEvent(b[:i])
 	}
 
-	// GL character(s)
+	// GL 字符
 	gl := b[i]
 	i++
 
@@ -595,7 +568,7 @@ func (p *Parser) parseSs3(b []byte) (int, Event) {
 		return i, UnknownEvent(b[:i])
 	}
 
-	// Handle weird SS3 <modifier> Func
+	// 处理奇怪的 SS3 <修饰键> 功能
 	if mod > 0 {
 		k.Mod |= KeyMod(mod - 1)
 	}
@@ -608,7 +581,7 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 		return KeyPressEvent{Code: rune(b[1]), Mod: ModAlt}
 	}
 	if len(b) == 2 && b[0] == ansi.ESC {
-		// short cut if this is an alt+] key
+		// 如果这是 alt+] 键的快捷键
 		return 2, defaultKey()
 	}
 
@@ -620,8 +593,8 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 		i++
 	}
 
-	// Parse OSC command
-	// An OSC sequence is terminated by a BEL, ESC, or ST character
+	// 解析 OSC 命令
+	// OSC 序列由 BEL、ESC 或 ST 字符终止
 	var start, end int
 	cmd := -1
 	for ; i < len(b) && b[i] >= '0' && b[i] <= '9'; i++ {
@@ -634,13 +607,13 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 	}
 
 	if i < len(b) && b[i] == ';' {
-		// mark the start of the sequence data
+		// 标记序列数据的开始
 		i++
 		start = i
 	}
 
 	for ; i < len(b); i++ {
-		// advance to the end of the sequence
+		// 前进到序列的末尾
 		if slices.Contains([]byte{ansi.BEL, ansi.ESC, ansi.ST, ansi.CAN, ansi.SUB}, b[i]) {
 			break
 		}
@@ -650,10 +623,10 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 		return i, UnknownEvent(b[:i])
 	}
 
-	end = i // end of the sequence data
+	end = i // 序列数据的末尾
 	i++
 
-	// Check 7-bit ST (string terminator) character
+	// 检查 7 位 ST（字符串终止符）字符
 	switch b[i-1] {
 	case ansi.CAN, ansi.SUB:
 		return i, UnknownEvent(b[:i])
@@ -663,8 +636,8 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 				return 2, defaultKey()
 			}
 
-			// If we don't have a valid ST terminator, then this is a
-			// cancelled sequence and should be ignored.
+			// 如果我们没有有效的 ST 终止符，那么这是一个
+			// 已取消的序列，应该被忽略。
 			return i, UnknownEvent(b[:i])
 		}
 
@@ -705,7 +678,7 @@ func (p *Parser) parseOsc(b []byte) (int, Event) {
 	return i, UnknownEvent(b[:i])
 }
 
-// parseStTerminated parses a control sequence that gets terminated by a ST character.
+// parseStTerminated 解析由 ST 字符终止的控制序列。
 func (p *Parser) parseStTerminated(intro8, intro7 byte, fn func([]byte) Event) func([]byte) (int, Event) {
 	defaultKey := func(b []byte) (int, Event) {
 		switch intro8 {
@@ -729,9 +702,9 @@ func (p *Parser) parseStTerminated(intro8, intro7 byte, fn func([]byte) Event) f
 			i++
 		}
 
-		// Scan control sequence
-		// Most common control sequence is terminated by a ST character
-		// ST is a 7-bit string terminator character is (ESC \)
+		// 扫描控制序列
+		// 最常见的控制序列由 ST 字符终止
+		// ST 是 7 位字符串终止符字符 (ESC \)
 		start := i
 		for ; i < len(b); i++ {
 			if slices.Contains([]byte{ansi.ESC, ansi.ST, ansi.CAN, ansi.SUB}, b[i]) {
@@ -743,10 +716,10 @@ func (p *Parser) parseStTerminated(intro8, intro7 byte, fn func([]byte) Event) f
 			return i, UnknownEvent(b[:i])
 		}
 
-		end := i // end of the sequence data
+		end := i // 序列数据的末尾
 		i++
 
-		// Check 7-bit ST (string terminator) character
+		// 检查 7 位 ST（字符串终止符）字符
 		switch b[i-1] {
 		case ansi.CAN, ansi.SUB:
 			return i, UnknownEvent(b[:i])
@@ -756,15 +729,15 @@ func (p *Parser) parseStTerminated(intro8, intro7 byte, fn func([]byte) Event) f
 					return defaultKey(b)
 				}
 
-				// If we don't have a valid ST terminator, then this is a
-				// cancelled sequence and should be ignored.
+				// 如果我们没有有效的 ST 终止符，那么这是一个
+				// 已取消的序列，应该被忽略。
 				return i, UnknownEvent(b[:i])
 			}
 
 			i++
 		}
 
-		// Call the function to parse the sequence and return the result
+		// 调用函数解析序列并返回结果
 		if fn != nil {
 			if e := fn(b[start:end]); e != nil {
 				return i, e
@@ -777,7 +750,7 @@ func (p *Parser) parseStTerminated(intro8, intro7 byte, fn func([]byte) Event) f
 
 func (p *Parser) parseDcs(b []byte) (int, Event) {
 	if len(b) == 2 && b[0] == ansi.ESC {
-		// short cut if this is an alt+P key
+		// 如果这是 alt+P 键的快捷键
 		return 2, KeyPressEvent{Code: 'p', Mod: ModShift | ModAlt}
 	}
 
@@ -785,7 +758,7 @@ func (p *Parser) parseDcs(b []byte) (int, Event) {
 	var paramsLen int
 	var cmd ansi.Cmd
 
-	// DCS sequences are introduced by DCS (0x90) or ESC P (0x1b 0x50)
+	// DCS 序列由 DCS (0x90) 或 ESC P (0x1b 0x50) 引入
 	var i int
 	if b[i] == ansi.DCS || b[i] == ansi.ESC {
 		i++
@@ -794,12 +767,12 @@ func (p *Parser) parseDcs(b []byte) (int, Event) {
 		i++
 	}
 
-	// initial DCS byte
+	// 初始 DCS 字节
 	if i < len(b) && b[i] >= '<' && b[i] <= '?' {
 		cmd |= ansi.Cmd(b[i]) << parser.PrefixShift
 	}
 
-	// Scan parameter bytes in the range 0x30-0x3F
+	// 扫描参数字节在 0x30-0x3F 范围内
 	var j int
 	for j = 0; i < len(b) && paramsLen < len(params) && b[i] >= 0x30 && b[i] <= 0x3F; i, j = i+1, j+1 {
 		if b[i] >= '0' && b[i] <= '9' {
@@ -822,20 +795,20 @@ func (p *Parser) parseDcs(b []byte) (int, Event) {
 	}
 
 	if j > 0 && paramsLen < len(params) {
-		// has parameters
+		// 有参数
 		paramsLen++
 	}
 
-	// Scan intermediate bytes in the range 0x20-0x2F
+	// 扫描中间字节在 0x20-0x2F 范围内
 	var intermed byte
 	for j := 0; i < len(b) && b[i] >= 0x20 && b[i] <= 0x2F; i, j = i+1, j+1 {
 		intermed = b[i]
 	}
 
-	// set intermediate byte
+	// 设置中间字节
 	cmd |= ansi.Cmd(intermed) << parser.IntermedShift
 
-	// Scan final byte in the range 0x40-0x7E
+	// 扫描最终字节在 0x40-0x7E 范围内
 	if i >= len(b) || b[i] < 0x40 || b[i] > 0x7E {
 		return i, UnknownEvent(b[:i])
 	}
@@ -866,23 +839,21 @@ func (p *Parser) parseDcs(b []byte) (int, Event) {
 	pa := ansi.Params(params[:paramsLen])
 	switch cmd {
 	case 'r' | '+'<<parser.IntermedShift:
-		// XTGETTCAP responses
+		// XTGETTCAP 响应
 		param, _, _ := pa.Param(0, 0)
 		switch param {
-		case 1: // 1 means valid response, 0 means invalid response
+		case 1: // 1 表示有效响应，0 表示无效响应
 			tc := parseTermcap(b[start:end])
-			// XXX: some terminals like KiTTY report invalid responses with
-			// their queries i.e. sending a query for "Tc" using "\x1bP+q5463\x1b\\"
-			// returns "\x1bP0+r5463\x1b\\".
-			// The specs says that invalid responses should be in the form of
-			// DCS 0 + r ST "\x1bP0+r\x1b\\"
-			// We ignore invalid responses and only send valid ones to the program.
+			// XXX: 一些终端如 KiTTY 在查询时会报告无效响应，例如使用 "\x1bP+q5463\x1b\\"
+			// 发送 "Tc" 的查询会返回 "\x1bP0+r5463\x1b\\"。
+			// 规范说无效响应应该采用 DCS 0 + r ST "\x1bP0+r\x1b\\" 的形式
+			// 我们忽略无效响应，只将有效响应发送给程序。
 			//
-			// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+			// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 			return i, tc
 		}
 	case '|' | '>'<<parser.PrefixShift:
-		// XTVersion response
+		// XTVersion 响应
 		return i, TerminalVersionEvent(b[start:end])
 	}
 
@@ -891,11 +862,11 @@ func (p *Parser) parseDcs(b []byte) (int, Event) {
 
 func (p *Parser) parseApc(b []byte) (int, Event) {
 	if len(b) == 2 && b[0] == ansi.ESC {
-		// short cut if this is an alt+_ key
+		// 如果这是 alt+_ 键的快捷键
 		return 2, KeyPressEvent{Code: rune(b[1]), Mod: ModAlt}
 	}
 
-	// APC sequences are introduced by APC (0x9f) or ESC _ (0x1b 0x5f)
+	// APC 序列由 APC (0x9f) 或 ESC _ (0x1b 0x5f) 引入
 	return p.parseStTerminated(ansi.APC, '_', func(b []byte) Event {
 		if len(b) == 0 {
 			return nil
@@ -923,14 +894,14 @@ func (p *Parser) parseUtf8(b []byte) (int, Event) {
 
 	c := b[0]
 	if c <= ansi.US || c == ansi.DEL || c == ansi.SP {
-		// Control codes get handled by parseControl
+		// 控制代码由 parseControl 处理
 		return 1, p.parseControl(c)
 	} else if c > ansi.US && c < ansi.DEL {
-		// ASCII printable characters
+		// ASCII 可打印字符
 		code := rune(c)
 		k := KeyPressEvent{Code: code, Text: string(code)}
 		if unicode.IsUpper(code) {
-			// Convert upper case letters to lower case + shift modifier
+			// 将大写字母转换为小写 + shift 修饰键
 			k.Code = unicode.ToLower(code)
 			k.ShiftedCode = code
 			k.Mod |= ModShift
@@ -948,7 +919,7 @@ func (p *Parser) parseUtf8(b []byte) (int, Event) {
 	text := string(cluster)
 	for i := range text {
 		if i > 0 {
-			// Use [KeyExtended] for multi-rune graphemes
+			// 对多符文图形集群使用 [KeyExtended]
 			code = KeyExtended
 			break
 		}

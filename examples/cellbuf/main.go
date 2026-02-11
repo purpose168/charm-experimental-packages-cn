@@ -1,4 +1,4 @@
-// Package main demonstrates cellbuf usage.
+// 包 main 演示 cellbuf 的使用方法。
 package main
 
 import (
@@ -6,21 +6,21 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/cellbuf"
-	"github.com/charmbracelet/x/input"
-	"github.com/charmbracelet/x/term"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/cellbuf"
+	"github.com/purpose168/charm-experimental-packages-cn/input"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
 func main() {
 	w, h, err := term.GetSize(os.Stdout.Fd())
 	if err != nil {
-		log.Fatalf("getting terminal size: %v", err)
+		log.Fatalf("获取终端大小: %v", err)
 	}
 
 	state, err := term.MakeRaw(os.Stdin.Fd())
 	if err != nil {
-		log.Fatalf("making raw: %v", err)
+		log.Fatalf("设置为原始模式: %v", err)
 	}
 
 	defer term.Restore(os.Stdin.Fd(), state) //nolint:errcheck
@@ -41,7 +41,7 @@ func main() {
 
 	drv, err := input.NewReader(os.Stdin, termType, 0)
 	if err != nil {
-		log.Fatalf("creating input driver: %v", err)
+		log.Fatalf("创建输入驱动: %v", err)
 	}
 
 	modes := []ansi.Mode{
@@ -55,7 +55,7 @@ func main() {
 	x, y := (w/2)-10, h/2
 
 	text := ansi.SetHyperlink("https://charm.sh") +
-		ansi.Style{}.Reverse(true).Styled(" !Hello, world! ") +
+		ansi.Style{}.Reverse(true).Styled(" !你好，世界! ") +
 		ansi.ResetHyperlink()
 	scrw := cellbuf.NewScreenWriter(scr)
 	render := func() {
@@ -75,20 +75,20 @@ func main() {
 	}
 
 	if runtime.GOOS != "windows" {
-		// Listen for resize events
+		// 监听窗口大小调整事件
 		go listenForResize(func() {
 			nw, nh, _ := term.GetSize(os.Stdout.Fd())
 			resize(nw, nh)
 		})
 	}
 
-	// First render
+	// 首次渲染
 	render()
 
 	for {
 		evs, err := drv.ReadEvents()
 		if err != nil {
-			log.Fatalf("reading events: %v", err)
+			log.Fatalf("读取事件: %v", err)
 		}
 
 		for _, ev := range evs {

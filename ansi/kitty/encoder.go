@@ -8,19 +8,18 @@ import (
 	"io"
 )
 
-// Encoder is an encoder for the Kitty graphics protocol. It supports encoding
-// images in the 24-bit [RGB], 32-bit [RGBA], and [PNG] formats, and
-// compressing the data using zlib.
-// The default format is 32-bit [RGBA].
+// Encoder 是 Kitty 图形协议的编码器。它支持将图像编码为 24 位 [RGB]、32 位 [RGBA] 和 [PNG] 格式，
+// 并使用 zlib 压缩数据。
+// 默认格式是 32 位 [RGBA]。
 type Encoder struct {
-	// Uses zlib compression.
+	// 使用 zlib 压缩。
 	Compress bool
 
-	// Can be one of [RGBA], [RGB], or [PNG].
+	// 可以是 [RGBA]、[RGB] 或 [PNG] 之一。
 	Format int
 }
 
-// Encode encodes the image data in the specified format and writes it to w.
+// Encode 将图像数据编码为指定格式并写入 w。
 func (e *Encoder) Encode(w io.Writer, m image.Image) error {
 	if m == nil {
 		return nil

@@ -1,4 +1,4 @@
-// Package config represents configuration management for language servers.
+// Package config 表示语言服务器的配置管理。
 package config
 
 import (
@@ -12,7 +12,7 @@ import (
 //go:embed lsps.json
 var lspsJSON []byte
 
-// ServerConfig represents the configuration for a language server.
+// ServerConfig 表示语言服务器的配置。
 type ServerConfig struct {
 	Command           string            `mapstructure:"command" json:"command"`
 	Args              []string          `mapstructure:"args" json:"args,omitempty"`
@@ -25,17 +25,17 @@ type ServerConfig struct {
 	SingleFileSupport bool              `mapstructure:"single_file_support" json:"-"`
 }
 
-// Config represents the overall configuration.
+// Config 表示整体配置。
 type Config struct {
 	Servers map[string]*ServerConfig `mapstructure:"servers"`
 }
 
-// Manager manages configuration loading and access.
+// Manager 管理配置加载和访问。
 type Manager struct {
 	config *Config
 }
 
-// NewManager creates a new configuration manager.
+// NewManager 创建一个新的配置管理器。
 func NewManager() *Manager {
 	return &Manager{
 		config: &Config{
@@ -44,7 +44,7 @@ func NewManager() *Manager {
 	}
 }
 
-// LoadDefaults loads default server configurations from the embedded JSON.
+// LoadDefaults 从嵌入的 JSON 加载默认服务器配置。
 func (m *Manager) LoadDefaults() error {
 	servers := make(map[string]*ServerConfig)
 	if err := json.Unmarshal(lspsJSON, &servers); err != nil {
@@ -56,28 +56,28 @@ func (m *Manager) LoadDefaults() error {
 	return nil
 }
 
-// GetServers returns all server configurations.
+// GetServers 返回所有服务器配置。
 func (m *Manager) GetServers() map[string]*ServerConfig {
 	return m.config.Servers
 }
 
-// GetServer returns a specific server configuration.
+// GetServer 返回特定的服务器配置。
 func (m *Manager) GetServer(name string) (*ServerConfig, bool) {
 	server, exists := m.config.Servers[name]
 	return server, exists
 }
 
-// AddServer adds or updates a server configuration.
+// AddServer 添加或更新服务器配置。
 func (m *Manager) AddServer(name string, config *ServerConfig) {
 	m.config.Servers[name] = config
 }
 
-// RemoveServer removes a server configuration.
+// RemoveServer 移除服务器配置。
 func (m *Manager) RemoveServer(name string) {
 	delete(m.config.Servers, name)
 }
 
-// applyDefaults applies default values to server configurations.
+// applyDefaults 应用默认值到服务器配置。
 func (m *Manager) applyDefaults() {
 	for name, server := range m.config.Servers {
 		if server.RootMarkers == nil {
@@ -96,7 +96,7 @@ func (m *Manager) applyDefaults() {
 	}
 }
 
-// LoadFromMap loads configuration from a map (useful for testing).
+// LoadFromMap 从映射加载配置（对测试有用）。
 func (m *Manager) LoadFromMap(data map[string]any) error {
 	var config Config
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{

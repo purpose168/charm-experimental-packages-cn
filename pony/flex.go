@@ -2,19 +2,19 @@ package pony
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// Flex represents an element wrapper that supports flex-grow and flex-shrink.
-// Use this to make elements flexible within VStack or HStack.
+// Flex 表示支持 flex-grow 和 flex-shrink 的元素包装器。
+// 使用它可以使元素在 VStack 或 HStack 中具有灵活性。
 type Flex struct {
 	BaseElement
 	child  Element
-	grow   int // flex-grow: how much to grow relative to siblings (default 0 = no grow)
-	shrink int // flex-shrink: how much to shrink relative to siblings (default 1)
-	basis  int // flex-basis: initial size before flex calculation (default 0 = auto)
+	grow   int // flex-grow: 相对于兄弟元素的增长比例（默认 0 = 不增长）
+	shrink int // flex-shrink: 相对于兄弟元素的收缩比例（默认 1）
+	basis  int // flex-basis: 弹性计算前的初始大小（默认 0 = 自动）
 }
 
 var _ Element = (*Flex)(nil)
 
-// NewFlex creates a new flex wrapper.
+// NewFlex 创建一个新的弹性包装器。
 func NewFlex(child Element) *Flex {
 	return &Flex{
 		child:  child,
@@ -24,25 +24,25 @@ func NewFlex(child Element) *Flex {
 	}
 }
 
-// Grow sets the flex-grow and returns the flex for chaining.
+// Grow 设置 flex-grow 并返回弹性包装器以支持链式调用。
 func (f *Flex) Grow(grow int) *Flex {
 	f.grow = grow
 	return f
 }
 
-// Shrink sets the flex-shrink and returns the flex for chaining.
+// Shrink 设置 flex-shrink 并返回弹性包装器以支持链式调用。
 func (f *Flex) Shrink(shrink int) *Flex {
 	f.shrink = shrink
 	return f
 }
 
-// Basis sets the flex-basis and returns the flex for chaining.
+// Basis 设置 flex-basis 并返回弹性包装器以支持链式调用。
 func (f *Flex) Basis(basis int) *Flex {
 	f.basis = basis
 	return f
 }
 
-// Draw renders the flex child.
+// Draw 渲染弹性子元素。
 func (f *Flex) Draw(scr uv.Screen, area uv.Rectangle) {
 	f.SetBounds(area)
 
@@ -51,15 +51,15 @@ func (f *Flex) Draw(scr uv.Screen, area uv.Rectangle) {
 	}
 }
 
-// Layout calculates the flex child size.
+// Layout 计算弹性子元素的大小。
 func (f *Flex) Layout(constraints Constraints) Size {
 	if f.child == nil {
 		return Size{Width: 0, Height: 0}
 	}
 
-	// If basis is set, use it as the initial size
+	// 如果设置了 basis，则将其用作初始大小
 	if f.basis > 0 {
-		// Create constraints with basis as preferred size
+		// 创建以 basis 为首选大小的约束
 		flexConstraints := constraints
 		flexConstraints.MinWidth = min(f.basis, constraints.MaxWidth)
 		flexConstraints.MinHeight = min(f.basis, constraints.MaxHeight)
@@ -69,7 +69,7 @@ func (f *Flex) Layout(constraints Constraints) Size {
 	return f.child.Layout(constraints)
 }
 
-// Children returns the child element.
+// Children 返回子元素。
 func (f *Flex) Children() []Element {
 	if f.child == nil {
 		return nil
@@ -77,21 +77,21 @@ func (f *Flex) Children() []Element {
 	return []Element{f.child}
 }
 
-// GetFlexGrow returns the flex-grow value for an element.
-// Returns 0 if the element is not a Flex wrapper.
+// GetFlexGrow 返回元素的 flex-grow 值。
+// 如果元素不是 Flex 包装器，则返回 0。
 func GetFlexGrow(elem Element) int {
 	if flex, ok := elem.(*Flex); ok {
 		return flex.grow
 	}
-	// Check if it's a flexible spacer
+	// 检查是否为弹性间隔符
 	if spacer, ok := elem.(*Spacer); ok && spacer.fixedSize == 0 {
 		return 1
 	}
 	return 0
 }
 
-// GetFlexShrink returns the flex-shrink value for an element.
-// Returns 1 if the element is not a Flex wrapper.
+// GetFlexShrink 返回元素的 flex-shrink 值。
+// 如果元素不是 Flex 包装器，则返回 1。
 func GetFlexShrink(elem Element) int {
 	if flex, ok := elem.(*Flex); ok {
 		return flex.shrink
@@ -99,8 +99,8 @@ func GetFlexShrink(elem Element) int {
 	return 1
 }
 
-// GetFlexBasis returns the flex-basis value for an element.
-// Returns 0 (auto) if the element is not a Flex wrapper.
+// GetFlexBasis 返回元素的 flex-basis 值。
+// 如果元素不是 Flex 包装器，则返回 0（自动）。
 func GetFlexBasis(elem Element) int {
 	if flex, ok := elem.(*Flex); ok {
 		return flex.basis
@@ -108,7 +108,7 @@ func GetFlexBasis(elem Element) int {
 	return 0
 }
 
-// IsFlexible returns true if the element can grow.
+// IsFlexible 如果元素可以增长，则返回 true。
 func IsFlexible(elem Element) bool {
 	return GetFlexGrow(elem) > 0
 }

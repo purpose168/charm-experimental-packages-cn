@@ -5,10 +5,10 @@ import (
 	"log"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
-// TemplateData represents the data passed to the template
+// TemplateData 表示传递给模板的数据
 type TemplateData struct {
 	Title       string
 	Count       int
@@ -16,7 +16,7 @@ type TemplateData struct {
 	HoveredID   string
 }
 
-// Define our template with interactive buttons
+// 定义带有交互按钮的模板
 const tmpl = `
 <vstack spacing="1">
 	<box border="double" border-color="cyan">
@@ -83,7 +83,7 @@ func (m model) Init() tea.Cmd {
 	)
 }
 
-// Custom messages for button clicks
+// 按钮点击的自定义消息
 type buttonClickMsg string
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -98,7 +98,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case buttonClickMsg:
-		// Handle button clicks
+		// 处理按钮点击
 		m.lastClicked = string(msg)
 		switch msg {
 		case "increment-btn":
@@ -123,7 +123,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 type hoverMsg string
 
 func (m model) View() tea.View {
-	// Prepare data for template
+	// 准备模板数据
 	data := TemplateData{
 		Title:       "pony Mouse Click Demo",
 		Count:       m.count,
@@ -131,22 +131,22 @@ func (m model) View() tea.View {
 		HoveredID:   m.hoveredID,
 	}
 
-	// Render with bounds for hit testing
+	// 渲染并包含碰撞测试的边界
 	scr, boundsMap := m.template.RenderWithBounds(data, nil, m.width, m.height)
 
-	// Create view with callback for mouse events
+	// 创建带有鼠标事件回调的视图
 	view := tea.NewView(scr.Render())
 	view.AltScreen = true
 	view.MouseMode = tea.MouseModeAllMotion
 
-	// Set up callback to handle mouse events using bounds map
+	// 设置回调以使用边界映射处理鼠标事件
 	view.Callback = func(msg tea.Msg) tea.Cmd {
 		switch msg := msg.(type) {
 		case tea.MouseClickMsg:
 			mouse := msg.Mouse()
-			// Hit test to find which element was clicked
+			// 碰撞测试以找出被点击的元素
 			if elem := boundsMap.HitTest(mouse.X, mouse.Y); elem != nil {
-				// Return command with button ID
+				// 返回带有按钮 ID 的命令
 				return func() tea.Msg {
 					return buttonClickMsg(elem.ID())
 				}
@@ -154,7 +154,7 @@ func (m model) View() tea.View {
 
 		case tea.MouseMotionMsg:
 			mouse := msg.Mouse()
-			// Track hover state
+			// 跟踪悬停状态
 			if elem := boundsMap.HitTest(mouse.X, mouse.Y); elem != nil {
 				return func() tea.Msg {
 					return hoverMsg(elem.ID())

@@ -2,19 +2,19 @@ module example
 
 go 1.25.4
 
-replace github.com/charmbracelet/x/pony => ../..
+replace github.com/purpose168/charm-experimental-packages-cn/pony => ../..
 
 require (
-	github.com/charmbracelet/x/pony v0.0.0-00010101000000-000000000000
-	github.com/charmbracelet/x/term v0.2.2
+	github.com/purpose168/charm-experimental-packages-cn/pony v0.0.0-00010101000000-000000000000
+	github.com/purpose168/charm-experimental-packages-cn/term v0.2.2
 )
 
 require (
 	github.com/charmbracelet/colorprofile v0.3.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20251120225753-26363bddd922 // indirect
-	github.com/charmbracelet/x/ansi v0.11.1 // indirect
-	github.com/charmbracelet/x/termios v0.1.1 // indirect
-	github.com/charmbracelet/x/windows v0.2.2 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.1 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/termios v0.1.1 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.5.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.3.0 // indirect

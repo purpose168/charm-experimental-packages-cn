@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/windows
+module github.com/purpose168/charm-experimental-packages-cn/windows
 
 go 1.24.0
 

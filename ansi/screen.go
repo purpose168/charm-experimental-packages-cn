@@ -5,20 +5,19 @@ import (
 	"strings"
 )
 
-// EraseDisplay (ED) clears the display or parts of the display. A screen is
-// the shown part of the terminal display excluding the scrollback buffer.
-// Possible values:
+// EraseDisplay（ED）清除整个显示或显示的部分内容。屏幕是终端显示的可见部分，不包括回滚缓冲区。
+// 可能的值：
 //
-// Default is 0.
+// 默认值为 0。
 //
-//	 0: Clear from cursor to end of screen.
-//	 1: Clear from cursor to beginning of the screen.
-//	 2: Clear entire screen (and moves cursor to upper left on DOS).
-//	 3: Clear entire display which delete all lines saved in the scrollback buffer (xterm).
+//	 0: 清除从光标到屏幕末尾的内容。
+//	 1: 清除从光标到屏幕开始的内容。
+//	 2: 清除整个屏幕（并在 DOS 上将光标移到左上角）。
+//	 3: 清除整个显示，删除回滚缓冲区中保存的所有行（xterm）。
 //
 //	CSI <n> J
 //
-// See: https://vt100.net/docs/vt510-rm/ED.html
+// 参考：https://vt100.net/docs/vt510-rm/ED.html
 func EraseDisplay(n int) string {
 	var s string
 	if n > 0 {
@@ -27,13 +26,13 @@ func EraseDisplay(n int) string {
 	return "\x1b[" + s + "J"
 }
 
-// ED is an alias for [EraseDisplay].
+// ED 是 [EraseDisplay] 的别名。
 func ED(n int) string {
 	return EraseDisplay(n)
 }
 
-// EraseDisplay constants.
-// These are the possible values for the EraseDisplay function.
+// EraseDisplay 常量。
+// 这些是 EraseDisplay 函数的可能值。
 const (
 	EraseScreenBelow   = "\x1b[J"
 	EraseScreenAbove   = "\x1b[1J"
@@ -41,17 +40,17 @@ const (
 	EraseEntireDisplay = "\x1b[3J"
 )
 
-// EraseLine (EL) clears the current line or parts of the line. Possible values:
+// EraseLine（EL）清除当前行或行的部分内容。可能的值：
 //
-//	0: Clear from cursor to end of line.
-//	1: Clear from cursor to beginning of the line.
-//	2: Clear entire line.
+//	0: 清除从光标到行尾的内容。
+//	1: 清除从光标到行首的内容。
+//	2: 清除整行内容。
 //
-// The cursor position is not affected.
+// 光标位置不受影响。
 //
 //	CSI <n> K
 //
-// See: https://vt100.net/docs/vt510-rm/EL.html
+// 参考：https://vt100.net/docs/vt510-rm/EL.html
 func EraseLine(n int) string {
 	var s string
 	if n > 0 {
@@ -60,25 +59,24 @@ func EraseLine(n int) string {
 	return "\x1b[" + s + "K"
 }
 
-// EL is an alias for [EraseLine].
+// EL 是 [EraseLine] 的别名。
 func EL(n int) string {
 	return EraseLine(n)
 }
 
-// EraseLine constants.
-// These are the possible values for the EraseLine function.
+// EraseLine 常量。
+// 这些是 EraseLine 函数的可能值。
 const (
 	EraseLineRight  = "\x1b[K"
 	EraseLineLeft   = "\x1b[1K"
 	EraseEntireLine = "\x1b[2K"
 )
 
-// ScrollUp (SU) scrolls the screen up n lines. New lines are added at the
-// bottom of the screen.
+// ScrollUp（SU）向上滚动屏幕 n 行。新行添加到屏幕底部。
 //
 //	CSI Pn S
 //
-// See: https://vt100.net/docs/vt510-rm/SU.html
+// 参考：https://vt100.net/docs/vt510-rm/SU.html
 func ScrollUp(n int) string {
 	var s string
 	if n > 1 {
@@ -87,22 +85,21 @@ func ScrollUp(n int) string {
 	return "\x1b[" + s + "S"
 }
 
-// PanDown is an alias for [ScrollUp].
+// PanDown 是 [ScrollUp] 的别名。
 func PanDown(n int) string {
 	return ScrollUp(n)
 }
 
-// SU is an alias for [ScrollUp].
+// SU 是 [ScrollUp] 的别名。
 func SU(n int) string {
 	return ScrollUp(n)
 }
 
-// ScrollDown (SD) scrolls the screen down n lines. New lines are added at the
-// top of the screen.
+// ScrollDown（SD）向下滚动屏幕 n 行。新行添加到屏幕顶部。
 //
 //	CSI Pn T
 //
-// See: https://vt100.net/docs/vt510-rm/SD.html
+// 参考：https://vt100.net/docs/vt510-rm/SD.html
 func ScrollDown(n int) string {
 	var s string
 	if n > 1 {
@@ -111,22 +108,21 @@ func ScrollDown(n int) string {
 	return "\x1b[" + s + "T"
 }
 
-// PanUp is an alias for [ScrollDown].
+// PanUp 是 [ScrollDown] 的别名。
 func PanUp(n int) string {
 	return ScrollDown(n)
 }
 
-// SD is an alias for [ScrollDown].
+// SD 是 [ScrollDown] 的别名。
 func SD(n int) string {
 	return ScrollDown(n)
 }
 
-// InsertLine (IL) inserts n blank lines at the current cursor position.
-// Existing lines are moved down.
+// InsertLine（IL）在当前光标位置插入 n 个空行。现有行向下移动。
 //
 //	CSI Pn L
 //
-// See: https://vt100.net/docs/vt510-rm/IL.html
+// 参考：https://vt100.net/docs/vt510-rm/IL.html
 func InsertLine(n int) string {
 	var s string
 	if n > 1 {
@@ -135,17 +131,16 @@ func InsertLine(n int) string {
 	return "\x1b[" + s + "L"
 }
 
-// IL is an alias for [InsertLine].
+// IL 是 [InsertLine] 的别名。
 func IL(n int) string {
 	return InsertLine(n)
 }
 
-// DeleteLine (DL) deletes n lines at the current cursor position. Existing
-// lines are moved up.
+// DeleteLine（DL）删除当前光标位置的 n 行。现有行向上移动。
 //
 //	CSI Pn M
 //
-// See: https://vt100.net/docs/vt510-rm/DL.html
+// 参考：https://vt100.net/docs/vt510-rm/DL.html
 func DeleteLine(n int) string {
 	var s string
 	if n > 1 {
@@ -154,19 +149,18 @@ func DeleteLine(n int) string {
 	return "\x1b[" + s + "M"
 }
 
-// DL is an alias for [DeleteLine].
+// DL 是 [DeleteLine] 的别名。
 func DL(n int) string {
 	return DeleteLine(n)
 }
 
-// SetTopBottomMargins (DECSTBM) sets the top and bottom margins for the scrolling
-// region. The default is the entire screen.
+// SetTopBottomMargins（DECSTBM）设置滚动区域的顶部和底部边距。默认值是整个屏幕。
 //
-// Default is 1 and the bottom of the screen.
+// 默认值为 1 和屏幕底部。
 //
 //	CSI Pt ; Pb r
 //
-// See: https://vt100.net/docs/vt510-rm/DECSTBM.html
+// 参考：https://vt100.net/docs/vt510-rm/DECSTBM.html
 func SetTopBottomMargins(top, bot int) string {
 	var t, b string
 	if top > 0 {
@@ -178,19 +172,18 @@ func SetTopBottomMargins(top, bot int) string {
 	return "\x1b[" + t + ";" + b + "r"
 }
 
-// DECSTBM is an alias for [SetTopBottomMargins].
+// DECSTBM 是 [SetTopBottomMargins] 的别名。
 func DECSTBM(top, bot int) string {
 	return SetTopBottomMargins(top, bot)
 }
 
-// SetLeftRightMargins (DECSLRM) sets the left and right margins for the scrolling
-// region.
+// SetLeftRightMargins（DECSLRM）设置滚动区域的左侧和右侧边距。
 //
-// Default is 1 and the right of the screen.
+// 默认值为 1 和屏幕右侧。
 //
 //	CSI Pl ; Pr s
 //
-// See: https://vt100.net/docs/vt510-rm/DECSLRM.html
+// 参考：https://vt100.net/docs/vt510-rm/DECSLRM.html
 func SetLeftRightMargins(left, right int) string {
 	var l, r string
 	if left > 0 {
@@ -202,19 +195,18 @@ func SetLeftRightMargins(left, right int) string {
 	return "\x1b[" + l + ";" + r + "s"
 }
 
-// DECSLRM is an alias for [SetLeftRightMargins].
+// DECSLRM 是 [SetLeftRightMargins] 的别名。
 func DECSLRM(left, right int) string {
 	return SetLeftRightMargins(left, right)
 }
 
-// SetScrollingRegion (DECSTBM) sets the top and bottom margins for the scrolling
-// region. The default is the entire screen.
+// SetScrollingRegion（DECSTBM）设置滚动区域的顶部和底部边距。默认值是整个屏幕。
 //
 //	CSI <top> ; <bottom> r
 //
-// See: https://vt100.net/docs/vt510-rm/DECSTBM.html
+// 参考：https://vt100.net/docs/vt510-rm/DECSTBM.html
 //
-// Deprecated: use [SetTopBottomMargins] instead.
+// 已弃用：请使用 [SetTopBottomMargins] 代替。
 func SetScrollingRegion(t, b int) string {
 	if t < 0 {
 		t = 0
@@ -225,15 +217,13 @@ func SetScrollingRegion(t, b int) string {
 	return "\x1b[" + strconv.Itoa(t) + ";" + strconv.Itoa(b) + "r"
 }
 
-// InsertCharacter (ICH) inserts n blank characters at the current cursor
-// position. Existing characters move to the right. Characters moved past the
-// right margin are lost. ICH has no effect outside the scrolling margins.
+// InsertCharacter（ICH）在当前光标位置插入 n 个空字符。现有字符向右移动。移动超过右侧边距的字符将丢失。ICH 在滚动边距外无效。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI Pn @
 //
-// See: https://vt100.net/docs/vt510-rm/ICH.html
+// 参考：https://vt100.net/docs/vt510-rm/ICH.html
 func InsertCharacter(n int) string {
 	var s string
 	if n > 1 {
@@ -242,20 +232,19 @@ func InsertCharacter(n int) string {
 	return "\x1b[" + s + "@"
 }
 
-// ICH is an alias for [InsertCharacter].
+// ICH 是 [InsertCharacter] 的别名。
 func ICH(n int) string {
 	return InsertCharacter(n)
 }
 
-// DeleteCharacter (DCH) deletes n characters at the current cursor position.
-// As the characters are deleted, the remaining characters move to the left and
-// the cursor remains at the same position.
+// DeleteCharacter（DCH）删除当前光标位置的 n 个字符。
+// 当字符被删除时，剩余字符向左移动，光标保持在相同位置。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI Pn P
 //
-// See: https://vt100.net/docs/vt510-rm/DCH.html
+// 参考：https://vt100.net/docs/vt510-rm/DCH.html
 func DeleteCharacter(n int) string {
 	var s string
 	if n > 1 {
@@ -264,42 +253,41 @@ func DeleteCharacter(n int) string {
 	return "\x1b[" + s + "P"
 }
 
-// DCH is an alias for [DeleteCharacter].
+// DCH 是 [DeleteCharacter] 的别名。
 func DCH(n int) string {
 	return DeleteCharacter(n)
 }
 
-// SetTabEvery8Columns (DECST8C) sets the tab stops at every 8 columns.
+// SetTabEvery8Columns（DECST8C）在每 8 列设置制表位。
 //
 //	CSI ? 5 W
 //
-// See: https://vt100.net/docs/vt510-rm/DECST8C.html
+// 参考：https://vt100.net/docs/vt510-rm/DECST8C.html
 const (
 	SetTabEvery8Columns = "\x1b[?5W"
 	DECST8C             = SetTabEvery8Columns
 )
 
-// HorizontalTabSet (HTS) sets a horizontal tab stop at the current cursor
-// column.
+// HorizontalTabSet（HTS）在当前光标列设置水平制表位。
 //
-// This is equivalent to [HTS].
+// 这等同于 [HTS]。
 //
 //	ESC H
 //
-// See: https://vt100.net/docs/vt510-rm/HTS.html
+// 参考：https://vt100.net/docs/vt510-rm/HTS.html
 const HorizontalTabSet = "\x1bH"
 
-// TabClear (TBC) clears tab stops.
+// TabClear（TBC）清除制表位。
 //
-// Default is 0.
+// 默认值为 0。
 //
-// Possible values:
-// 0: Clear tab stop at the current column. (default)
-// 3: Clear all tab stops.
+// 可能的值：
+// 0: 清除当前列的制表位。（默认）
+// 3: 清除所有制表位。
 //
 //	CSI Pn g
 //
-// See: https://vt100.net/docs/vt510-rm/TBC.html
+// 参考：https://vt100.net/docs/vt510-rm/TBC.html
 func TabClear(n int) string {
 	var s string
 	if n > 0 {
@@ -308,25 +296,23 @@ func TabClear(n int) string {
 	return "\x1b[" + s + "g"
 }
 
-// TBC is an alias for [TabClear].
+// TBC 是 [TabClear] 的别名。
 func TBC(n int) string {
 	return TabClear(n)
 }
 
-// RequestPresentationStateReport (DECRQPSR) requests the terminal to send a
-// report of the presentation state. This includes the cursor information [DECCIR],
-// and tab stop [DECTABSR] reports.
+// RequestPresentationStateReport（DECRQPSR）请求终端发送显示状态报告。这包括光标信息 [DECCIR] 和制表位 [DECTABSR] 报告。
 //
-// Default is 0.
+// 默认值为 0。
 //
-// Possible values:
-// 0: Error, request ignored.
-// 1: Cursor information report [DECCIR].
-// 2: Tab stop report [DECTABSR].
+// 可能的值：
+// 0: 错误，请求被忽略。
+// 1: 光标信息报告 [DECCIR]。
+// 2: 制表位报告 [DECTABSR]。
 //
 //	CSI Ps $ w
 //
-// See: https://vt100.net/docs/vt510-rm/DECRQPSR.html
+// 参考：https://vt100.net/docs/vt510-rm/DECRQPSR.html
 func RequestPresentationStateReport(n int) string {
 	var s string
 	if n > 0 {
@@ -335,21 +321,21 @@ func RequestPresentationStateReport(n int) string {
 	return "\x1b[" + s + "$w"
 }
 
-// DECRQPSR is an alias for [RequestPresentationStateReport].
+// DECRQPSR 是 [RequestPresentationStateReport] 的别名。
 func DECRQPSR(n int) string {
 	return RequestPresentationStateReport(n)
 }
 
-// TabStopReport (DECTABSR) is the response to a tab stop report request.
-// It reports the tab stops set in the terminal.
+// TabStopReport（DECTABSR）是对制表位报告请求的响应。
+// 它报告终端中设置的制表位。
 //
-// The response is a list of tab stops separated by a slash (/) character.
+// 响应是由斜杠（/）字符分隔的制表位列表。
 //
 //	DCS 2 $ u D ... D ST
 //
-// Where D is a decimal number representing a tab stop.
+// 其中 D 是表示制表位的十进制数字。
 //
-// See: https://vt100.net/docs/vt510-rm/DECTABSR.html
+// 参考：https://vt100.net/docs/vt510-rm/DECTABSR.html
 func TabStopReport(stops ...int) string {
 	var s []string //nolint:prealloc
 	for _, v := range stops {
@@ -358,23 +344,20 @@ func TabStopReport(stops ...int) string {
 	return "\x1bP2$u" + strings.Join(s, "/") + "\x1b\\"
 }
 
-// DECTABSR is an alias for [TabStopReport].
+// DECTABSR 是 [TabStopReport] 的别名。
 func DECTABSR(stops ...int) string {
 	return TabStopReport(stops...)
 }
 
-// CursorInformationReport (DECCIR) is the response to a cursor information
-// report request. It reports the cursor position, visual attributes, and
-// character protection attributes. It also reports the status of origin mode
-// [DECOM] and the current active character set.
+// CursorInformationReport（DECCIR）是对光标信息报告请求的响应。它报告光标位置、视觉属性和字符保护属性。它还报告原点模式 [DECOM] 的状态和当前活动字符集。
 //
-// The response is a list of values separated by a semicolon (;) character.
+// 响应是由分号（;）字符分隔的值列表。
 //
 //	DCS 1 $ u D ... D ST
 //
-// Where D is a decimal number representing a value.
+// 其中 D 是表示值的十进制数字。
 //
-// See: https://vt100.net/docs/vt510-rm/DECCIR.html
+// 参考：https://vt100.net/docs/vt510-rm/DECCIR.html
 func CursorInformationReport(values ...int) string {
 	var s []string //nolint:prealloc
 	for _, v := range values {
@@ -383,19 +366,19 @@ func CursorInformationReport(values ...int) string {
 	return "\x1bP1$u" + strings.Join(s, ";") + "\x1b\\"
 }
 
-// DECCIR is an alias for [CursorInformationReport].
+// DECCIR 是 [CursorInformationReport] 的别名。
 func DECCIR(values ...int) string {
 	return CursorInformationReport(values...)
 }
 
-// RepeatPreviousCharacter (REP) repeats the previous character n times.
-// This is identical to typing the same character n times.
+// RepeatPreviousCharacter（REP）重复前一个字符 n 次。
+// 这与键入相同字符 n 次相同。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI Pn b
 //
-// See: ECMA-48 § 8.3.103.
+// 参考：ECMA-48 § 8.3.103。
 func RepeatPreviousCharacter(n int) string {
 	var s string
 	if n > 1 {
@@ -404,7 +387,7 @@ func RepeatPreviousCharacter(n int) string {
 	return "\x1b[" + s + "b"
 }
 
-// REP is an alias for [RepeatPreviousCharacter].
+// REP 是 [RepeatPreviousCharacter] 的别名。
 func REP(n int) string {
 	return RepeatPreviousCharacter(n)
 }

@@ -2,8 +2,8 @@ package ansi
 
 import "strconv"
 
-// Kitty keyboard protocol progressive enhancement flags.
-// See: https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+// Kitty 键盘协议渐进增强标志。
+// 参见: https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
 const (
 	KittyDisambiguateEscapeCodes = 1 << iota
 	KittyReportEventTypes
@@ -15,50 +15,48 @@ const (
 		KittyReportAlternateKeys | KittyReportAllKeysAsEscapeCodes | KittyReportAssociatedKeys
 )
 
-// RequestKittyKeyboard is a sequence to request the terminal Kitty keyboard
-// protocol enabled flags.
+// RequestKittyKeyboard 是一个请求启用终端 Kitty 键盘协议标志的序列。
 //
-// See: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+// 参见: https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 const RequestKittyKeyboard = "\x1b[?u"
 
-// KittyKeyboard returns a sequence to request keyboard enhancements from the terminal.
-// The flags argument is a bitmask of the Kitty keyboard protocol flags. While
-// mode specifies how the flags should be interpreted.
+// KittyKeyboard 返回一个从终端请求键盘增强功能的序列。
+// flags 参数是一个位掩码，表示 Kitty 键盘协议的标志。
+// mode 指定如何解释这些标志。
 //
-// Possible values for flags mask:
+// 标志掩码的可能的值：
 //
-//	1:  Disambiguate escape codes
-//	2:  Report event types
-//	4:  Report alternate keys
-//	8:  Report all keys as escape codes
-//	16: Report associated text
+//	1:  消除转义码歧义
+//	2:  报告事件类型
+//	4:  报告备用键
+//	8:  将所有键报告为转义码
+//	16: 报告关联文本
 //
-// Possible values for mode:
+// 模式的可能的值：
 //
-//	1: Set given flags and unset all others
-//	2: Set given flags and keep existing flags unchanged
-//	3: Unset given flags and keep existing flags unchanged
+//	1: 设置给定标志并清除所有其他标志
+//	2: 设置给定标志并保持现有标志不变
+//	3: 清除给定标志并保持现有标志不变
 //
-// See https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+// 参见 https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
 func KittyKeyboard(flags, mode int) string {
 	return "\x1b[=" + strconv.Itoa(flags) + ";" + strconv.Itoa(mode) + "u"
 }
 
-// PushKittyKeyboard returns a sequence to push the given flags to the terminal
-// Kitty Keyboard stack.
+// PushKittyKeyboard 返回一个将给定标志压入终端 Kitty 键盘堆栈的序列。
 //
-// Possible values for flags mask:
+// 标志掩码的可能的值：
 //
-//	0:  Disable all features
-//	1:  Disambiguate escape codes
-//	2:  Report event types
-//	4:  Report alternate keys
-//	8:  Report all keys as escape codes
-//	16: Report associated text
+//	0:  禁用所有功能
+//	1:  消除转义码歧义
+//	2:  报告事件类型
+//	4:  报告备用键
+//	8:  将所有键报告为转义码
+//	16: 报告关联文本
 //
 //	CSI > flags u
 //
-// See https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+// 参见 https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
 func PushKittyKeyboard(flags int) string {
 	var f string
 	if flags > 0 {
@@ -68,18 +66,16 @@ func PushKittyKeyboard(flags int) string {
 	return "\x1b[>" + f + "u"
 }
 
-// DisableKittyKeyboard is a sequence to push zero into the terminal Kitty
-// Keyboard stack to disable the protocol.
+// DisableKittyKeyboard 是一个将零压入终端 Kitty 键盘堆栈以禁用该协议的序列。
 //
-// This is equivalent to PushKittyKeyboard(0).
+// 这等同于 PushKittyKeyboard(0)。
 const DisableKittyKeyboard = "\x1b[>u"
 
-// PopKittyKeyboard returns a sequence to pop n number of flags from the
-// terminal Kitty Keyboard stack.
+// PopKittyKeyboard 返回一个从终端 Kitty 键盘堆栈弹出一个或多个标志的序列。
 //
 //	CSI < flags u
 //
-// See https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+// 参见 https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
 func PopKittyKeyboard(n int) string {
 	var num string
 	if n > 0 {

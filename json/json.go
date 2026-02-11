@@ -1,4 +1,4 @@
-// Package json provides functions to facilitate dealing with JSON.
+// 包 json 提供了处理 JSON 的辅助函数。
 package json
 
 import (
@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-// Reader takes an input, marshal it to JSON and returns a io.Reader of it.
+// Reader 接收一个输入，将其序列化为 JSON 并返回一个 io.Reader。
 func Reader[T any](v T) io.Reader {
 	bts, err := json.Marshal(v)
 	if err != nil {
@@ -18,7 +18,7 @@ func Reader[T any](v T) io.Reader {
 	return bytes.NewReader(bts)
 }
 
-// ErrorReader is a reader that always errors with the given error.
+// ErrorReader 是一个始终返回给定错误的读取器。
 type ErrorReader struct {
 	err error
 }
@@ -27,7 +27,7 @@ func (r *ErrorReader) Read(_ []byte) (int, error) {
 	return 0, r.err
 }
 
-// From parses a io.Reader with JSON.
+// From 解析包含 JSON 的 io.Reader。
 func From[T any](r io.Reader, t T) (T, error) {
 	bts, err := io.ReadAll(r)
 	if err != nil {
@@ -39,7 +39,7 @@ func From[T any](r io.Reader, t T) (T, error) {
 	return t, nil
 }
 
-// Write writes the given data as JSON.
+// Write 将给定数据以 JSON 形式写入。
 func Write(w http.ResponseWriter, data any) error {
 	bts, err := json.Marshal(data)
 	if err != nil {
@@ -50,7 +50,7 @@ func Write(w http.ResponseWriter, data any) error {
 	return err //nolint:wrapcheck
 }
 
-// IsValid checks if the given data is valid JSON.
+// IsValid 检查给定数据是否为有效的 JSON。
 func IsValid[T string | []byte](data T) bool {
 	if len(data) == 0 { // hot path
 		return false

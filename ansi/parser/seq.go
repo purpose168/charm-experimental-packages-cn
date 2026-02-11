@@ -2,7 +2,7 @@ package parser
 
 import "math"
 
-// Shift and masks for sequence parameters and intermediates.
+// 用于序列参数和中间字节的移位和掩码。
 const (
 	PrefixShift    = 8
 	IntermedShift  = 16
@@ -11,41 +11,39 @@ const (
 	ParamMask      = ^HasMoreFlag
 	MissingParam   = ParamMask
 	MissingCommand = MissingParam
-	MaxParam       = math.MaxUint16 // the maximum value a parameter can have
+	MaxParam       = math.MaxUint16 // 参数可以拥有的最大值
 )
 
 const (
-	// MaxParamsSize is the maximum number of parameters a sequence can have.
+	// MaxParamsSize 是序列可以拥有的最大参数数量。
 	MaxParamsSize = 32
 
-	// DefaultParamValue is the default value used for missing parameters.
+	// DefaultParamValue 是用于缺失参数的默认值。
 	DefaultParamValue = 0
 )
 
-// Prefix returns the prefix byte of the sequence.
-// This is always gonna be one of the following '<' '=' '>' '?' and in the
-// range of 0x3C-0x3F.
-// Zero is returned if the sequence does not have a prefix.
+// Prefix 返回序列的前缀字节。
+// 这始终是以下之一 '<' '=' '>' '?' 并且在 0x3C-0x3F 范围内。
+// 如果序列没有前缀，则返回零。
 func Prefix(cmd int) int {
 	return (cmd >> PrefixShift) & FinalMask
 }
 
-// Intermediate returns the intermediate byte of the sequence.
-// An intermediate byte is in the range of 0x20-0x2F. This includes these
-// characters from ' ', '!', '"', '#', '$', '%', '&', ”', '(', ')', '*', '+',
-// ',', '-', '.', '/'.
-// Zero is returned if the sequence does not have an intermediate byte.
+// Intermediate 返回序列的中间字节。
+// 中间字节在 0x20-0x2F 范围内。这包括这些字符：' ', '!', '"', '#', '$', '%', '&', ''', '(', ')', '*', '+',
+// ',', '-', '.', '/'。
+// 如果序列没有中间字节，则返回零。
 func Intermediate(cmd int) int {
 	return (cmd >> IntermedShift) & FinalMask
 }
 
-// Command returns the command byte of the CSI sequence.
+// Command 返回 CSI 序列的命令字节。
 func Command(cmd int) int {
 	return cmd & FinalMask
 }
 
-// Param returns the parameter at the given index.
-// It returns -1 if the parameter does not exist.
+// Param 返回给定索引处的参数。
+// 如果参数不存在，则返回 -1。
 func Param(params []int, i int) int {
 	if len(params) == 0 || i < 0 || i >= len(params) {
 		return -1
@@ -59,7 +57,7 @@ func Param(params []int, i int) int {
 	return p
 }
 
-// HasMore returns true if the parameter has more sub-parameters.
+// HasMore 如果参数有更多子参数，则返回 true。
 func HasMore(params []int, i int) bool {
 	if len(params) == 0 || i >= len(params) {
 		return false
@@ -68,14 +66,14 @@ func HasMore(params []int, i int) bool {
 	return params[i]&HasMoreFlag != 0
 }
 
-// Subparams returns the sub-parameters of the given parameter.
-// It returns nil if the parameter does not exist.
+// Subparams 返回给定参数的子参数。
+// 如果参数不存在，则返回 nil。
 func Subparams(params []int, i int) []int {
 	if len(params) == 0 || i < 0 || i >= len(params) {
 		return nil
 	}
 
-	// Count the number of parameters before the given parameter index.
+	// 计算给定参数索引之前的参数数量。
 	var count int
 	var j int
 	for j = range params {
@@ -111,9 +109,8 @@ func Subparams(params []int, i int) []int {
 	return append(subs, p)
 }
 
-// Len returns the number of parameters in the sequence.
-// This will return the number of parameters in the sequence, excluding any
-// sub-parameters.
+// Len 返回序列中的参数数量。
+// 这将返回序列中的参数数量，不包括任何子参数。
 func Len(params []int) int {
 	var n int
 	for i := range params {
@@ -124,9 +121,8 @@ func Len(params []int) int {
 	return n
 }
 
-// Range iterates over the parameters of the sequence and calls the given
-// function for each parameter.
-// The function should return false to stop the iteration.
+// Range 遍历序列的参数，并为每个参数调用给定的函数。
+// 函数应返回 false 以停止迭代。
 func Range(params []int, fn func(i int, param int, hasMore bool) bool) {
 	for i := range params {
 		if !fn(i, Param(params, i), HasMore(params, i)) {

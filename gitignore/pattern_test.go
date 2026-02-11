@@ -1,18 +1,18 @@
 // Copyright 2019 The go-git authors
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
+// 本文件受 Apache License 2.0 许可证约束（以下简称"许可证"）;
+// 除非符合许可证的规定，否则您不得使用本文件。
+// 您可以在以下地址获取许可证的副本：
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// 除非适用法律要求或书面同意，软件
+// 根据许可证分发时以"按原样"为基础，
+// 不附带任何明示或暗示的保证或条件。
+// 请参阅许可证中有关权限和
+// 限制的特定语言。
 //
-// This file was originally part of https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes
+// 本文件最初是 https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes 的一部分
 
 package gitignore
 

@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// This file was originally part of https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes
-// and has been modified to provide a simplified matcher that works with a single pattern.
+// 此文件最初是 https://github.com/go-git/go-git/blob/main/plumbing/format/gitattributes 的一部分
+// 已被修改为提供一个简化的匹配器，用于处理单个模式。
 
 package gitignore
 
-// Matcher defines a matcher for a single gitignore pattern
+// Matcher 定义了一个用于单个 gitignore 模式的匹配器
 type Matcher struct {
 	pattern Pattern
 }
 
-// NewMatcher constructs a new simple matcher for a single pattern
+// NewMatcher 为单个模式构造一个新的简单匹配器
 func NewMatcher(pattern Pattern) *Matcher {
 	return &Matcher{pattern: pattern}
 }
 
-// Match matches the given path against the single pattern
+// Match 将给定路径与单个模式进行匹配
 func (m *Matcher) Match(path []string, isDir bool) bool {
 	match := m.pattern.Match(path, isDir)
 	return match == Exclude

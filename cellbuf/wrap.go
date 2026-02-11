@@ -6,30 +6,23 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-const nbsp = '\u00a0'
+const nbsp = '\u00a0' // 非断空格字符
 
-// Wrap returns a string that is wrapped to the specified limit applying any
-// ANSI escape sequences in the string. It tries to wrap the string at word
-// boundaries, but will break words if necessary.
+// Wrap 返回一个根据指定宽度限制进行换行的字符串，同时保留字符串中的ANSI转义序列。
+// 它会尝试在单词边界处换行，但必要时会截断单词。
 //
-// The breakpoints string is a list of characters that are considered
-// breakpoints for word wrapping. A hyphen (-) is always considered a
-// breakpoint.
+// breakpoints 参数是一个字符串，包含被视为单词换行断点的字符。连字符 (-) 始终被视为断点。
 //
-// Note: breakpoints must be a string of 1-cell wide rune characters.
+// 注意：breakpoints 必须是由1单元格宽度的字符组成的字符串。
 func Wrap(s string, limit int, breakpoints string) string {
 	//nolint:godox
-	// TODO: Use [PenWriter] once we get
-	// https://github.com/charmbracelet/lipgloss/pull/489 out the door and
-	// released.
-	// The problem is that [ansi.Wrap] doesn't keep track of style and link
-	// state, so combining both breaks styled space cells. To fix this, we use
-	// non-breaking space cells for padding and styled blank cells. And since
-	// both wrapping methods respect non-breaking spaces, we can use them to
-	// preserve styled spaces in the output.
+	// TODO: 一旦 https://github.com/purpose168/lipgloss-cn/pull/489 发布后，使用 [PenWriter]
+	// 问题是 [ansi.Wrap] 不跟踪样式和链接状态，所以组合使用时会破坏带样式的空格单元格。
+	// 为了解决这个问题，我们对填充和带样式的空白单元格使用非断空格单元格。
+	// 由于两种换行方法都尊重非断空格，我们可以使用它们来保留输出中的带样式空格。
 
 	if len(s) == 0 {
 		return ""
@@ -43,26 +36,29 @@ func Wrap(s string, limit int, breakpoints string) string {
 	defer ansi.PutParser(p)
 
 	var (
-		buf             bytes.Buffer
-		word            bytes.Buffer
-		space           bytes.Buffer
-		style, curStyle Style
-		link, curLink   Link
-		curWidth        int
-		wordLen         int
+		buf             bytes.Buffer    // 结果缓冲区
+		word            bytes.Buffer    // 当前单词缓冲区
+		space           bytes.Buffer    // 当前空格缓冲区
+		style, curStyle Style           // 当前样式和累积样式
+		link, curLink   Link            // 当前链接和累积链接
+		curWidth        int             // 当前行宽度
+		wordLen         int             // 当前单词长度
 	)
 
+	// hasBlankStyle 检查当前样式是否为空白样式（仅考虑反向属性、背景色和下划线样式）
 	hasBlankStyle := func() bool {
-		// Only follow reverse attribute, bg color and underline style
+		// 仅跟踪反向属性、背景色和下划线样式
 		return !style.Attrs.Contains(ReverseAttr) && style.Bg == nil && style.UlStyle == NoUnderline
 	}
 
+	// addSpace 将空格缓冲区内容添加到结果中
 	addSpace := func() {
 		curWidth += space.Len()
 		buf.Write(space.Bytes())
 		space.Reset()
 	}
 
+	// addWord 将单词缓冲区内容添加到结果中
 	addWord := func() {
 		if word.Len() == 0 {
 			return
@@ -78,6 +74,7 @@ func Wrap(s string, limit int, breakpoints string) string {
 		wordLen = 0
 	}
 
+	// addNewline 添加换行符并重置相关状态
 	addNewline := func() {
 		if !curStyle.Empty() {
 			buf.WriteString(ansi.ResetStyle)
@@ -110,7 +107,7 @@ func Wrap(s string, limit int, breakpoints string) string {
 					if curWidth+space.Len() > limit {
 						curWidth = 0
 					} else {
-						// preserve whitespaces
+						// 保留空白字符
 						buf.Write(space.Bytes())
 					}
 					space.Reset()
@@ -120,17 +117,17 @@ func Wrap(s string, limit int, breakpoints string) string {
 				addNewline()
 				break
 			} else if ansi.HasCsiPrefix(seq) && p.Command() == 'm' {
-				// SGR style sequence [ansi.SGR]
+				// SGR 样式序列 [ansi.SGR]
 				ReadStyle(p.Params(), &style)
 			} else if ansi.HasOscPrefix(seq) && p.Command() == 8 {
-				// Hyperlink sequence [ansi.SetHyperlink]
+				// 超链接序列 [ansi.SetHyperlink]
 				ReadLink(p.Data(), &link)
 			}
 
 			word.WriteString(seq)
 		default:
 			if len(seq) == 1 {
-				// ASCII
+				// ASCII 字符
 				r, _ := utf8.DecodeRuneInString(seq)
 				if r != nbsp && unicode.IsSpace(r) && hasBlankStyle() {
 					addWord()
@@ -148,7 +145,7 @@ func Wrap(s string, limit int, breakpoints string) string {
 			}
 
 			if wordLen+width > limit {
-				// Hardwrap the word if it's too long
+				// 如果单词太长，强制换行
 				addWord()
 			}
 
@@ -168,7 +165,7 @@ func Wrap(s string, limit int, breakpoints string) string {
 		if curWidth+space.Len() > limit {
 			curWidth = 0
 		} else {
-			// preserve whitespaces
+			// 保留空白字符
 			buf.Write(space.Bytes())
 		}
 		space.Reset()
@@ -186,6 +183,7 @@ func Wrap(s string, limit int, breakpoints string) string {
 	return buf.String()
 }
 
+// runeContainsAny 检查符文 r 是否包含在序列 s 中
 func runeContainsAny[T string | []rune](r rune, s T) bool {
 	return slices.Contains([]rune(s), r)
 }

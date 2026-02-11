@@ -1,55 +1,54 @@
 package ansi
 
-// SelectCharacterSet sets the G-set character designator to the specified
-// character set.
+// SelectCharacterSet 将 G 集字符指定符设置为指定的字符集。
 //
 //	ESC Ps Pd
 //
-// Where Ps is the G-set character designator, and Pd is the identifier.
-// For 94-character sets, the designator can be one of:
+// 其中 Ps 是 G 集字符指定符，Pd 是标识符。
+// 对于 94 字符集，指定符可以是以下之一：
 //   - ( G0
 //   - ) G1
 //   - * G2
 //   - + G3
 //
-// For 96-character sets, the designator can be one of:
+// 对于 96 字符集，指定符可以是以下之一：
 //   - - G1
 //   - . G2
 //   - / G3
 //
-// Some common 94-character sets are:
-//   - 0 DEC Special Drawing Set
-//   - A United Kingdom (UK)
-//   - B United States (USASCII)
+// 一些常见的 94 字符集：
+//   - 0 DEC 特殊绘图集
+//   - A 英国 (UK)
+//   - B 美国 (USASCII)
 //
-// Examples:
+// 示例：
 //
-//	ESC ( B  Select character set G0 = United States (USASCII)
-//	ESC ( 0  Select character set G0 = Special Character and Line Drawing Set
-//	ESC ) 0  Select character set G1 = Special Character and Line Drawing Set
-//	ESC * A  Select character set G2 = United Kingdom (UK)
+//	ESC ( B  选择字符集 G0 = 美国 (USASCII)
+//	ESC ( 0  选择字符集 G0 = 特殊字符和线条绘图集
+//	ESC ) 0  选择字符集 G1 = 特殊字符和线条绘图集
+//	ESC * A  选择字符集 G2 = 英国 (UK)
 //
-// See: https://vt100.net/docs/vt510-rm/SCS.html
+// 参见: https://vt100.net/docs/vt510-rm/SCS.html
 func SelectCharacterSet(gset byte, charset byte) string {
 	return "\x1b" + string(gset) + string(charset)
 }
 
-// SCS is an alias for SelectCharacterSet.
+// SCS 是 SelectCharacterSet 的别名。
 func SCS(gset byte, charset byte) string {
 	return SelectCharacterSet(gset, charset)
 }
 
-// LS1R (Locking Shift 1 Right) shifts G1 into GR character set.
+// LS1R (右锁定移位 1) 将 G1 移入 GR 字符集。
 const LS1R = "\x1b~"
 
-// LS2 (Locking Shift 2) shifts G2 into GL character set.
+// LS2 (锁定移位 2) 将 G2 移入 GL 字符集。
 const LS2 = "\x1bn"
 
-// LS2R (Locking Shift 2 Right) shifts G2 into GR character set.
+// LS2R (右锁定移位 2) 将 G2 移入 GR 字符集。
 const LS2R = "\x1b}"
 
-// LS3 (Locking Shift 3) shifts G3 into GL character set.
+// LS3 (锁定移位 3) 将 G3 移入 GL 字符集。
 const LS3 = "\x1bo"
 
-// LS3R (Locking Shift 3 Right) shifts G3 into GR character set.
+// LS3R (右锁定移位 3) 将 G3 移入 GR 字符集。
 const LS3R = "\x1b|"

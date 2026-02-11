@@ -1,3 +1,3 @@
-module github.com/charmbracelet/x/exp/charmtone
+module github.com/purpose168/charm-experimental-packages-cn/exp/charmtone
 
 go 1.24.0

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 // TemplateData represents the data passed to the template

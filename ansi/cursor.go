@@ -4,66 +4,59 @@ import (
 	"strconv"
 )
 
-// SaveCursor (DECSC) is an escape sequence that saves the current cursor
-// position.
+// SaveCursor (DECSC) 是一个保存当前光标位置的转义序列。
 //
 //	ESC 7
 //
-// See: https://vt100.net/docs/vt510-rm/DECSC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/DECSC.html
 const (
 	SaveCursor = "\x1b7"
 	DECSC      = SaveCursor
 )
 
-// RestoreCursor (DECRC) is an escape sequence that restores the cursor
-// position.
+// RestoreCursor (DECRC) 是一个恢复光标位置的转义序列。
 //
 //	ESC 8
 //
-// See: https://vt100.net/docs/vt510-rm/DECRC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/DECRC.html
 const (
 	RestoreCursor = "\x1b8"
 	DECRC         = RestoreCursor
 )
 
-// RequestCursorPosition is an escape sequence that requests the current cursor
-// position.
+// RequestCursorPosition 是一个请求当前光标位置的转义序列。
 //
 //	CSI 6 n
 //
-// The terminal will report the cursor position as a CSI sequence in the
-// following format:
+// 终端将以 CSI 序列的形式报告光标位置，格式如下：
 //
 //	CSI Pl ; Pc R
 //
-// Where Pl is the line number and Pc is the column number.
-// See: https://vt100.net/docs/vt510-rm/CPR.html
+// 其中 Pl 是行号，Pc 是列号。
+// 请参阅：https://vt100.net/docs/vt510-rm/CPR.html
 //
-// Deprecated: use [RequestCursorPositionReport] instead.
+// 已弃用：请使用 [RequestCursorPositionReport] 代替。
 const RequestCursorPosition = "\x1b[6n"
 
-// RequestExtendedCursorPosition (DECXCPR) is a sequence for requesting the
-// cursor position report including the current page number.
+// RequestExtendedCursorPosition (DECXCPR) 是一个请求光标位置报告的序列，包括当前页码。
 //
 //	CSI ? 6 n
 //
-// The terminal will report the cursor position as a CSI sequence in the
-// following format:
+// 终端将以 CSI 序列的形式报告光标位置，格式如下：
 //
 //	CSI ? Pl ; Pc ; Pp R
 //
-// Where Pl is the line number, Pc is the column number, and Pp is the page
-// number.
-// See: https://vt100.net/docs/vt510-rm/DECXCPR.html
+// 其中 Pl 是行号，Pc 是列号，Pp 是页码。
+// 请参阅：https://vt100.net/docs/vt510-rm/DECXCPR.html
 //
-// Deprecated: use [RequestExtendedCursorPositionReport] instead.
+// 已弃用：请使用 [RequestExtendedCursorPositionReport] 代替。
 const RequestExtendedCursorPosition = "\x1b[?6n"
 
-// CursorUp (CUU) returns a sequence for moving the cursor up n cells.
+// CursorUp (CUU) 返回一个使光标上移 n 个单元格的序列。
 //
 //	CSI n A
 //
-// See: https://vt100.net/docs/vt510-rm/CUU.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUU.html
 func CursorUp(n int) string {
 	var s string
 	if n > 1 {
@@ -72,26 +65,26 @@ func CursorUp(n int) string {
 	return "\x1b[" + s + "A"
 }
 
-// CUU is an alias for [CursorUp].
+// CUU 是 [CursorUp] 的别名。
 func CUU(n int) string {
 	return CursorUp(n)
 }
 
-// CUU1 is a sequence for moving the cursor up one cell.
+// CUU1 是一个使光标上移一个单元格的序列。
 const CUU1 = "\x1b[A"
 
-// CursorUp1 is a sequence for moving the cursor up one cell.
+// CursorUp1 是一个使光标上移一个单元格的序列。
 //
-// This is equivalent to CursorUp(1).
+// 这相当于 CursorUp(1)。
 //
-// Deprecated: use [CUU1] instead.
+// 已弃用：请使用 [CUU1] 代替。
 const CursorUp1 = "\x1b[A"
 
-// CursorDown (CUD) returns a sequence for moving the cursor down n cells.
+// CursorDown (CUD) 返回一个使光标下移 n 个单元格的序列。
 //
 //	CSI n B
 //
-// See: https://vt100.net/docs/vt510-rm/CUD.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUD.html
 func CursorDown(n int) string {
 	var s string
 	if n > 1 {
@@ -100,26 +93,26 @@ func CursorDown(n int) string {
 	return "\x1b[" + s + "B"
 }
 
-// CUD is an alias for [CursorDown].
+// CUD 是 [CursorDown] 的别名。
 func CUD(n int) string {
 	return CursorDown(n)
 }
 
-// CUD1 is a sequence for moving the cursor down one cell.
+// CUD1 是一个使光标下移一个单元格的序列。
 const CUD1 = "\x1b[B"
 
-// CursorDown1 is a sequence for moving the cursor down one cell.
+// CursorDown1 是一个使光标下移一个单元格的序列。
 //
-// This is equivalent to CursorDown(1).
+// 这相当于 CursorDown(1)。
 //
-// Deprecated: use [CUD1] instead.
+// 已弃用：请使用 [CUD1] 代替。
 const CursorDown1 = "\x1b[B"
 
-// CursorForward (CUF) returns a sequence for moving the cursor right n cells.
+// CursorForward (CUF) 返回一个使光标右移 n 个单元格的序列。
 //
 // # CSI n C
 //
-// See: https://vt100.net/docs/vt510-rm/CUF.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUF.html
 func CursorForward(n int) string {
 	var s string
 	if n > 1 {
@@ -128,37 +121,37 @@ func CursorForward(n int) string {
 	return "\x1b[" + s + "C"
 }
 
-// CUF is an alias for [CursorForward].
+// CUF 是 [CursorForward] 的别名。
 func CUF(n int) string {
 	return CursorForward(n)
 }
 
-// CUF1 is a sequence for moving the cursor right one cell.
+// CUF1 是一个使光标右移一个单元格的序列。
 const CUF1 = "\x1b[C"
 
-// CursorRight (CUF) returns a sequence for moving the cursor right n cells.
+// CursorRight (CUF) 返回一个使光标右移 n 个单元格的序列。
 //
 //	CSI n C
 //
-// See: https://vt100.net/docs/vt510-rm/CUF.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUF.html
 //
-// Deprecated: use [CursorForward] instead.
+// 已弃用：请使用 [CursorForward] 代替。
 func CursorRight(n int) string {
 	return CursorForward(n)
 }
 
-// CursorRight1 is a sequence for moving the cursor right one cell.
+// CursorRight1 是一个使光标右移一个单元格的序列。
 //
-// This is equivalent to CursorRight(1).
+// 这相当于 CursorRight(1)。
 //
-// Deprecated: use [CUF1] instead.
+// 已弃用：请使用 [CUF1] 代替。
 const CursorRight1 = CUF1
 
-// CursorBackward (CUB) returns a sequence for moving the cursor left n cells.
+// CursorBackward (CUB) 返回一个使光标左移 n 个单元格的序列。
 //
 // # CSI n D
 //
-// See: https://vt100.net/docs/vt510-rm/CUB.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUB.html
 func CursorBackward(n int) string {
 	var s string
 	if n > 1 {
@@ -167,38 +160,37 @@ func CursorBackward(n int) string {
 	return "\x1b[" + s + "D"
 }
 
-// CUB is an alias for [CursorBackward].
+// CUB 是 [CursorBackward] 的别名。
 func CUB(n int) string {
 	return CursorBackward(n)
 }
 
-// CUB1 is a sequence for moving the cursor left one cell.
+// CUB1 是一个使光标左移一个单元格的序列。
 const CUB1 = "\x1b[D"
 
-// CursorLeft (CUB) returns a sequence for moving the cursor left n cells.
+// CursorLeft (CUB) 返回一个使光标左移 n 个单元格的序列。
 //
 //	CSI n D
 //
-// See: https://vt100.net/docs/vt510-rm/CUB.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUB.html
 //
-// Deprecated: use [CursorBackward] instead.
+// 已弃用：请使用 [CursorBackward] 代替。
 func CursorLeft(n int) string {
 	return CursorBackward(n)
 }
 
-// CursorLeft1 is a sequence for moving the cursor left one cell.
+// CursorLeft1 是一个使光标左移一个单元格的序列。
 //
-// This is equivalent to CursorLeft(1).
+// 这相当于 CursorLeft(1)。
 //
-// Deprecated: use [CUB1] instead.
+// 已弃用：请使用 [CUB1] 代替。
 const CursorLeft1 = CUB1
 
-// CursorNextLine (CNL) returns a sequence for moving the cursor to the
-// beginning of the next line n times.
+// CursorNextLine (CNL) 返回一个使光标移动到下一行开头 n 次的序列。
 //
 //	CSI n E
 //
-// See: https://vt100.net/docs/vt510-rm/CNL.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CNL.html
 func CursorNextLine(n int) string {
 	var s string
 	if n > 1 {
@@ -207,17 +199,16 @@ func CursorNextLine(n int) string {
 	return "\x1b[" + s + "E"
 }
 
-// CNL is an alias for [CursorNextLine].
+// CNL 是 [CursorNextLine] 的别名。
 func CNL(n int) string {
 	return CursorNextLine(n)
 }
 
-// CursorPreviousLine (CPL) returns a sequence for moving the cursor to the
-// beginning of the previous line n times.
+// CursorPreviousLine (CPL) 返回一个使光标移动到上一行开头 n 次的序列。
 //
 //	CSI n F
 //
-// See: https://vt100.net/docs/vt510-rm/CPL.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CPL.html
 func CursorPreviousLine(n int) string {
 	var s string
 	if n > 1 {
@@ -226,19 +217,18 @@ func CursorPreviousLine(n int) string {
 	return "\x1b[" + s + "F"
 }
 
-// CPL is an alias for [CursorPreviousLine].
+// CPL 是 [CursorPreviousLine] 的别名。
 func CPL(n int) string {
 	return CursorPreviousLine(n)
 }
 
-// CursorHorizontalAbsolute (CHA) returns a sequence for moving the cursor to
-// the given column.
+// CursorHorizontalAbsolute (CHA) 返回一个使光标移动到指定列的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n G
 //
-// See: https://vt100.net/docs/vt510-rm/CHA.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CHA.html
 func CursorHorizontalAbsolute(col int) string {
 	var s string
 	if col > 0 {
@@ -247,19 +237,18 @@ func CursorHorizontalAbsolute(col int) string {
 	return "\x1b[" + s + "G"
 }
 
-// CHA is an alias for [CursorHorizontalAbsolute].
+// CHA 是 [CursorHorizontalAbsolute] 的别名。
 func CHA(col int) string {
 	return CursorHorizontalAbsolute(col)
 }
 
-// CursorPosition (CUP) returns a sequence for setting the cursor to the
-// given row and column.
+// CursorPosition (CUP) 返回一个将光标设置到指定行和列的序列。
 //
-// Default is 1,1.
+// 默认值为 1,1。
 //
 //	CSI n ; m H
 //
-// See: https://vt100.net/docs/vt510-rm/CUP.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUP.html
 func CursorPosition(col, row int) string {
 	if row <= 1 && col <= 1 {
 		return CursorHomePosition
@@ -275,25 +264,23 @@ func CursorPosition(col, row int) string {
 	return "\x1b[" + r + ";" + c + "H"
 }
 
-// CUP is an alias for [CursorPosition].
+// CUP 是 [CursorPosition] 的别名。
 func CUP(col, row int) string {
 	return CursorPosition(col, row)
 }
 
-// CursorHomePosition is a sequence for moving the cursor to the upper left
-// corner of the scrolling region.
+// CursorHomePosition 是一个使光标移动到滚动区域左上角的序列。
 //
-// This is equivalent to [CursorPosition](1, 1).
+// 这相当于 [CursorPosition](1, 1)。
 const CursorHomePosition = "\x1b[H"
 
-// SetCursorPosition (CUP) returns a sequence for setting the cursor to the
-// given row and column.
+// SetCursorPosition (CUP) 返回一个将光标设置到指定行和列的序列。
 //
 //	CSI n ; m H
 //
-// See: https://vt100.net/docs/vt510-rm/CUP.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUP.html
 //
-// Deprecated: use [CursorPosition] instead.
+// 已弃用：请使用 [CursorPosition] 代替。
 func SetCursorPosition(col, row int) string {
 	if row <= 0 && col <= 0 {
 		return HomeCursorPosition
@@ -309,44 +296,39 @@ func SetCursorPosition(col, row int) string {
 	return "\x1b[" + r + ";" + c + "H"
 }
 
-// HomeCursorPosition is a sequence for moving the cursor to the upper left
-// corner of the scrolling region. This is equivalent to `SetCursorPosition(1, 1)`.
+// HomeCursorPosition 是一个使光标移动到滚动区域左上角的序列。这相当于 `SetCursorPosition(1, 1)`。
 //
-// Deprecated: use [CursorHomePosition] instead.
+// 已弃用：请使用 [CursorHomePosition] 代替。
 const HomeCursorPosition = CursorHomePosition
 
-// MoveCursor (CUP) returns a sequence for setting the cursor to the
-// given row and column.
+// MoveCursor (CUP) 返回一个将光标设置到指定行和列的序列。
 //
 //	CSI n ; m H
 //
-// See: https://vt100.net/docs/vt510-rm/CUP.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CUP.html
 //
-// Deprecated: use [CursorPosition] instead.
+// 已弃用：请使用 [CursorPosition] 代替。
 func MoveCursor(col, row int) string {
 	return SetCursorPosition(col, row)
 }
 
-// CursorOrigin is a sequence for moving the cursor to the upper left corner of
-// the display. This is equivalent to `SetCursorPosition(1, 1)`.
+// CursorOrigin 是一个使光标移动到显示区域左上角的序列。这相当于 `SetCursorPosition(1, 1)`。
 //
-// Deprecated: use [CursorHomePosition] instead.
+// 已弃用：请使用 [CursorHomePosition] 代替。
 const CursorOrigin = "\x1b[1;1H"
 
-// MoveCursorOrigin is a sequence for moving the cursor to the upper left
-// corner of the display. This is equivalent to `SetCursorPosition(1, 1)`.
+// MoveCursorOrigin 是一个使光标移动到显示区域左上角的序列。这相当于 `SetCursorPosition(1, 1)`。
 //
-// Deprecated: use [CursorHomePosition] instead.
+// 已弃用：请使用 [CursorHomePosition] 代替。
 const MoveCursorOrigin = CursorOrigin
 
-// CursorHorizontalForwardTab (CHT) returns a sequence for moving the cursor to
-// the next tab stop n times.
+// CursorHorizontalForwardTab (CHT) 返回一个使光标移动到下一个制表位 n 次的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n I
 //
-// See: https://vt100.net/docs/vt510-rm/CHT.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CHT.html
 func CursorHorizontalForwardTab(n int) string {
 	var s string
 	if n > 1 {
@@ -355,19 +337,18 @@ func CursorHorizontalForwardTab(n int) string {
 	return "\x1b[" + s + "I"
 }
 
-// CHT is an alias for [CursorHorizontalForwardTab].
+// CHT 是 [CursorHorizontalForwardTab] 的别名。
 func CHT(n int) string {
 	return CursorHorizontalForwardTab(n)
 }
 
-// EraseCharacter (ECH) returns a sequence for erasing n characters from the
-// screen. This doesn't affect other cell attributes.
+// EraseCharacter (ECH) 返回一个从屏幕上擦除 n 个字符的序列。这不会影响其他单元格属性。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n X
 //
-// See: https://vt100.net/docs/vt510-rm/ECH.html
+// 请参阅：https://vt100.net/docs/vt510-rm/ECH.html
 func EraseCharacter(n int) string {
 	var s string
 	if n > 1 {
@@ -376,19 +357,18 @@ func EraseCharacter(n int) string {
 	return "\x1b[" + s + "X"
 }
 
-// ECH is an alias for [EraseCharacter].
+// ECH 是 [EraseCharacter] 的别名。
 func ECH(n int) string {
 	return EraseCharacter(n)
 }
 
-// CursorBackwardTab (CBT) returns a sequence for moving the cursor to the
-// previous tab stop n times.
+// CursorBackwardTab (CBT) 返回一个使光标移动到上一个制表位 n 次的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n Z
 //
-// See: https://vt100.net/docs/vt510-rm/CBT.html
+// 请参阅：https://vt100.net/docs/vt510-rm/CBT.html
 func CursorBackwardTab(n int) string {
 	var s string
 	if n > 1 {
@@ -397,19 +377,18 @@ func CursorBackwardTab(n int) string {
 	return "\x1b[" + s + "Z"
 }
 
-// CBT is an alias for [CursorBackwardTab].
+// CBT 是 [CursorBackwardTab] 的别名。
 func CBT(n int) string {
 	return CursorBackwardTab(n)
 }
 
-// VerticalPositionAbsolute (VPA) returns a sequence for moving the cursor to
-// the given row.
+// VerticalPositionAbsolute (VPA) 返回一个使光标移动到指定行的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n d
 //
-// See: https://vt100.net/docs/vt510-rm/VPA.html
+// 请参阅：https://vt100.net/docs/vt510-rm/VPA.html
 func VerticalPositionAbsolute(row int) string {
 	var s string
 	if row > 0 {
@@ -418,19 +397,18 @@ func VerticalPositionAbsolute(row int) string {
 	return "\x1b[" + s + "d"
 }
 
-// VPA is an alias for [VerticalPositionAbsolute].
+// VPA 是 [VerticalPositionAbsolute] 的别名。
 func VPA(row int) string {
 	return VerticalPositionAbsolute(row)
 }
 
-// VerticalPositionRelative (VPR) returns a sequence for moving the cursor down
-// n rows relative to the current position.
+// VerticalPositionRelative (VPR) 返回一个使光标相对于当前位置下移 n 行的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n e
 //
-// See: https://vt100.net/docs/vt510-rm/VPR.html
+// 请参阅：https://vt100.net/docs/vt510-rm/VPR.html
 func VerticalPositionRelative(n int) string {
 	var s string
 	if n > 1 {
@@ -439,21 +417,20 @@ func VerticalPositionRelative(n int) string {
 	return "\x1b[" + s + "e"
 }
 
-// VPR is an alias for [VerticalPositionRelative].
+// VPR 是 [VerticalPositionRelative] 的别名。
 func VPR(n int) string {
 	return VerticalPositionRelative(n)
 }
 
-// HorizontalVerticalPosition (HVP) returns a sequence for moving the cursor to
-// the given row and column.
+// HorizontalVerticalPosition (HVP) 返回一个使光标移动到指定行和列的序列。
 //
-// Default is 1,1.
+// 默认值为 1,1。
 //
 //	CSI n ; m f
 //
-// This has the same effect as [CursorPosition].
+// 这与 [CursorPosition] 效果相同。
 //
-// See: https://vt100.net/docs/vt510-rm/HVP.html
+// 请参阅：https://vt100.net/docs/vt510-rm/HVP.html
 func HorizontalVerticalPosition(col, row int) string {
 	var r, c string
 	if row > 0 {
@@ -465,88 +442,79 @@ func HorizontalVerticalPosition(col, row int) string {
 	return "\x1b[" + r + ";" + c + "f"
 }
 
-// HVP is an alias for [HorizontalVerticalPosition].
+// HVP 是 [HorizontalVerticalPosition] 的别名。
 func HVP(col, row int) string {
 	return HorizontalVerticalPosition(col, row)
 }
 
-// HorizontalVerticalHomePosition is a sequence for moving the cursor to the
-// upper left corner of the scrolling region. This is equivalent to
-// `HorizontalVerticalPosition(1, 1)`.
+// HorizontalVerticalHomePosition 是一个使光标移动到滚动区域左上角的序列。这相当于
+// `HorizontalVerticalPosition(1, 1)`。
 const HorizontalVerticalHomePosition = "\x1b[f"
 
-// SaveCurrentCursorPosition (SCOSC) is a sequence for saving the current cursor
-// position for SCO console mode.
+// SaveCurrentCursorPosition (SCOSC) 是一个用于 SCO 控制台模式的保存当前光标位置的序列。
 //
 //	CSI s
 //
-// This acts like [DECSC], except the page number where the cursor is located
-// is not saved.
+// 这与 [DECSC] 类似，只是不保存光标所在的页码。
 //
-// See: https://vt100.net/docs/vt510-rm/SCOSC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/SCOSC.html
 const (
 	SaveCurrentCursorPosition = "\x1b[s"
 	SCOSC                     = SaveCurrentCursorPosition
 )
 
-// SaveCursorPosition (SCP or SCOSC) is a sequence for saving the cursor
-// position.
+// SaveCursorPosition (SCP 或 SCOSC) 是一个保存光标位置的序列。
 //
 //	CSI s
 //
-// This acts like Save, except the page number where the cursor is located is
-// not saved.
+// 这与 Save 类似，只是不保存光标所在的页码。
 //
-// See: https://vt100.net/docs/vt510-rm/SCOSC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/SCOSC.html
 //
-// Deprecated: use [SaveCurrentCursorPosition] instead.
+// 已弃用：请使用 [SaveCurrentCursorPosition] 代替。
 const SaveCursorPosition = "\x1b[s"
 
-// RestoreCurrentCursorPosition (SCORC) is a sequence for restoring the current
-// cursor position for SCO console mode.
+// RestoreCurrentCursorPosition (SCORC) 是一个用于 SCO 控制台模式的恢复当前光标位置的序列。
 //
 //	CSI u
 //
-// This acts like [DECRC], except the page number where the cursor was saved is
-// not restored.
+// 这与 [DECRC] 类似，只是不恢复光标保存时的页码。
 //
-// See: https://vt100.net/docs/vt510-rm/SCORC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/SCORC.html
 const (
 	RestoreCurrentCursorPosition = "\x1b[u"
 	SCORC                        = RestoreCurrentCursorPosition
 )
 
-// RestoreCursorPosition (RCP or SCORC) is a sequence for restoring the cursor
-// position.
+// RestoreCursorPosition (RCP 或 SCORC) 是一个恢复光标位置的序列。
 //
 //	CSI u
 //
-// This acts like Restore, except the cursor stays on the same page where the
-// cursor was saved.
+// 这与 Restore 类似，只是光标会停留在保存时的同一页。
 //
-// See: https://vt100.net/docs/vt510-rm/SCORC.html
+// 请参阅：https://vt100.net/docs/vt510-rm/SCORC.html
 //
-// Deprecated: use [RestoreCurrentCursorPosition] instead.
+// 已弃用：请使用 [RestoreCurrentCursorPosition] 代替。
 const RestoreCursorPosition = "\x1b[u"
 
-// SetCursorStyle (DECSCUSR) returns a sequence for changing the cursor style.
+// SetCursorStyle (DECSCUSR) 返回一个更改光标样式的序列。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI Ps SP q
 //
-// Where Ps is the cursor style:
+// 其中 Ps 是光标样式：
 //
-//	0: Blinking block
-//	1: Blinking block (default)
-//	2: Steady block
-//	3: Blinking underline
-//	4: Steady underline
-//	5: Blinking bar (xterm)
-//	6: Steady bar (xterm)
+//	0: 闪烁块
+//	1: 闪烁块（默认）
+//	2: 稳定块
+//	3: 闪烁下划线
+//	4: 稳定下划线
+//	5: 闪烁竖线（xterm）
+//	6: 稳定竖线（xterm）
 //
-// See: https://vt100.net/docs/vt510-rm/DECSCUSR.html
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
+// 请参阅：https://vt100.net/docs/vt510-rm/DECSCUSR.html
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h4-Functions-using-CSI-_-ordered-by-the-final-character-lparen-s-rparen:CSI-Ps-SP-q.1D81
 func SetCursorStyle(style int) string {
 	if style < 0 {
 		style = 0
@@ -554,19 +522,17 @@ func SetCursorStyle(style int) string {
 	return "\x1b[" + strconv.Itoa(style) + " q"
 }
 
-// DECSCUSR is an alias for [SetCursorStyle].
+// DECSCUSR 是 [SetCursorStyle] 的别名。
 func DECSCUSR(style int) string {
 	return SetCursorStyle(style)
 }
 
-// SetPointerShape returns a sequence for changing the mouse pointer cursor
-// shape. Use "default" for the default pointer shape.
+// SetPointerShape 返回一个更改鼠标指针光标形状的序列。使用 "default" 表示默认指针形状。
 //
 //	OSC 22 ; Pt ST
 //	OSC 22 ; Pt BEL
 //
-// Where Pt is the pointer shape name. The name can be anything that the
-// operating system can understand. Some common names are:
+// 其中 Pt 是指针形状名称。该名称可以是操作系统能够理解的任何内容。一些常见名称包括：
 //
 //   - copy
 //   - crosshair
@@ -576,26 +542,23 @@ func DECSCUSR(style int) string {
 //   - text
 //   - wait
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
 func SetPointerShape(shape string) string {
 	return "\x1b]22;" + shape + "\x07"
 }
 
-// ReverseIndex (RI) is an escape sequence for moving the cursor up one line in
-// the same column. If the cursor is at the top margin, the screen scrolls
-// down.
+// ReverseIndex (RI) 是一个使光标在同一列中上移一行的转义序列。如果光标在顶部边缘，屏幕会向下滚动。
 //
-// This has the same effect as [RI].
+// 这与 [RI] 效果相同。
 const ReverseIndex = "\x1bM"
 
-// HorizontalPositionAbsolute (HPA) returns a sequence for moving the cursor to
-// the given column. This has the same effect as [CUP].
+// HorizontalPositionAbsolute (HPA) 返回一个使光标移动到指定列的序列。这与 [CUP] 效果相同。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n \`
 //
-// See: https://vt100.net/docs/vt510-rm/HPA.html
+// 请参阅：https://vt100.net/docs/vt510-rm/HPA.html
 func HorizontalPositionAbsolute(col int) string {
 	var s string
 	if col > 0 {
@@ -604,20 +567,18 @@ func HorizontalPositionAbsolute(col int) string {
 	return "\x1b[" + s + "`"
 }
 
-// HPA is an alias for [HorizontalPositionAbsolute].
+// HPA 是 [HorizontalPositionAbsolute] 的别名。
 func HPA(col int) string {
 	return HorizontalPositionAbsolute(col)
 }
 
-// HorizontalPositionRelative (HPR) returns a sequence for moving the cursor
-// right n columns relative to the current position. This has the same effect
-// as [CUP].
+// HorizontalPositionRelative (HPR) 返回一个使光标相对于当前位置右移 n 列的序列。这与 [CUP] 效果相同。
 //
-// Default is 1.
+// 默认值为 1。
 //
 //	CSI n a
 //
-// See: https://vt100.net/docs/vt510-rm/HPR.html
+// 请参阅：https://vt100.net/docs/vt510-rm/HPR.html
 func HorizontalPositionRelative(n int) string {
 	var s string
 	if n > 0 {
@@ -626,12 +587,11 @@ func HorizontalPositionRelative(n int) string {
 	return "\x1b[" + s + "a"
 }
 
-// HPR is an alias for [HorizontalPositionRelative].
+// HPR 是 [HorizontalPositionRelative] 的别名。
 func HPR(n int) string {
 	return HorizontalPositionRelative(n)
 }
 
-// Index (IND) is an escape sequence for moving the cursor down one line in the
-// same column. If the cursor is at the bottom margin, the screen scrolls up.
-// This has the same effect as [IND].
+// Index (IND) 是一个使光标在同一列中下移一行的转义序列。如果光标在底部边缘，屏幕会向上滚动。
+// 这与 [IND] 效果相同。
 const Index = "\x1bD"

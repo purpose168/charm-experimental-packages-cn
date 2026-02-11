@@ -1,42 +1,38 @@
 package cellbuf
 
 import (
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 var (
-	// BlankCell is a cell with a single space, width of 1, and no style or link.
+	// BlankCell 是一个包含单个空格的单元格，宽度为 1，无样式或链接。
 	BlankCell = Cell{Rune: ' ', Width: 1}
 
-	// EmptyCell is just an empty cell used for comparisons and as a placeholder
-	// for wide cells.
+	// EmptyCell 只是一个空单元格，用于比较和作为宽单元格的占位符。
 	EmptyCell = Cell{}
 )
 
-// Cell represents a single cell in the terminal screen.
+// Cell 表示终端屏幕中的单个单元格。
 type Cell struct {
-	// The style of the cell. Nil style means no style. Zero value prints a
-	// reset sequence.
+	// 单元格的样式。Nil 样式表示无样式。零值会打印重置序列。
 	Style Style
 
-	// Link is the hyperlink of the cell.
+	// Link 是单元格的超链接。
 	Link Link
 
-	// Comb is the combining runes of the cell. This is nil if the cell is a
-	// single rune or if it's a zero width cell that is part of a wider cell.
+	// Comb 是单元格的组合符文。如果单元格是单个符文或
+	// 是宽单元格的一部分的零宽度单元格，则为 nil。
 	Comb []rune
 
-	// Width is the mono-space width of the grapheme cluster.
+	// Width 是字形簇的等宽宽度。
 	Width int
 
-	// Rune is the main rune of the cell. This is zero if the cell is part of a
-	// wider cell.
+	// Rune 是单元格的主符文。如果单元格是宽单元格的一部分，则为零。
 	Rune rune
 }
 
-// Append appends runes to the cell without changing the width. This is useful
-// when we want to use the cell to store escape sequences or other runes that
-// don't affect the width of the cell.
+// Append 向单元格追加符文而不更改宽度。这在我们想要使用单元格存储
+// 转义序列或其他不影响单元格宽度的符文时非常有用。
 func (c *Cell) Append(r ...rune) {
 	for i, r := range r {
 		if i == 0 && c.Rune == 0 {
@@ -47,8 +43,7 @@ func (c *Cell) Append(r ...rune) {
 	}
 }
 
-// String returns the string content of the cell excluding any styles, links,
-// and escape sequences.
+// String 返回单元格的字符串内容，不包括任何样式、链接和转义序列。
 func (c Cell) String() string {
 	if c.Rune == 0 {
 		return ""
@@ -59,7 +54,7 @@ func (c Cell) String() string {
 	return string(append([]rune{c.Rune}, c.Comb...))
 }
 
-// Equal returns whether the cell is equal to the other cell.
+// Equal 返回单元格是否等于另一个单元格。
 func (c *Cell) Equal(o *Cell) bool {
 	return o != nil &&
 		c.Width == o.Width &&
@@ -69,15 +64,14 @@ func (c *Cell) Equal(o *Cell) bool {
 		c.Link.Equal(&o.Link)
 }
 
-// Empty returns whether the cell is an empty cell. An empty cell is a cell
-// with a width of 0, a rune of 0, and no combining runes.
+// Empty 返回单元格是否为空单元格。空单元格是宽度为 0、符文为 0 且无组合符文的单元格。
 func (c Cell) Empty() bool {
 	return c.Width == 0 &&
 		c.Rune == 0 &&
 		len(c.Comb) == 0
 }
 
-// Reset resets the cell to the default state zero value.
+// Reset 将单元格重置为默认状态零值。
 func (c *Cell) Reset() {
 	c.Rune = 0
 	c.Comb = nil
@@ -86,21 +80,19 @@ func (c *Cell) Reset() {
 	c.Link.Reset()
 }
 
-// Clear returns whether the cell consists of only attributes that don't
-// affect appearance of a space character.
+// Clear 返回单元格是否仅包含不影响空格字符外观的属性。
 func (c *Cell) Clear() bool {
 	return c.Rune == ' ' && len(c.Comb) == 0 && c.Width == 1 && c.Style.Clear() && c.Link.Empty()
 }
 
-// Clone returns a copy of the cell.
+// Clone 返回单元格的副本。
 func (c *Cell) Clone() (n *Cell) {
 	n = new(Cell)
 	*n = *c
 	return n
 }
 
-// Blank makes the cell a blank cell by setting the rune to a space, comb to
-// nil, and the width to 1.
+// Blank 通过将符文设置为空格、comb 设置为 nil 并将宽度设置为 1 来使单元格成为空白单元格。
 func (c *Cell) Blank() *Cell {
 	c.Rune = ' '
 	c.Comb = nil
@@ -108,39 +100,38 @@ func (c *Cell) Blank() *Cell {
 	return c
 }
 
-// Link represents a hyperlink in the terminal screen.
+// Link 表示终端屏幕中的超链接。
 type Link struct {
 	URL    string
 	Params string
 }
 
-// String returns a string representation of the hyperlink.
+// String 返回超链接的字符串表示形式。
 func (h Link) String() string {
 	return h.URL
 }
 
-// Reset resets the hyperlink to the default state zero value.
+// Reset 将超链接重置为默认状态零值。
 func (h *Link) Reset() {
 	h.URL = ""
 	h.Params = ""
 }
 
-// Equal returns whether the hyperlink is equal to the other hyperlink.
+// Equal 返回超链接是否等于另一个超链接。
 func (h *Link) Equal(o *Link) bool {
 	return o != nil && h.URL == o.URL && h.Params == o.Params
 }
 
-// Empty returns whether the hyperlink is empty.
+// Empty 返回超链接是否为空。
 func (h Link) Empty() bool {
 	return h.URL == "" && h.Params == ""
 }
 
-// AttrMask is a bitmask for text attributes that can change the look of text.
-// These attributes can be combined to create different styles.
+// AttrMask 是可更改文本外观的文本属性的位掩码。
+// 这些属性可以组合以创建不同的样式。
 type AttrMask uint8
 
-// These are the available text attributes that can be combined to create
-// different styles.
+// 这些是可用的文本属性，可以组合以创建不同的样式。
 const (
 	BoldAttr AttrMask = 1 << iota
 	FaintAttr
@@ -154,15 +145,15 @@ const (
 	ResetAttr AttrMask = 0
 )
 
-// Contains returns whether the attribute mask contains the attribute.
+// Contains 返回属性掩码是否包含该属性。
 func (a AttrMask) Contains(attr AttrMask) bool {
 	return a&attr == attr
 }
 
-// UnderlineStyle is the style of underline to use for text.
+// UnderlineStyle 是文本使用的下划线样式。
 type UnderlineStyle = ansi.UnderlineStyle
 
-// These are the available underline styles.
+// 这些是可用的下划线样式。
 const (
 	NoUnderline     = ansi.UnderlineStyleNone
 	SingleUnderline = ansi.UnderlineStyleSingle
@@ -172,7 +163,7 @@ const (
 	DashedUnderline = ansi.UnderlineStyleDashed
 )
 
-// Style represents the Style of a cell.
+// Style 表示单元格的样式。
 type Style struct {
 	Fg      ansi.Color
 	Bg      ansi.Color
@@ -181,7 +172,7 @@ type Style struct {
 	UlStyle UnderlineStyle
 }
 
-// Sequence returns the ANSI sequence that sets the style.
+// Sequence 返回设置样式的 ANSI 序列。
 func (s Style) Sequence() string {
 	if s.Empty() {
 		return ansi.ResetStyle
@@ -237,8 +228,7 @@ func (s Style) Sequence() string {
 	return b.String()
 }
 
-// DiffSequence returns the ANSI sequence that sets the style as a diff from
-// another style.
+// DiffSequence 返回将样式设置为与另一种样式的差异的 ANSI 序列。
 func (s Style) DiffSequence(o Style) string {
 	if o.Empty() {
 		return s.Sequence()
@@ -315,7 +305,7 @@ func (s Style) DiffSequence(o Style) string {
 	return b.String()
 }
 
-// Equal returns true if the style is equal to the other style.
+// Equal 如果样式等于另一种样式，则返回 true。
 func (s *Style) Equal(o *Style) bool {
 	return s.Attrs == o.Attrs &&
 		s.UlStyle == o.UlStyle &&
@@ -336,7 +326,7 @@ func colorEqual(c, o ansi.Color) bool {
 	return cr == or && cg == og && cb == ob && ca == oa
 }
 
-// Bold sets the bold attribute.
+// Bold 设置粗体属性。
 func (s *Style) Bold(v bool) *Style {
 	if v {
 		s.Attrs |= BoldAttr
@@ -346,7 +336,7 @@ func (s *Style) Bold(v bool) *Style {
 	return s
 }
 
-// Faint sets the faint attribute.
+// Faint 设置 faint 属性。
 func (s *Style) Faint(v bool) *Style {
 	if v {
 		s.Attrs |= FaintAttr
@@ -356,7 +346,7 @@ func (s *Style) Faint(v bool) *Style {
 	return s
 }
 
-// Italic sets the italic attribute.
+// Italic 设置斜体属性。
 func (s *Style) Italic(v bool) *Style {
 	if v {
 		s.Attrs |= ItalicAttr
@@ -366,7 +356,7 @@ func (s *Style) Italic(v bool) *Style {
 	return s
 }
 
-// SlowBlink sets the slow blink attribute.
+// SlowBlink 设置慢闪烁属性。
 func (s *Style) SlowBlink(v bool) *Style {
 	if v {
 		s.Attrs |= SlowBlinkAttr
@@ -376,7 +366,7 @@ func (s *Style) SlowBlink(v bool) *Style {
 	return s
 }
 
-// RapidBlink sets the rapid blink attribute.
+// RapidBlink 设置快闪烁属性。
 func (s *Style) RapidBlink(v bool) *Style {
 	if v {
 		s.Attrs |= RapidBlinkAttr
@@ -386,7 +376,7 @@ func (s *Style) RapidBlink(v bool) *Style {
 	return s
 }
 
-// Reverse sets the reverse attribute.
+// Reverse 设置反转属性。
 func (s *Style) Reverse(v bool) *Style {
 	if v {
 		s.Attrs |= ReverseAttr
@@ -396,7 +386,7 @@ func (s *Style) Reverse(v bool) *Style {
 	return s
 }
 
-// Conceal sets the conceal attribute.
+// Conceal 设置隐藏属性。
 func (s *Style) Conceal(v bool) *Style {
 	if v {
 		s.Attrs |= ConcealAttr
@@ -406,7 +396,7 @@ func (s *Style) Conceal(v bool) *Style {
 	return s
 }
 
-// Strikethrough sets the strikethrough attribute.
+// Strikethrough 设置删除线属性。
 func (s *Style) Strikethrough(v bool) *Style {
 	if v {
 		s.Attrs |= StrikethroughAttr
@@ -416,14 +406,14 @@ func (s *Style) Strikethrough(v bool) *Style {
 	return s
 }
 
-// UnderlineStyle sets the underline style.
+// UnderlineStyle 设置下划线样式。
 func (s *Style) UnderlineStyle(style UnderlineStyle) *Style {
 	s.UlStyle = style
 	return s
 }
 
-// Underline sets the underline attribute.
-// This is a syntactic sugar for [UnderlineStyle].
+// Underline 设置下划线属性。
+// 这是 [UnderlineStyle] 的语法糖。
 func (s *Style) Underline(v bool) *Style {
 	if v {
 		return s.UnderlineStyle(SingleUnderline)
@@ -431,25 +421,25 @@ func (s *Style) Underline(v bool) *Style {
 	return s.UnderlineStyle(NoUnderline)
 }
 
-// Foreground sets the foreground color.
+// Foreground 设置前景色。
 func (s *Style) Foreground(c ansi.Color) *Style {
 	s.Fg = c
 	return s
 }
 
-// Background sets the background color.
+// Background 设置背景色。
 func (s *Style) Background(c ansi.Color) *Style {
 	s.Bg = c
 	return s
 }
 
-// UnderlineColor sets the underline color.
+// UnderlineColor 设置下划线颜色。
 func (s *Style) UnderlineColor(c ansi.Color) *Style {
 	s.Ul = c
 	return s
 }
 
-// Reset resets the style to default.
+// Reset 将样式重置为默认值。
 func (s *Style) Reset() *Style {
 	s.Fg = nil
 	s.Bg = nil
@@ -459,13 +449,12 @@ func (s *Style) Reset() *Style {
 	return s
 }
 
-// Empty returns true if the style is empty.
+// Empty 如果样式为空，则返回 true。
 func (s *Style) Empty() bool {
 	return s.Fg == nil && s.Bg == nil && s.Ul == nil && s.Attrs == ResetAttr && s.UlStyle == NoUnderline
 }
 
-// Clear returns whether the style consists of only attributes that don't
-// affect appearance of a space character.
+// Clear 返回样式是否仅包含不影响空格字符外观的属性。
 func (s *Style) Clear() bool {
 	return s.UlStyle == NoUnderline &&
 		s.Attrs&^(BoldAttr|FaintAttr|ItalicAttr|SlowBlinkAttr|RapidBlinkAttr) == 0 &&

@@ -4,6 +4,8 @@ import (
 	"testing"
 )
 
+// TestSosPmApcSequence 测试SOS、PM和APC序列的解析
+
 func TestSosPmApcSequence(t *testing.T) {
 	cases := []testCase{
 		{

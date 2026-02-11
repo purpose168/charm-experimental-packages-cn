@@ -5,59 +5,56 @@ import (
 	"strings"
 )
 
-// RequestNameVersion (XTVERSION) is a control sequence that requests the
-// terminal's name and version. It responds with a DSR sequence identifying the
-// terminal.
+// RequestNameVersion (XTVERSION) 是一个控制序列，用于请求终端的名称和版本。
+// 它响应一个 DSR 序列，标识终端信息。
 //
 //	CSI > 0 q
 //	DCS > | text ST
 //
-// See https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-PC-Style-Function-Keys
+// 参见 https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-PC-Style-Function-Keys
 const (
 	RequestNameVersion = "\x1b[>q"
 	XTVERSION          = RequestNameVersion
 )
 
-// RequestXTVersion is a control sequence that requests the terminal's XTVERSION. It responds with a DSR sequence identifying the version.
+// RequestXTVersion 是一个控制序列，用于请求终端的 XTVERSION。它响应一个 DSR 序列来标识版本信息。
 //
 //	CSI > Ps q
 //	DCS > | text ST
 //
-// See https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-PC-Style-Function-Keys
+// 参见 https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-PC-Style-Function-Keys
 //
-// Deprecated: use [RequestNameVersion] instead.
+// 已废弃：请改用 [RequestNameVersion]。
 const RequestXTVersion = RequestNameVersion
 
-// PrimaryDeviceAttributes (DA1) is a control sequence that reports the
-// terminal's primary device attributes.
+// PrimaryDeviceAttributes (DA1) 是一个控制序列，用于报告终端的主设备属性。
 //
 //	CSI c
 //	CSI 0 c
 //	CSI ? Ps ; ... c
 //
-// If no attributes are given, or if the attribute is 0, this function returns
-// the request sequence. Otherwise, it returns the response sequence.
+// 如果未给出属性，或者属性为 0，此函数返回请求序列。否则，它返回响应序列。
 //
-// Common attributes include:
-//   - 1	132 columns
-//   - 2	Printer port
+// 常见属性包括：
+//   - 1	132 列
+//   - 2	打印机端口
 //   - 4	Sixel
-//   - 6	Selective erase
-//   - 7	Soft character set (DRCS)
-//   - 8	User-defined keys (UDKs)
-//   - 9	National replacement character sets (NRCS) (International terminal only)
-//   - 12	Yugoslavian (SCS)
-//   - 15	Technical character set
-//   - 18	Windowing capability
-//   - 21	Horizontal scrolling
-//   - 23	Greek
-//   - 24	Turkish
-//   - 42	ISO Latin-2 character set
+//   - 5	选择性擦除
+//   - 6	软字符集 (DRCS)
+//   - 7	用户定义键 (UDKs)
+//   - 8	国家替换字符集 (NRCS)（仅国际终端）
+//   - 9	南斯拉夫语 (SCS)
+//   - 12	技术字符集
+//   - 15	窗口功能
+//   - 18	水平滚动
+//   - 21	希腊语
+//   - 23	土耳其语
+//   - 42	ISO Latin-2 字符集
 //   - 44	PCTerm
-//   - 45	Soft key map
-//   - 46	ASCII emulation
+//   - 45	软键映射
+//   - 46	ASCII 仿真
 //
-// See https://vt100.net/docs/vt510-rm/DA1.html
+// 参见 https://vt100.net/docs/vt510-rm/DA1.html
 func PrimaryDeviceAttributes(attrs ...int) string {
 	if len(attrs) == 0 {
 		return RequestPrimaryDeviceAttributes
@@ -72,27 +69,25 @@ func PrimaryDeviceAttributes(attrs ...int) string {
 	return "\x1b[?" + strings.Join(as, ";") + "c"
 }
 
-// DA1 is an alias for [PrimaryDeviceAttributes].
+// DA1 是 [PrimaryDeviceAttributes] 的别名。
 func DA1(attrs ...int) string {
 	return PrimaryDeviceAttributes(attrs...)
 }
 
-// RequestPrimaryDeviceAttributes is a control sequence that requests the
-// terminal's primary device attributes (DA1).
+// RequestPrimaryDeviceAttributes 是一个控制序列，用于请求终端的主设备属性 (DA1)。
 //
 //	CSI c
 //
-// See https://vt100.net/docs/vt510-rm/DA1.html
+// 参见 https://vt100.net/docs/vt510-rm/DA1.html
 const RequestPrimaryDeviceAttributes = "\x1b[c"
 
-// SecondaryDeviceAttributes (DA2) is a control sequence that reports the
-// terminal's secondary device attributes.
+// SecondaryDeviceAttributes (DA2) 是一个控制序列，用于报告终端的次要设备属性。
 //
 //	CSI > c
 //	CSI > 0 c
 //	CSI > Ps ; ... c
 //
-// See https://vt100.net/docs/vt510-rm/DA2.html
+// 参见 https://vt100.net/docs/vt510-rm/DA2.html
 func SecondaryDeviceAttributes(attrs ...int) string {
 	if len(attrs) == 0 {
 		return RequestSecondaryDeviceAttributes
@@ -105,32 +100,29 @@ func SecondaryDeviceAttributes(attrs ...int) string {
 	return "\x1b[>" + strings.Join(as, ";") + "c"
 }
 
-// DA2 is an alias for [SecondaryDeviceAttributes].
+// DA2 是 [SecondaryDeviceAttributes] 的别名。
 func DA2(attrs ...int) string {
 	return SecondaryDeviceAttributes(attrs...)
 }
 
-// RequestSecondaryDeviceAttributes is a control sequence that requests the
-// terminal's secondary device attributes (DA2).
+// RequestSecondaryDeviceAttributes 是一个控制序列，用于请求终端的次要设备属性 (DA2)。
 //
 //	CSI > c
 //
-// See https://vt100.net/docs/vt510-rm/DA2.html
+// 参见 https://vt100.net/docs/vt510-rm/DA2.html
 const RequestSecondaryDeviceAttributes = "\x1b[>c"
 
-// TertiaryDeviceAttributes (DA3) is a control sequence that reports the
-// terminal's tertiary device attributes.
+// TertiaryDeviceAttributes (DA3) 是一个控制序列，用于报告终端的第三级设备属性。
 //
 //	CSI = c
 //	CSI = 0 c
 //	DCS ! | Text ST
 //
-// Where Text is the unit ID for the terminal.
+// 其中 Text 是终端的单元 ID。
 //
-// If no unit ID is given, or if the unit ID is 0, this function returns the
-// request sequence. Otherwise, it returns the response sequence.
+// 如果未给出单元 ID，或者单元 ID 为 0，此函数返回请求序列。否则，它返回响应序列。
 //
-// See https://vt100.net/docs/vt510-rm/DA3.html
+// 参见 https://vt100.net/docs/vt510-rm/DA3.html
 func TertiaryDeviceAttributes(unitID string) string {
 	switch unitID {
 	case "":
@@ -142,15 +134,14 @@ func TertiaryDeviceAttributes(unitID string) string {
 	return "\x1bP!|" + unitID + "\x1b\\"
 }
 
-// DA3 is an alias for [TertiaryDeviceAttributes].
+// DA3 是 [TertiaryDeviceAttributes] 的别名。
 func DA3(unitID string) string {
 	return TertiaryDeviceAttributes(unitID)
 }
 
-// RequestTertiaryDeviceAttributes is a control sequence that requests the
-// terminal's tertiary device attributes (DA3).
+// RequestTertiaryDeviceAttributes 是一个控制序列，用于请求终端的第三级设备属性 (DA3)。
 //
 //	CSI = c
 //
-// See https://vt100.net/docs/vt510-rm/DA3.html
+// 参见 https://vt100.net/docs/vt510-rm/DA3.html
 const RequestTertiaryDeviceAttributes = "\x1b[=c"

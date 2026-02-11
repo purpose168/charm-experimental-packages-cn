@@ -5,23 +5,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// CellBuffer is a cell buffer that represents a set of cells in a screen or a
-// grid.
+// CellBuffer 是一个单元格缓冲区，代表屏幕或网格中的一组单元格。
 type CellBuffer interface {
-	// Cell returns the cell at the given position.
+	// Cell 返回指定位置的单元格。
 	Cell(x, y int) *Cell
-	// SetCell sets the cell at the given position to the given cell. It
-	// returns whether the cell was set successfully.
+	// SetCell 将指定位置的单元格设置为给定的单元格。
+	// 返回单元格是否设置成功。
 	SetCell(x, y int, c *Cell) bool
-	// Bounds returns the bounds of the cell buffer.
+	// Bounds 返回单元格缓冲区的边界。
 	Bounds() Rectangle
 }
 
-// FillRect fills the rectangle within the cell buffer with the given cell.
-// This will not fill cells outside the bounds of the cell buffer.
+// FillRect 用给定的单元格填充单元格缓冲区中的矩形区域。
+// 这不会填充单元格缓冲区边界外的单元格。
 func FillRect(s CellBuffer, c *Cell, rect Rectangle) {
 	for y := rect.Min.Y; y < rect.Max.Y; y++ {
 		for x := rect.Min.X; x < rect.Max.X; x++ {
@@ -30,41 +29,41 @@ func FillRect(s CellBuffer, c *Cell, rect Rectangle) {
 	}
 }
 
-// Fill fills the cell buffer with the given cell.
+// Fill 用给定的单元格填充整个单元格缓冲区。
 func Fill(s CellBuffer, c *Cell) {
 	FillRect(s, c, s.Bounds())
 }
 
-// ClearRect clears the rectangle within the cell buffer with blank cells.
+// ClearRect 用空白单元格清除单元格缓冲区中的矩形区域。
 func ClearRect(s CellBuffer, rect Rectangle) {
 	FillRect(s, nil, rect)
 }
 
-// Clear clears the cell buffer with blank cells.
+// Clear 用空白单元格清除整个单元格缓冲区。
 func Clear(s CellBuffer) {
 	Fill(s, nil)
 }
 
-// SetContentRect clears the rectangle within the cell buffer with blank cells,
-// and sets the given string as its content. If the height or width of the
-// string exceeds the height or width of the cell buffer, it will be truncated.
+// SetContentRect 用空白单元格清除单元格缓冲区中的矩形区域，
+// 并将给定的字符串设置为其内容。如果字符串的高度或宽度超过
+// 单元格缓冲区的高度或宽度，它将被截断。
 func SetContentRect(s CellBuffer, str string, rect Rectangle) {
-	// Replace all "\n" with "\r\n" to ensure the cursor is reset to the start
-	// of the line. Make sure we don't replace "\r\n" with "\r\r\n".
+	// 将所有 "\n" 替换为 "\r\n" 以确保光标重置到行首。
+	// 确保我们不会将 "\r\n" 替换为 "\r\r\n"。
 	str = strings.ReplaceAll(str, "\r\n", "\n")
 	str = strings.ReplaceAll(str, "\n", "\r\n")
 	ClearRect(s, rect)
 	printString(s, ansi.GraphemeWidth, rect.Min.X, rect.Min.Y, rect, str, true, "")
 }
 
-// SetContent clears the cell buffer with blank cells, and sets the given string
-// as its content. If the height or width of the string exceeds the height or
-// width of the cell buffer, it will be truncated.
+// SetContent 用空白单元格清除单元格缓冲区，并将给定的字符串
+// 设置为其内容。如果字符串的高度或宽度超过单元格缓冲区的
+// 高度或宽度，它将被截断。
 func SetContent(s CellBuffer, str string) {
 	SetContentRect(s, str, s.Bounds())
 }
 
-// Render returns a string representation of the grid with ANSI escape sequences.
+// Render 返回带有 ANSI 转义序列的网格字符串表示。
 func Render(d CellBuffer) string {
 	var buf bytes.Buffer
 	height := d.Bounds().Dy()
@@ -78,17 +77,16 @@ func Render(d CellBuffer) string {
 	return buf.String()
 }
 
-// RenderLine returns a string representation of the yth line of the grid along
-// with the width of the line.
+// RenderLine 返回网格第 y 行的字符串表示及其宽度。
 func RenderLine(d CellBuffer, n int) (w int, line string) {
 	var pen Style
 	var link Link
 	var buf bytes.Buffer
 	var pendingLine string
-	var pendingWidth int // this ignores space cells until we hit a non-space cell
+	var pendingWidth int // 忽略空格单元格，直到遇到非空格单元格
 
 	writePending := func() {
-		// If there's no pending line, we don't need to do anything.
+		// 如果没有待处理的行，我们不需要做任何事情。
 		if len(pendingLine) == 0 {
 			return
 		}
@@ -100,7 +98,7 @@ func RenderLine(d CellBuffer, n int) (w int, line string) {
 
 	for x := range d.Bounds().Dx() {
 		if cell := d.Cell(x, n); cell != nil && cell.Width > 0 { //nolint:nestif
-			// Convert the cell's style and link to the given color profile.
+			// 将单元格的样式和链接转换为给定的颜色配置文件。
 			cellStyle := cell.Style
 			cellLink := cell.Link
 			if cellStyle.Empty() && !pen.Empty() {
@@ -115,7 +113,7 @@ func RenderLine(d CellBuffer, n int) (w int, line string) {
 				pen = cellStyle
 			}
 
-			// Write the URL escape sequence
+			// 写入 URL 转义序列
 			if cellLink != link && link.URL != "" {
 				writePending()
 				buf.WriteString(ansi.ResetHyperlink())
@@ -127,8 +125,8 @@ func RenderLine(d CellBuffer, n int) (w int, line string) {
 				link = cellLink
 			}
 
-			// We only write the cell content if it's not empty. If it is, we
-			// append it to the pending line and width to be evaluated later.
+			// 我们只在单元格内容不为空时写入。如果为空，
+			// 将其添加到待处理行和宽度中，以便稍后评估。
 			if cell.Equal(&BlankCell) {
 				pendingLine += cell.String()
 				pendingWidth += cell.Width
@@ -145,25 +143,24 @@ func RenderLine(d CellBuffer, n int) (w int, line string) {
 	if !pen.Empty() {
 		buf.WriteString(ansi.ResetStyle)
 	}
-	return w, strings.TrimRight(buf.String(), " ") // Trim trailing spaces
+	return w, strings.TrimRight(buf.String(), " ") // 修剪尾部空格
 }
 
-// ScreenWriter represents a writer that writes to a [Screen] parsing ANSI
-// escape sequences and Unicode characters and converting them into cells that
-// can be written to a cell [Buffer].
+// ScreenWriter 表示一个写入到 [Screen] 的写入器，解析 ANSI
+// 转义序列和 Unicode 字符，并将它们转换为可以写入到单元格
+// [Buffer] 的单元格。
 type ScreenWriter struct {
 	*Screen
 }
 
-// NewScreenWriter creates a new ScreenWriter that writes to the given Screen.
-// This is a convenience function for creating a ScreenWriter.
+// NewScreenWriter 创建一个新的 ScreenWriter，写入到给定的 Screen。
+// 这是创建 ScreenWriter 的便捷函数。
 func NewScreenWriter(s *Screen) *ScreenWriter {
 	return &ScreenWriter{s}
 }
 
-// Write writes the given bytes to the screen.
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// Write 将给定的字节写入屏幕。
+// 这将识别 ANSI [ansi.SGR] 样式和 [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) Write(p []byte) (n int, err error) {
 	printString(s.Screen, s.method,
 		s.cur.X, s.cur.Y, s.Bounds(),
@@ -171,24 +168,23 @@ func (s *ScreenWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-// SetContent clears the screen with blank cells, and sets the given string as
-// its content. If the height or width of the string exceeds the height or
-// width of the screen, it will be truncated.
+// SetContent 用空白单元格清除屏幕，并将给定的字符串设置为
+// 其内容。如果字符串的高度或宽度超过屏幕的高度或宽度，
+// 它将被截断。
 //
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape sequences.
+// 这将识别 ANSI [ansi.SGR] 样式和 [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) SetContent(str string) {
 	s.SetContentRect(str, s.Bounds())
 }
 
-// SetContentRect clears the rectangle within the screen with blank cells, and
-// sets the given string as its content. If the height or width of the string
-// exceeds the height or width of the screen, it will be truncated.
+// SetContentRect 用空白单元格清除屏幕中的矩形区域，并
+// 将给定的字符串设置为其内容。如果字符串的高度或宽度
+// 超过屏幕的高度或宽度，它将被截断。
 //
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// 这将识别 ANSI [ansi.SGR] 样式和 [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) SetContentRect(str string, rect Rectangle) {
-	// Replace all "\n" with "\r\n" to ensure the cursor is reset to the start
-	// of the line. Make sure we don't replace "\r\n" with "\r\r\n".
+	// 将所有 "\n" 替换为 "\r\n" 以确保光标重置到行首。
+	// 确保我们不会将 "\r\n" 替换为 "\r\r\n"。
 	str = strings.ReplaceAll(str, "\r\n", "\n")
 	str = strings.ReplaceAll(str, "\n", "\r\n")
 	s.ClearRect(rect)
@@ -197,10 +193,9 @@ func (s *ScreenWriter) SetContentRect(str string, rect Rectangle) {
 		str, true, "")
 }
 
-// Print prints the string at the current cursor position. It will wrap the
-// string to the width of the screen if it exceeds the width of the screen.
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// Print 在当前光标位置打印字符串。如果字符串超过屏幕宽度，
+// 它将换行到屏幕宽度。这将识别 ANSI [ansi.SGR] 样式和
+// [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) Print(str string, v ...any) {
 	if len(v) > 0 {
 		str = fmt.Sprintf(str, v...)
@@ -210,10 +205,9 @@ func (s *ScreenWriter) Print(str string, v ...any) {
 		str, false, "")
 }
 
-// PrintAt prints the string at the given position. It will wrap the string to
-// the width of the screen if it exceeds the width of the screen.
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// PrintAt 在给定位置打印字符串。如果字符串超过屏幕宽度，
+// 它将换行到屏幕宽度。这将识别 ANSI [ansi.SGR] 样式和
+// [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) PrintAt(x, y int, str string, v ...any) {
 	if len(v) > 0 {
 		str = fmt.Sprintf(str, v...)
@@ -223,29 +217,25 @@ func (s *ScreenWriter) PrintAt(x, y int, str string, v ...any) {
 		str, false, "")
 }
 
-// PrintCrop prints the string at the current cursor position and truncates the
-// text if it exceeds the width of the screen. Use tail to specify a string to
-// append if the string is truncated.
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// PrintCrop 在当前光标位置打印字符串，如果文本超过屏幕宽度则截断。
+// 如果字符串被截断，使用 tail 指定要追加的字符串。
+// 这将识别 ANSI [ansi.SGR] 样式和 [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) PrintCrop(str string, tail string) {
 	printString(s.Screen, s.method,
 		s.cur.X, s.cur.Y, s.Bounds(),
 		str, true, tail)
 }
 
-// PrintCropAt prints the string at the given position and truncates the text
-// if it exceeds the width of the screen. Use tail to specify a string to append
-// if the string is truncated.
-// This will recognize ANSI [ansi.SGR] style and [ansi.SetHyperlink] escape
-// sequences.
+// PrintCropAt 在给定位置打印字符串，如果文本超过屏幕宽度则截断。
+// 如果字符串被截断，使用 tail 指定要追加的字符串。
+// 这将识别 ANSI [ansi.SGR] 样式和 [ansi.SetHyperlink] 转义序列。
 func (s *ScreenWriter) PrintCropAt(x, y int, str string, tail string) {
 	printString(s.Screen, s.method,
 		x, y, s.Bounds(),
 		str, true, tail)
 }
 
-// printString draws a string starting at the given position.
+// printString 从给定位置开始绘制字符串。
 func printString[T []byte | string](
 	s CellBuffer,
 	m ansi.Method,
@@ -278,25 +268,25 @@ func printString[T []byte | string](
 		seq, width, n, newState := decoder(str, state, p)
 
 		switch width {
-		case 1, 2, 3, 4: // wide cells can go up to 4 cells wide
+		case 1, 2, 3, 4: // 宽单元格最多可以宽达 4 个单元格
 			cell.Width += width
 			cell.Append([]rune(string(seq))...)
 
 			if !truncate && x+cell.Width > bounds.Max.X && y+1 < bounds.Max.Y {
-				// Wrap the string to the width of the window
+				// 将字符串换行到窗口宽度
 				x = bounds.Min.X
 				y++
 			}
 			if Pos(x, y).In(bounds) {
 				if truncate && tailc.Width > 0 && x+cell.Width > bounds.Max.X-tailc.Width {
-					// Truncate the string and append the tail if any.
+					// 截断字符串并在需要时追加尾部
 					cell := tailc
 					cell.Style = style
 					cell.Link = link
 					s.SetCell(x, y, &cell)
 					x += tailc.Width
 				} else {
-					// Print the cell to the screen
+					// 将单元格打印到屏幕
 					cell.Style = style
 					cell.Link = link
 					s.SetCell(x, y, &cell)
@@ -304,19 +294,19 @@ func printString[T []byte | string](
 				}
 			}
 
-			// String is too long for the line, truncate it.
-			// Make sure we reset the cell for the next iteration.
+			// 字符串太长，超出行宽，截断它。
+			// 确保我们为下一次迭代重置单元格。
 			cell.Reset()
 		default:
-			// Valid sequences always have a non-zero Cmd.
+			// 有效的序列总是有非零的 Cmd。
 			//nolint:godox
-			// TODO: Handle cursor movement and other sequences
+			// TODO: 处理光标移动和其他序列
 			switch {
 			case ansi.HasCsiPrefix(seq) && p.Command() == 'm':
-				// SGR - Select Graphic Rendition
+				// SGR - 选择图形渲染
 				ReadStyle(p.Params(), &style)
 			case ansi.HasOscPrefix(seq) && p.Command() == 8:
-				// Hyperlinks
+				// 超链接
 				ReadLink(p.Data(), &link)
 			case ansi.Equal(seq, T("\n")):
 				y++
@@ -327,12 +317,12 @@ func printString[T []byte | string](
 			}
 		}
 
-		// Advance the state and data
+		// 推进状态和数据
 		state = newState
 		str = str[n:]
 	}
 
-	// Make sure to set the last cell if it's not empty.
+	// 如果最后一个单元格不为空，确保设置它。
 	if !cell.Empty() {
 		s.SetCell(x, y, &cell)
 		cell.Reset()

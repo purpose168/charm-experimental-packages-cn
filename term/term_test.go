@@ -5,7 +5,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/charmbracelet/x/term"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
 func TestIsTerminalTempFile(t *testing.T) {

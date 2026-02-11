@@ -12,14 +12,14 @@ import (
 )
 
 func TestWriteKittyGraphics(t *testing.T) {
-	// Create a test image
+	// 创建测试图像
 	img := image.NewRGBA(image.Rect(0, 0, 2, 2))
 	img.Set(0, 0, color.RGBA{R: 255, G: 0, B: 0, A: 255})
 	img.Set(1, 0, color.RGBA{R: 0, G: 255, B: 0, A: 255})
 	img.Set(0, 1, color.RGBA{R: 0, G: 0, B: 255, A: 255})
 	img.Set(1, 1, color.RGBA{R: 255, G: 255, B: 255, A: 255})
 
-	// Create large test image (larger than [MaxChunkSize] 4096 bytes)
+	// 创建大型测试图像（大于 [MaxChunkSize] 4096 字节）
 	imgLarge := image.NewRGBA(image.Rect(0, 0, 100, 100))
 	for y := range 100 {
 		for x := range 100 {
@@ -27,7 +27,7 @@ func TestWriteKittyGraphics(t *testing.T) {
 		}
 	}
 
-	// Create a temporary test file
+	// 创建临时测试文件
 	tmpDir := t.TempDir()
 	tmpFile := filepath.Join(tmpDir, "test-image")
 	if err := os.WriteFile(tmpFile, []byte("test image data"), 0o644); err != nil {
@@ -42,7 +42,7 @@ func TestWriteKittyGraphics(t *testing.T) {
 		check     func(t *testing.T, output string)
 	}{
 		{
-			name: "direct transmission",
+			name: "直接传输",
 			img:  img,
 			opts: &Options{
 				Transmission: Direct,
@@ -51,18 +51,18 @@ func TestWriteKittyGraphics(t *testing.T) {
 			wantError: false,
 			check: func(t *testing.T, output string) {
 				if !strings.HasPrefix(output, "\x1b_G") {
-					t.Error("output should start with ESC sequence")
+					t.Error("输出应以 ESC 序列开头")
 				}
 				if !strings.HasSuffix(output, "\x1b\\") {
-					t.Error("output should end with ST sequence")
+					t.Error("输出应以 ST 序列结尾")
 				}
 				if !strings.Contains(output, "f=24") {
-					t.Error("output should contain format specification")
+					t.Error("输出应包含格式规范")
 				}
 			},
 		},
 		{
-			name: "chunked transmission",
+			name: "分块传输",
 			img:  imgLarge,
 			opts: &Options{
 				Transmission: Direct,
@@ -73,25 +73,25 @@ func TestWriteKittyGraphics(t *testing.T) {
 			check: func(t *testing.T, output string) {
 				chunks := strings.Split(output, "\x1b\\")
 				if len(chunks) < 2 {
-					t.Error("output should contain multiple chunks")
+					t.Error("输出应包含多个块")
 				}
 
-				chunks = chunks[:len(chunks)-1] // Remove last empty chunk
+				chunks = chunks[:len(chunks)-1] // 移除最后一个空块
 				for i, chunk := range chunks {
 					if i == len(chunks)-1 {
 						if !strings.Contains(chunk, "m=0") {
-							t.Errorf("output should contain chunk end-of-data indicator for chunk %d %q", i, chunk)
+							t.Errorf("输出应包含块 %d 的数据结束指示符 %q", i, chunk)
 						}
 					} else {
 						if !strings.Contains(chunk, "m=1") {
-							t.Errorf("output should contain chunk indicator for chunk %d %q", i, chunk)
+							t.Errorf("输出应包含块 %d 的块指示符 %q", i, chunk)
 						}
 					}
 				}
 			},
 		},
 		{
-			name: "file transmission",
+			name: "文件传输",
 			img:  img,
 			opts: &Options{
 				Transmission: File,
@@ -100,12 +100,12 @@ func TestWriteKittyGraphics(t *testing.T) {
 			wantError: false,
 			check: func(t *testing.T, output string) {
 				if !strings.Contains(output, base64.StdEncoding.EncodeToString([]byte(tmpFile))) {
-					t.Error("output should contain encoded file path")
+					t.Error("输出应包含编码的文件路径")
 				}
 			},
 		},
 		{
-			name: "temp file transmission",
+			name: "临时文件传输",
 			img:  img,
 			opts: &Options{
 				Transmission: TempFile,
@@ -117,18 +117,18 @@ func TestWriteKittyGraphics(t *testing.T) {
 				payload := strings.Split(output, ";")[1]
 				fn, err := base64.StdEncoding.DecodeString(payload)
 				if err != nil {
-					t.Error("output should contain base64 encoded temp file path")
+					t.Error("输出应包含 base64 编码的临时文件路径")
 				}
 				if !strings.Contains(string(fn), "tty-graphics-protocol") {
-					t.Error("output should contain temp file path")
+					t.Error("输出应包含临时文件路径")
 				}
 				if !strings.Contains(output, "t=t") {
-					t.Error("output should contain transmission specification")
+					t.Error("输出应包含传输规范")
 				}
 			},
 		},
 		{
-			name: "compression enabled",
+			name: "启用压缩",
 			img:  img,
 			opts: &Options{
 				Transmission: Direct,
@@ -137,12 +137,12 @@ func TestWriteKittyGraphics(t *testing.T) {
 			wantError: false,
 			check: func(t *testing.T, output string) {
 				if !strings.Contains(output, "o=z") {
-					t.Error("output should contain compression specification")
+					t.Error("输出应包含压缩规范")
 				}
 			},
 		},
 		{
-			name: "invalid file path",
+			name: "无效的文件路径",
 			img:  img,
 			opts: &Options{
 				Transmission: File,
@@ -152,13 +152,13 @@ func TestWriteKittyGraphics(t *testing.T) {
 			check:     nil,
 		},
 		{
-			name:      "nil options",
+			name:      "空选项",
 			img:       img,
 			opts:      nil,
 			wantError: false,
 			check: func(t *testing.T, output string) {
 				if !strings.HasPrefix(output, "\x1b_G") {
-					t.Error("output should start with ESC sequence")
+					t.Error("输出应以 ESC 序列开头")
 				}
 			},
 		},
@@ -189,7 +189,7 @@ func TestWriteKittyGraphicsEdgeCases(t *testing.T) {
 		wantError bool
 	}{
 		{
-			name: "zero size image",
+			name: "零尺寸图像",
 			img:  image.NewRGBA(image.Rect(0, 0, 0, 0)),
 			opts: &Options{
 				Transmission: Direct,
@@ -197,15 +197,15 @@ func TestWriteKittyGraphicsEdgeCases(t *testing.T) {
 			wantError: false,
 		},
 		{
-			name: "shared memory transmission",
+			name: "共享内存传输",
 			img:  image.NewRGBA(image.Rect(0, 0, 1, 1)),
 			opts: &Options{
 				Transmission: SharedMemory,
 			},
-			wantError: true, // Not implemented
+			wantError: true, // 未实现
 		},
 		{
-			name: "file transmission without file path",
+			name: "无文件路径的文件传输",
 			img:  image.NewRGBA(image.Rect(0, 0, 1, 1)),
 			opts: &Options{
 				Transmission: File,

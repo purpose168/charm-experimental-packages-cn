@@ -5,23 +5,23 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/charmbracelet/x/powernap/pkg/lsp/protocol"
-	"github.com/charmbracelet/x/powernap/pkg/transport"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp/protocol"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/transport"
 )
 
-// OffsetEncoding represents the character encoding used for text document offsets.
+// OffsetEncoding 表示用于文本文档偏移的字符编码。
 type OffsetEncoding int
 
 const (
-	// UTF8 encoding - bytes.
+	// UTF8 编码 - 字节。
 	UTF8 OffsetEncoding = iota
-	// UTF16 encoding - default for LSP.
+	// UTF16 编码 - LSP 的默认编码。
 	UTF16
-	// UTF32 encoding - codepoints.
+	// UTF32 编码 - 代码点。
 	UTF32
 )
 
-// Client represents an LSP client connection to a language server.
+// Client 表示与语言服务器的 LSP 客户端连接。
 type Client struct {
 	ID               string
 	Name             string
@@ -38,7 +38,7 @@ type Client struct {
 	initOptions      map[string]any
 }
 
-// ClientConfig represents the configuration for creating a new LSP client.
+// ClientConfig 表示创建新 LSP 客户端的配置。
 type ClientConfig struct {
 	Command          string
 	Args             []string

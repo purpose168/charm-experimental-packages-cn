@@ -4,23 +4,23 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/ansi/kitty"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/kitty"
 )
 
-// KittyGraphicsEvent represents a Kitty Graphics response event.
+// KittyGraphicsEvent 表示 Kitty 图形响应事件。
 //
-// See https://sw.kovidgoyal.net/kitty/graphics-protocol/
+// 请参阅 https://sw.kovidgoyal.net/kitty/graphics-protocol/
 type KittyGraphicsEvent struct {
 	Options kitty.Options
 	Payload []byte
 }
 
-// KittyEnhancementsEvent represents a Kitty enhancements event.
+// KittyEnhancementsEvent 表示 Kitty 增强事件。
 type KittyEnhancementsEvent int
 
-// Kitty keyboard enhancement constants.
-// See https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
+// Kitty 键盘增强常量。
+// 请参阅 https://sw.kovidgoyal.net/kitty/keyboard-protocol/#progressive-enhancement
 const (
 	KittyDisambiguateEscapeCodes KittyEnhancementsEvent = 1 << iota
 	KittyReportEventTypes
@@ -29,12 +29,12 @@ const (
 	KittyReportAssociatedText
 )
 
-// Contains reports whether m contains the given enhancements.
+// Contains 报告 e 是否包含给定的增强功能。
 func (e KittyEnhancementsEvent) Contains(enhancements KittyEnhancementsEvent) bool {
 	return e&enhancements == enhancements
 }
 
-// Kitty Clipboard Control Sequences.
+// Kitty 剪贴板控制序列。
 var kittyKeyMap = map[int]Key{
 	ansi.BS:  {Code: KeyBackspace},
 	ansi.HT:  {Code: KeyTab},
@@ -156,8 +156,7 @@ var kittyKeyMap = map[int]Key{
 }
 
 func init() {
-	// These are some faulty C0 mappings some terminals such as WezTerm have
-	// and doesn't follow the specs.
+	// 这些是一些终端（如 WezTerm）具有的错误 C0 映射，不符合规范。
 	kittyKeyMap[ansi.NUL] = Key{Code: KeySpace, Mod: ModCtrl}
 	for i := ansi.SOH; i <= ansi.SUB; i++ {
 		if _, ok := kittyKeyMap[i]; !ok {
@@ -211,35 +210,33 @@ func fromKittyMod(mod int) KeyMod {
 	return m
 }
 
-// parseKittyKeyboard parses a Kitty Keyboard Protocol sequence.
+// parseKittyKeyboard 解析 Kitty 键盘协议序列。
 //
-// In `CSI u`, this is parsed as:
+// 在 `CSI u` 中，它被解析为：
 //
 //	CSI codepoint ; modifiers u
-//	codepoint: ASCII Dec value
+//	codepoint: ASCII 十进制值
 //
-// The Kitty Keyboard Protocol extends this with optional components that can be
-// enabled progressively. The full sequence is parsed as:
+// Kitty 键盘协议通过可选组件扩展了这一点，这些组件可以逐步启用。完整序列被解析为：
 //
 //	CSI unicode-key-code:alternate-key-codes ; modifiers:event-type ; text-as-codepoints u
 //
-// See https://sw.kovidgoyal.net/kitty/keyboard-protocol/
+// 请参阅 https://sw.kovidgoyal.net/kitty/keyboard-protocol/
 func parseKittyKeyboard(params ansi.Params) (Event Event) {
 	var isRelease bool
 	var key Key
 
-	// The index of parameters separated by semicolons ';'. Sub parameters are
-	// separated by colons ':'.
+	// 由分号 ';' 分隔的参数索引。子参数由冒号 ':' 分隔。
 	var paramIdx int
-	var sudIdx int // The sub parameter index
+	var sudIdx int // 子参数索引
 	for _, p := range params {
-		// Kitty Keyboard Protocol has 3 optional components.
+		// Kitty 键盘协议有 3 个可选组件。
 		switch paramIdx {
 		case 0:
 			switch sudIdx {
 			case 0:
 				var foundKey bool
-				code := p.Param(1) // CSI u has a default value of 1
+				code := p.Param(1) // CSI u 的默认值为 1
 				key, foundKey = kittyKeyMap[code]
 				if !foundKey {
 					r := rune(code)
@@ -251,26 +248,22 @@ func parseKittyKeyboard(params ansi.Params) (Event Event) {
 				}
 
 			case 2:
-				// shifted key + base key
+				// 移位键 + 基础键
 				if b := rune(p.Param(1)); unicode.IsPrint(b) {
-					// XXX: When alternate key reporting is enabled, the protocol
-					// can return 3 things, the unicode codepoint of the key,
-					// the shifted codepoint of the key, and the standard
-					// PC-101 key layout codepoint.
-					// This is useful to create an unambiguous mapping of keys
-					// when using a different language layout.
+					// XXX: 当启用备用键报告时，协议可以返回 3 件事：键的 unicode 码点、
+				// 键的移位码点和标准 PC-101 键盘布局码点。
+				// 这在使用不同语言布局时创建明确的键映射很有用。
 					key.BaseCode = b
 				}
 				fallthrough
 
 			case 1:
-				// shifted key
+				// 移位键
 				if s := rune(p.Param(1)); unicode.IsPrint(s) {
-					// XXX: We swap keys here because we want the shifted key
-					// to be the Rune that is returned by the event.
-					// For example, shift+a should produce "A" not "a".
-					// In such a case, we set AltRune to the original key "a"
-					// and Rune to "A".
+					// XXX: 我们在这里交换键是因为我们希望移位键是事件返回的符文。
+				// 例如，shift+a 应该产生 "A" 而不是 "a"。
+				// 在这种情况下，我们将 AltRune 设置为原始键 "a"，
+				// 并将 Rune 设置为 "A"。
 					key.ShiftedCode = s
 				}
 			}
@@ -281,8 +274,7 @@ func parseKittyKeyboard(params ansi.Params) (Event Event) {
 				if mod > 1 {
 					key.Mod = fromKittyMod(mod - 1)
 					if key.Mod > ModShift {
-						// XXX: We need to clear the text if we have a modifier key
-						// other than a [ModShift] key.
+						// XXX: 如果我们有除 [ModShift] 键之外的修饰键，我们需要清除文本。
 						key.Text = ""
 					}
 				}
@@ -334,9 +326,8 @@ func parseKittyKeyboard(params ansi.Params) (Event Event) {
 	return KeyPressEvent(key)
 }
 
-// parseKittyKeyboardExt parses a Kitty Keyboard Protocol sequence extensions
-// for non CSI u sequences. This includes things like CSI A, SS3 A and others,
-// and CSI ~.
+// parseKittyKeyboardExt 解析非 CSI u 序列的 Kitty 键盘协议序列扩展。
+// 这包括像 CSI A、SS3 A 等以及 CSI ~ 这样的序列。
 func parseKittyKeyboardExt(params ansi.Params, k KeyPressEvent) Event {
 	// Handle Kitty keyboard protocol
 	if len(params) > 2 && // We have at least 3 parameters

@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/wcwidth
+module github.com/purpose168/charm-experimental-packages-cn/wcwidth
 
 go 1.24.0
 

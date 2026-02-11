@@ -4,18 +4,20 @@ import (
 	"testing"
 )
 
+// TestModeSetting_Methods 测试ModeSetting的方法
+
 func TestModeSetting_Methods(t *testing.T) {
 	tests := []struct {
-		name     string
-		mode     ModeSetting
-		notRecog bool
-		isSet    bool
-		isReset  bool
-		permSet  bool
-		permRst  bool
+		name     string      // 测试用例名称
+		mode     ModeSetting // 模式设置
+		notRecog bool        // 是否未识别
+		isSet    bool        // 是否设置
+		isReset  bool        // 是否重置
+		permSet  bool        // 是否永久设置
+		permRst  bool        // 是否永久重置
 	}{
 		{
-			name:     "ModeNotRecognized",
+			name:     "模式未识别",
 			mode:     ModeNotRecognized,
 			notRecog: true,
 			isSet:    false,
@@ -24,7 +26,7 @@ func TestModeSetting_Methods(t *testing.T) {
 			permRst:  false,
 		},
 		{
-			name:     "ModeSet",
+			name:     "模式设置",
 			mode:     ModeSet,
 			notRecog: false,
 			isSet:    true,
@@ -33,7 +35,7 @@ func TestModeSetting_Methods(t *testing.T) {
 			permRst:  false,
 		},
 		{
-			name:     "ModeReset",
+			name:     "模式重置",
 			mode:     ModeReset,
 			notRecog: false,
 			isSet:    false,
@@ -42,7 +44,7 @@ func TestModeSetting_Methods(t *testing.T) {
 			permRst:  false,
 		},
 		{
-			name:     "ModePermanentlySet",
+			name:     "模式永久设置",
 			mode:     ModePermanentlySet,
 			notRecog: false,
 			isSet:    true,
@@ -51,7 +53,7 @@ func TestModeSetting_Methods(t *testing.T) {
 			permRst:  false,
 		},
 		{
-			name:     "ModePermanentlyReset",
+			name:     "模式永久重置",
 			mode:     ModePermanentlyReset,
 			notRecog: false,
 			isSet:    false,
@@ -82,44 +84,46 @@ func TestModeSetting_Methods(t *testing.T) {
 	}
 }
 
+// TestSetMode 测试SetMode函数
+
 func TestSetMode(t *testing.T) {
 	tests := []struct {
-		name     string
-		modes    []Mode
-		expected string
+		name     string // 测试用例名称
+		modes    []Mode // 模式列表
+		expected string // 期望结果
 	}{
 		{
-			name:     "empty modes",
+			name:     "空模式",
 			modes:    []Mode{},
 			expected: "",
 		},
 		{
-			name:     "single ANSI mode",
+			name:     "单个ANSI模式",
 			modes:    []Mode{ModeKeyboardAction},
 			expected: "\x1b[2h",
 		},
 		{
-			name:     "single DEC mode",
+			name:     "单个DEC模式",
 			modes:    []Mode{ModeCursorKeys},
 			expected: "\x1b[?1h",
 		},
 		{
-			name:     "multiple ANSI modes",
+			name:     "多个ANSI模式",
 			modes:    []Mode{ModeKeyboardAction, ModeInsertReplace},
 			expected: "\x1b[2;4h",
 		},
 		{
-			name:     "multiple DEC modes",
+			name:     "多个DEC模式",
 			modes:    []Mode{ModeCursorKeys, ModeAutoWrap},
 			expected: "\x1b[?1;7h",
 		},
 		{
-			name:     "mixed ANSI and DEC modes",
+			name:     "混合ANSI和DEC模式",
 			modes:    []Mode{ModeKeyboardAction, ModeCursorKeys},
 			expected: "\x1b[2h\x1b[?1h",
 		},
 		{
-			name:     "multiple mixed ANSI and DEC modes",
+			name:     "多个混合ANSI和DEC模式",
 			modes:    []Mode{ModeKeyboardAction, ModeInsertReplace, ModeCursorKeys, ModeAutoWrap},
 			expected: "\x1b[2;4h\x1b[?1;7h",
 		},
@@ -134,44 +138,46 @@ func TestSetMode(t *testing.T) {
 	}
 }
 
+// TestResetMode 测试ResetMode函数
+
 func TestResetMode(t *testing.T) {
 	tests := []struct {
-		name     string
-		modes    []Mode
-		expected string
+		name     string // 测试用例名称
+		modes    []Mode // 模式列表
+		expected string // 期望结果
 	}{
 		{
-			name:     "empty modes",
+			name:     "空模式",
 			modes:    []Mode{},
 			expected: "",
 		},
 		{
-			name:     "single ANSI mode",
+			name:     "单个ANSI模式",
 			modes:    []Mode{ModeKeyboardAction},
 			expected: "\x1b[2l",
 		},
 		{
-			name:     "single DEC mode",
+			name:     "单个DEC模式",
 			modes:    []Mode{ModeCursorKeys},
 			expected: "\x1b[?1l",
 		},
 		{
-			name:     "multiple ANSI modes",
+			name:     "多个ANSI模式",
 			modes:    []Mode{ModeKeyboardAction, ModeInsertReplace},
 			expected: "\x1b[2;4l",
 		},
 		{
-			name:     "multiple DEC modes",
+			name:     "多个DEC模式",
 			modes:    []Mode{ModeCursorKeys, ModeAutoWrap},
 			expected: "\x1b[?1;7l",
 		},
 		{
-			name:     "mixed ANSI and DEC modes",
+			name:     "混合ANSI和DEC模式",
 			modes:    []Mode{ModeKeyboardAction, ModeCursorKeys},
 			expected: "\x1b[2l\x1b[?1l",
 		},
 		{
-			name:     "multiple mixed ANSI and DEC modes",
+			name:     "多个混合ANSI和DEC模式",
 			modes:    []Mode{ModeKeyboardAction, ModeInsertReplace, ModeCursorKeys, ModeAutoWrap},
 			expected: "\x1b[2;4l\x1b[?1;7l",
 		},
@@ -186,14 +192,16 @@ func TestResetMode(t *testing.T) {
 	}
 }
 
+// TestRequestMode 测试RequestMode函数
+
 func TestRequestMode(t *testing.T) {
 	tests := []struct {
-		name     string
-		mode     Mode
-		expected string
+		name     string // 测试用例名称
+		mode     Mode   // 模式
+		expected string // 期望结果
 	}{
 		{
-			name:     "ANSI mode",
+			name:     "ANSI模式",
 			mode:     ModeKeyboardAction,
 			expected: "\x1b[2$p",
 		},

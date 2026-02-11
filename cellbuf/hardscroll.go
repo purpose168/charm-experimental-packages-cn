@@ -3,11 +3,10 @@ package cellbuf
 import (
 	"strings"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// scrollOptimize optimizes the screen to transform the old buffer into the new
-// buffer.
+// scrollOptimize 优化屏幕以将旧缓冲区转换为新缓冲区。
 func (s *Screen) scrollOptimize() {
 	height := s.newbuf.Height()
 	if s.oldnum == nil || len(s.oldnum) < height {
@@ -20,7 +19,7 @@ func (s *Screen) scrollOptimize() {
 		return
 	}
 
-	// Pass 1 - from top to bottom scrolling up
+	// 第一轮 - 从上到下向上滚动
 	for i := 0; i < height; {
 		for i < height && (s.oldnum[i] == newIndex || s.oldnum[i] <= i) {
 			i++
@@ -43,7 +42,7 @@ func (s *Screen) scrollOptimize() {
 		}
 	}
 
-	// Pass 2 - from bottom to top scrolling down
+	// 第二轮 - 从下到上向下滚动
 	for i := height - 1; i >= 0; {
 		for i >= 0 && (s.oldnum[i] == newIndex || s.oldnum[i] >= i) {
 			i--
@@ -67,7 +66,7 @@ func (s *Screen) scrollOptimize() {
 	}
 }
 
-// scrolln scrolls the screen up by n lines.
+// scrolln 向上滚动屏幕 n 行。
 func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 	const (
 		nonDestScrollRegion = false
@@ -76,12 +75,12 @@ func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 
 	blank := s.clearBlank()
 	if n > 0 { //nolint:nestif
-		// Scroll up (forward)
+		// 向上滚动（向前）
 		v = s.scrollUp(n, top, bot, 0, maxY, blank)
 		if !v {
 			s.buf.WriteString(ansi.SetTopBottomMargins(top+1, bot+1))
 
-			// XXX: How should we handle this in inline mode when not using alternate screen?
+			// XXX: 在不使用替代屏幕的内联模式下，我们应该如何处理这个问题？
 			s.cur.X, s.cur.Y = -1, -1
 			v = s.scrollUp(n, top, bot, top, bot, blank)
 			s.buf.WriteString(ansi.SetTopBottomMargins(1, maxY+1))
@@ -92,7 +91,7 @@ func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 			v = s.scrollIdl(n, top, bot-n+1, blank)
 		}
 
-		// Clear newly shifted-in lines.
+		// 清除新移入的行。
 		if v &&
 			(nonDestScrollRegion || (memoryBelow && bot == maxY)) {
 			if bot == maxY {
@@ -106,12 +105,12 @@ func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 			}
 		}
 	} else if n < 0 {
-		// Scroll down (backward)
+		// 向下滚动（向后）
 		v = s.scrollDown(-n, top, bot, 0, maxY, blank)
 		if !v {
 			s.buf.WriteString(ansi.SetTopBottomMargins(top+1, bot+1))
 
-			// XXX: How should we handle this in inline mode when not using alternate screen?
+			// XXX: 在不使用替代屏幕的内联模式下，我们应该如何处理这个问题？
 			s.cur.X, s.cur.Y = -1, -1
 			v = s.scrollDown(-n, top, bot, top, bot, blank)
 			s.buf.WriteString(ansi.SetTopBottomMargins(1, maxY+1))
@@ -121,7 +120,7 @@ func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 				v = s.scrollIdl(-n, bot+n+1, top, blank)
 			}
 
-			// Clear newly shifted-in lines.
+			// 清除新移入的行。
 			if v &&
 				(nonDestScrollRegion || (memoryBelow && top == 0)) {
 				for i := range -n {
@@ -138,21 +137,21 @@ func (s *Screen) scrolln(n, top, bot, maxY int) (v bool) { //nolint:unparam
 
 	s.scrollBuffer(s.curbuf, n, top, bot, blank)
 
-	// shift hash values too, they can be reused
+	// 也移动哈希值，它们可以被重用
 	s.scrollOldhash(n, top, bot)
 
 	return true
 }
 
-// scrollBuffer scrolls the buffer by n lines.
+// scrollBuffer 滚动缓冲区 n 行。
 func (s *Screen) scrollBuffer(b *Buffer, n, top, bot int, blank *Cell) {
 	if top < 0 || bot < top || bot >= b.Height() {
-		// Nothing to scroll
+		// 没有内容需要滚动
 		return
 	}
 
 	if n < 0 {
-		// shift n lines downwards
+		// 向下移动 n 行
 		limit := top - n
 		for line := bot; line >= limit && line >= 0 && line >= top; line-- {
 			copy(b.Lines[line], b.Lines[line+n])
@@ -163,7 +162,7 @@ func (s *Screen) scrollBuffer(b *Buffer, n, top, bot int, blank *Cell) {
 	}
 
 	if n > 0 {
-		// shift n lines upwards
+		// 向上移动 n 行
 		limit := bot - n
 		for line := top; line <= limit && line <= b.Height()-1 && line <= bot; line++ {
 			copy(b.Lines[line], b.Lines[line+n])
@@ -176,10 +175,10 @@ func (s *Screen) scrollBuffer(b *Buffer, n, top, bot int, blank *Cell) {
 	s.touchLine(b.Width(), b.Height(), top, bot-top+1, true)
 }
 
-// touchLine marks the line as touched.
+// touchLine 将行标记为已触摸。
 func (s *Screen) touchLine(width, height, y, n int, changed bool) {
 	if n < 0 || y < 0 || y >= height {
-		return // Nothing to touch
+		return // 没有内容需要触摸
 	}
 
 	for i := y; i < y+n && i < height; i++ {
@@ -191,7 +190,7 @@ func (s *Screen) touchLine(width, height, y, n int, changed bool) {
 	}
 }
 
-// scrollUp scrolls the screen up by n lines.
+// scrollUp 向上滚动屏幕 n 行。
 func (s *Screen) scrollUp(n, top, bot, minY, maxY int, blank *Cell) bool {
 	if n == 1 && top == minY && bot == maxY { //nolint:nestif
 		s.move(0, bot)
@@ -224,7 +223,7 @@ func (s *Screen) scrollUp(n, top, bot, minY, maxY int, blank *Cell) bool {
 	return true
 }
 
-// scrollDown scrolls the screen down by n lines.
+// scrollDown 向下滚动屏幕 n 行。
 func (s *Screen) scrollDown(n, top, bot, minY, maxY int, blank *Cell) bool {
 	if n == 1 && top == minY && bot == maxY { //nolint:nestif
 		s.move(0, top)
@@ -252,8 +251,7 @@ func (s *Screen) scrollDown(n, top, bot, minY, maxY int, blank *Cell) bool {
 	return true
 }
 
-// scrollIdl scrolls the screen n lines by using [ansi.DL] at del and using
-// [ansi.IL] at ins.
+// scrollIdl 通过在 del 处使用 [ansi.DL] 和在 ins 处使用 [ansi.IL] 来滚动屏幕 n 行。
 func (s *Screen) scrollIdl(n, del, ins int, blank *Cell) bool {
 	if n < 0 {
 		return false

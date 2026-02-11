@@ -6,7 +6,7 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// Badge represents a badge element (like "NEW", "BETA", status indicators).
+// Badge 表示一个徽章元素（如 "NEW"、"BETA"、状态指示器等）。
 type Badge struct {
 	BaseElement
 	text  string
@@ -15,11 +15,11 @@ type Badge struct {
 
 var _ Element = (*Badge)(nil)
 
-// NewBadge creates a badge component.
+// NewBadge 创建一个徽章组件。
 func NewBadge(props Props, children []Element) Element {
 	text := props.Get("text")
 	if text == "" && len(children) > 0 {
-		// Use first child as text
+		// 使用第一个子元素作为文本
 		if t, ok := children[0].(*Text); ok {
 			text = t.Content()
 		}
@@ -38,7 +38,7 @@ func NewBadge(props Props, children []Element) Element {
 	}
 }
 
-// Draw renders the badge.
+// Draw 渲染徽章。
 func (b *Badge) Draw(scr uv.Screen, area uv.Rectangle) {
 	b.SetBounds(area)
 
@@ -46,7 +46,7 @@ func (b *Badge) Draw(scr uv.Screen, area uv.Rectangle) {
 		return
 	}
 
-	// Badges are rendered as [TEXT] with styling
+	// 徽章渲染为带样式的 [文本]
 	content := "[" + b.text + "]"
 	if b.color != nil {
 		style := uv.Style{Fg: b.color}
@@ -57,18 +57,18 @@ func (b *Badge) Draw(scr uv.Screen, area uv.Rectangle) {
 	styled.Draw(scr, area)
 }
 
-// Layout calculates badge size.
+// Layout 计算徽章大小。
 func (b *Badge) Layout(constraints Constraints) Size {
-	width := len(b.text) + 2 // text + brackets
+	width := len(b.text) + 2 // 文本 + 括号
 	return constraints.Constrain(Size{Width: width, Height: 1})
 }
 
-// Children returns nil.
+// Children 返回 nil。
 func (b *Badge) Children() []Element {
 	return nil
 }
 
-// ProgressView represents a progress bar element.
+// ProgressView 表示一个进度条元素。
 type ProgressView struct {
 	BaseElement
 	value int
@@ -80,7 +80,7 @@ type ProgressView struct {
 
 var _ Element = (*ProgressView)(nil)
 
-// NewProgressView creates a progress bar component.
+// NewProgressView 创建一个进度条组件。
 func NewProgressView(props Props, _ []Element) Element {
 	value := parseIntAttr(props, "value", 0)
 	maxValue := parseIntAttr(props, "max", 100)
@@ -103,7 +103,7 @@ func NewProgressView(props Props, _ []Element) Element {
 	}
 }
 
-// Draw renders the progress bar.
+// Draw 渲染进度条。
 func (p *ProgressView) Draw(scr uv.Screen, area uv.Rectangle) {
 	p.SetBounds(area)
 
@@ -111,22 +111,22 @@ func (p *ProgressView) Draw(scr uv.Screen, area uv.Rectangle) {
 		return
 	}
 
-	// Calculate filled portion
+	// 计算填充部分
 	filled := 0
 	if p.max > 0 {
 		filled = min((area.Dx()*p.value)/p.max, area.Dx())
 	}
 
-	// Create cell for filled portion
+	// 创建填充部分的单元格
 	filledCell := uv.NewCell(scr.WidthMethod(), p.char)
 	if filledCell != nil && p.color != nil {
 		filledCell.Style = uv.Style{Fg: p.color}
 	}
 
-	// Create cell for empty portion
+	// 创建空部分的单元格
 	emptyCell := uv.NewCell(scr.WidthMethod(), "░")
 
-	// Draw progress bar
+	// 绘制进度条
 	for x := 0; x < area.Dx(); x++ {
 		if x < filled {
 			scr.SetCell(area.Min.X+x, area.Min.Y, filledCell)
@@ -136,29 +136,29 @@ func (p *ProgressView) Draw(scr uv.Screen, area uv.Rectangle) {
 	}
 }
 
-// Layout calculates progress bar size.
+// Layout 计算进度条大小。
 func (p *ProgressView) Layout(constraints Constraints) Size {
-	// Default width if not specified
+	// 未指定时的默认宽度
 	width := 20
 
-	// Apply width constraint if specified
+	// 如果指定了宽度约束，则应用
 	if !p.width.IsAuto() {
-		// For fixed width, use the constraint value directly
+		// 对于固定宽度，直接使用约束值
 		width = p.width.Apply(constraints.MaxWidth, width)
 	} else {
-		// For auto, take available width
+		// 对于自动宽度，使用可用宽度
 		width = constraints.MaxWidth
 	}
 
 	return Size{Width: width, Height: 1}
 }
 
-// Children returns nil.
+// Children 返回 nil。
 func (p *ProgressView) Children() []Element {
 	return nil
 }
 
-// init registers built-in custom components.
+// init 注册内置的自定义组件。
 func init() {
 	Register("badge", NewBadge)
 	Register("progressview", NewProgressView)

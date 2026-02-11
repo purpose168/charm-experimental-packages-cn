@@ -7,10 +7,10 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
-// HexColor is a [color.Color] that can be formatted as a hex string.
+// HexColor 是一个可以作为十六进制字符串格式化的 [color.Color]。
 type HexColor string
 
-// RGBA returns the RGBA values of the color.
+// RGBA 返回颜色的 RGBA 值。
 func (h HexColor) RGBA() (r, g, b, a uint32) {
 	hex := h.color()
 	if hex == nil {
@@ -19,8 +19,7 @@ func (h HexColor) RGBA() (r, g, b, a uint32) {
 	return hex.RGBA()
 }
 
-// Hex returns the hex representation of the color. If the color is invalid, it
-// returns an empty string.
+// Hex 返回颜色的十六进制表示。如果颜色无效，则返回空字符串。
 func (h HexColor) Hex() string {
 	hex := h.color()
 	if hex == nil {
@@ -29,13 +28,12 @@ func (h HexColor) Hex() string {
 	return hex.Hex()
 }
 
-// String returns the color as a hex string. If the color is nil, an empty
-// string is returned.
+// String 将颜色作为十六进制字符串返回。如果颜色为 nil，则返回空字符串。
 func (h HexColor) String() string {
 	return h.Hex()
 }
 
-// color returns the underlying color of the HexColor.
+// color 返回 HexColor 的底层颜色。
 func (h HexColor) color() *colorful.Color {
 	hex, err := colorful.Hex(string(h))
 	if err != nil {
@@ -44,15 +42,14 @@ func (h HexColor) color() *colorful.Color {
 	return &hex
 }
 
-// XRGBColor is a [color.Color] that can be formatted as an XParseColor
-// rgb: string.
+// XRGBColor 是一个可以作为 XParseColor rgb: 字符串格式化的 [color.Color]。
 //
-// See: https://linux.die.net/man/3/xparsecolor
+// 参见: https://linux.die.net/man/3/xparsecolor
 type XRGBColor struct {
 	color.Color
 }
 
-// RGBA returns the RGBA values of the color.
+// RGBA 返回颜色的 RGBA 值。
 func (x XRGBColor) RGBA() (r, g, b, a uint32) {
 	if x.Color == nil {
 		return 0, 0, 0, 0
@@ -60,26 +57,24 @@ func (x XRGBColor) RGBA() (r, g, b, a uint32) {
 	return x.Color.RGBA()
 }
 
-// String returns the color as an XParseColor rgb: string. If the color is nil,
-// an empty string is returned.
+// String 将颜色作为 XParseColor rgb: 字符串返回。如果颜色为 nil，则返回空字符串。
 func (x XRGBColor) String() string {
 	if x.Color == nil {
 		return ""
 	}
 	r, g, b, _ := x.Color.RGBA()
-	// Get the lower 8 bits
+	// 获取低 8 位
 	return fmt.Sprintf("rgb:%04x/%04x/%04x", r, g, b)
 }
 
-// XRGBAColor is a [color.Color] that can be formatted as an XParseColor
-// rgba: string.
+// XRGBAColor 是一个可以作为 XParseColor rgba: 字符串格式化的 [color.Color]。
 //
-// See: https://linux.die.net/man/3/xparsecolor
+// 参见: https://linux.die.net/man/3/xparsecolor
 type XRGBAColor struct {
 	color.Color
 }
 
-// RGBA returns the RGBA values of the color.
+// RGBA 返回颜色的 RGBA 值。
 func (x XRGBAColor) RGBA() (r, g, b, a uint32) {
 	if x.Color == nil {
 		return 0, 0, 0, 0
@@ -87,92 +82,84 @@ func (x XRGBAColor) RGBA() (r, g, b, a uint32) {
 	return x.Color.RGBA()
 }
 
-// String returns the color as an XParseColor rgba: string. If the color is nil,
-// an empty string is returned.
+// String 将颜色作为 XParseColor rgba: 字符串返回。如果颜色为 nil，则返回空字符串。
 func (x XRGBAColor) String() string {
 	if x.Color == nil {
 		return ""
 	}
 	r, g, b, a := x.RGBA()
-	// Get the lower 8 bits
+	// 获取低 8 位
 	return fmt.Sprintf("rgba:%04x/%04x/%04x/%04x", r, g, b, a)
 }
 
-// SetForegroundColor returns a sequence that sets the default terminal
-// foreground color.
+// SetForegroundColor 返回一个设置默认终端前景色的序列。
 //
 //	OSC 10 ; color ST
 //	OSC 10 ; color BEL
 //
-// Where color is the encoded color number. Most terminals support hex,
-// XParseColor rgb: and rgba: strings. You could use [HexColor], [XRGBColor],
-// or [XRGBAColor] to format the color.
+// 其中 color 是编码的颜色编号。大多数终端支持十六进制、
+// XParseColor rgb: 和 rgba: 字符串。您可以使用 [HexColor]、[XRGBColor]
+// 或 [XRGBAColor] 来格式化颜色。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func SetForegroundColor(s string) string {
 	return "\x1b]10;" + s + "\x07"
 }
 
-// RequestForegroundColor is a sequence that requests the current default
-// terminal foreground color.
+// RequestForegroundColor 是一个请求当前默认终端前景色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const RequestForegroundColor = "\x1b]10;?\x07"
 
-// ResetForegroundColor is a sequence that resets the default terminal
-// foreground color.
+// ResetForegroundColor 是一个重置默认终端前景色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const ResetForegroundColor = "\x1b]110\x07"
 
-// SetBackgroundColor returns a sequence that sets the default terminal
-// background color.
+// SetBackgroundColor 返回一个设置默认终端背景色的序列。
 //
 //	OSC 11 ; color ST
 //	OSC 11 ; color BEL
 //
-// Where color is the encoded color number. Most terminals support hex,
-// XParseColor rgb: and rgba: strings. You could use [HexColor], [XRGBColor],
-// or [XRGBAColor] to format the color.
+// 其中 color 是编码的颜色编号。大多数终端支持十六进制、
+// XParseColor rgb: 和 rgba: 字符串。您可以使用 [HexColor]、[XRGBColor]
+// 或 [XRGBAColor] 来格式化颜色。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func SetBackgroundColor(s string) string {
 	return "\x1b]11;" + s + "\x07"
 }
 
-// RequestBackgroundColor is a sequence that requests the current default
-// terminal background color.
+// RequestBackgroundColor 是一个请求当前默认终端背景色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const RequestBackgroundColor = "\x1b]11;?\x07"
 
-// ResetBackgroundColor is a sequence that resets the default terminal
-// background color.
+// ResetBackgroundColor 是一个重置默认终端背景色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const ResetBackgroundColor = "\x1b]111\x07"
 
-// SetCursorColor returns a sequence that sets the terminal cursor color.
+// SetCursorColor 返回一个设置终端光标颜色的序列。
 //
 //	OSC 12 ; color ST
 //	OSC 12 ; color BEL
 //
-// Where color is the encoded color number. Most terminals support hex,
-// XParseColor rgb: and rgba: strings. You could use [HexColor], [XRGBColor],
-// or [XRGBAColor] to format the color.
+// 其中 color 是编码的颜色编号。大多数终端支持十六进制、
+// XParseColor rgb: 和 rgba: 字符串。您可以使用 [HexColor]、[XRGBColor]
+// 或 [XRGBAColor] 来格式化颜色。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func SetCursorColor(s string) string {
 	return "\x1b]12;" + s + "\x07"
 }
 
-// RequestCursorColor is a sequence that requests the current terminal cursor
-// color.
+// RequestCursorColor 是一个请求当前终端光标颜色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const RequestCursorColor = "\x1b]12;?\x07"
 
-// ResetCursorColor is a sequence that resets the terminal cursor color.
+// ResetCursorColor 是一个重置终端光标颜色的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 const ResetCursorColor = "\x1b]112\x07"

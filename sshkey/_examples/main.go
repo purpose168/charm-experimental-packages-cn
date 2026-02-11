@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/charmbracelet/x/sshkey"
+	"github.com/purpose168/charm-experimental-packages-cn/sshkey"
 )
 
 func main() {
-	// password is "asd".
+	// 密码是 "asd"。
 	signer, err := sshkey.Open("./key")
 	if err != nil {
 		panic(err)

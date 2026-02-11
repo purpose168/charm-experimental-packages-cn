@@ -1,26 +1,26 @@
 package parser
 
-// Table values are generated like this:
+// 表值的生成方式如下：
 //
-//	index:  currentState << IndexStateShift | charCode
-//	value:  action << TransitionActionShift | nextState
+//	索引:  currentState << IndexStateShift | charCode
+//	值:  action << TransitionActionShift | nextState
 const (
 	TransitionActionShift = 4
 	TransitionStateMask   = 15
 	IndexStateShift       = 8
 
-	// DefaultTableSize is the default size of the transition table.
+	// DefaultTableSize 是转换表的默认大小。
 	DefaultTableSize = 4096
 )
 
-// Table is a DEC ANSI transition table.
+// Table 是一个 DEC ANSI 转换表。
 var Table = GenerateTransitionTable()
 
-// TransitionTable is a DEC ANSI transition table.
+// TransitionTable 是一个 DEC ANSI 转换表。
 // https://vt100.net/emu/dec_ansi_parser
 type TransitionTable []byte
 
-// NewTransitionTable returns a new DEC ANSI transition table.
+// NewTransitionTable 返回一个新的 DEC ANSI 转换表。
 func NewTransitionTable(size int) TransitionTable {
 	if size <= 0 {
 		size = DefaultTableSize
@@ -28,35 +28,35 @@ func NewTransitionTable(size int) TransitionTable {
 	return TransitionTable(make([]byte, size))
 }
 
-// SetDefault sets default transition.
+// SetDefault 设置默认转换。
 func (t TransitionTable) SetDefault(action Action, state State) {
 	for i := range t {
 		t[i] = action<<TransitionActionShift | state
 	}
 }
 
-// AddOne adds a transition.
+// AddOne 添加一个转换。
 func (t TransitionTable) AddOne(code byte, state State, action Action, next State) {
 	idx := int(state)<<IndexStateShift | int(code)
 	value := action<<TransitionActionShift | next
 	t[idx] = value
 }
 
-// AddMany adds many transitions.
+// AddMany 添加多个转换。
 func (t TransitionTable) AddMany(codes []byte, state State, action Action, next State) {
 	for _, code := range codes {
 		t.AddOne(code, state, action, next)
 	}
 }
 
-// AddRange adds a range of transitions.
+// AddRange 添加一个范围的转换。
 func (t TransitionTable) AddRange(start, end byte, state State, action Action, next State) {
 	for i := int(start); i <= int(end); i++ {
 		t.AddOne(byte(i), state, action, next)
 	}
 }
 
-// Transition returns the next state and action for the given state and byte.
+// Transition 返回给定状态和字节的下一个状态和动作。
 func (t TransitionTable) Transition(state State, code byte) (State, Action) {
 	index := int(state)<<IndexStateShift | int(code)
 	value := t[index]
@@ -72,18 +72,15 @@ func r(start, end byte) []byte {
 	return a
 }
 
-// GenerateTransitionTable generates a DEC ANSI transition table compatible
-// with the VT500-series of terminals. This implementation includes a few
-// modifications that include:
-//   - A new Utf8State is introduced to handle UTF8 sequences.
-//   - Osc and Dcs data accept UTF8 sequences by extending the printable range
-//     to 0xFF and 0xFE respectively.
-//   - We don't ignore 0x3A (':') when building Csi and Dcs parameters and
-//     instead use it to denote sub-parameters.
-//   - Support dispatching SosPmApc sequences.
-//   - The DEL (0x7F) character is executed in the Ground state.
-//   - The DEL (0x7F) character is collected in the DcsPassthrough string state.
-//   - The ST C1 control character (0x9C) is executed and not ignored.
+// GenerateTransitionTable 生成一个与 VT500 系列终端兼容的 DEC ANSI 转换表。
+// 此实现包括以下修改：
+//   - 引入新的 Utf8State 来处理 UTF8 序列。
+//   - Osc 和 Dcs 数据通过将可打印范围分别扩展到 0xFF 和 0xFE 来接受 UTF8 序列。
+//   - 在构建 Csi 和 Dcs 参数时，我们不忽略 0x3A (':')，而是使用它来表示子参数。
+//   - 支持调度 SosPmApc 序列。
+//   - DEL (0x7F) 字符在 Ground 状态下执行。
+//   - DEL (0x7F) 字符在 DcsPassthrough 字符串状态下收集。
+//   - ST C1 控制字符 (0x9C) 被执行而不是被忽略。
 func GenerateTransitionTable() TransitionTable {
 	table := NewTransitionTable(DefaultTableSize)
 	table.SetDefault(NoneAction, GroundState)

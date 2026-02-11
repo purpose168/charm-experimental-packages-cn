@@ -5,15 +5,14 @@ import (
 	"strings"
 )
 
-// XTGETTCAP (RequestTermcap) requests Termcap/Terminfo strings.
+// XTGETTCAP (RequestTermcap) 请求 Termcap/Terminfo 字符串。
 //
 //	DCS + q <Pt> ST
 //
-// Where <Pt> is a list of Termcap/Terminfo capabilities, encoded in 2-digit
-// hexadecimals, separated by semicolons.
+// 其中 <Pt> 是 Termcap/Terminfo 功能列表，以两位十六进制编码，用分号分隔。
 //
-// See: https://man7.org/linux/man-pages/man5/terminfo.5.html
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见：https://man7.org/linux/man-pages/man5/terminfo.5.html
+// 参见：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func XTGETTCAP(caps ...string) string {
 	if len(caps) == 0 {
 		return ""
@@ -30,12 +29,12 @@ func XTGETTCAP(caps ...string) string {
 	return s + "\x1b\\"
 }
 
-// RequestTermcap is an alias for [XTGETTCAP].
+// RequestTermcap 是 [XTGETTCAP] 的别名。
 func RequestTermcap(caps ...string) string {
 	return XTGETTCAP(caps...)
 }
 
-// RequestTerminfo is an alias for [XTGETTCAP].
+// RequestTerminfo 是 [XTGETTCAP] 的别名。
 func RequestTerminfo(caps ...string) string {
 	return XTGETTCAP(caps...)
 }

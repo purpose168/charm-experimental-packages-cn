@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// node represents a parsed XML element.
+// node 表示一个解析后的 XML 元素。
 type node struct {
 	XMLName  xml.Name
 	Attrs    []xml.Attr `xml:",any,attr"`
@@ -16,7 +16,7 @@ type node struct {
 	Children []*node    `xml:",any"`
 }
 
-// Props converts XML attributes to Props map.
+// Props 将 XML 属性转换为 Props 映射。
 func (n *node) Props() Props {
 	props := make(Props)
 	for _, attr := range n.Attrs {
@@ -25,26 +25,26 @@ func (n *node) Props() Props {
 	return props
 }
 
-// parse parses XML markup into a node tree.
+// parse 将 XML 标记解析为节点树。
 func parse(markup string) (*node, error) {
-	// Wrap in root element if not already wrapped
+	// 如果未包装在根元素中，则添加包装
 	wrapped := markup
 	if !strings.HasPrefix(strings.TrimSpace(markup), "<") {
 		wrapped = "<root>" + markup + "</root>"
 	}
 
 	decoder := xml.NewDecoder(strings.NewReader(wrapped))
-	decoder.Strict = false // Be lenient with XML parsing
+	decoder.Strict = false // 对 XML 解析宽松处理
 
 	var root node
 	if err := decoder.Decode(&root); err != nil {
 		if err == io.EOF {
-			return nil, fmt.Errorf("empty markup")
+			return nil, fmt.Errorf("空标记")
 		}
-		return nil, fmt.Errorf("xml decode: %w", err)
+		return nil, fmt.Errorf("xml 解码: %w", err)
 	}
 
-	// If we added a wrapper, unwrap it
+	// 如果我们添加了包装器，则解包
 	if strings.TrimSpace(markup) != wrapped {
 		if len(root.Children) == 1 {
 			return root.Children[0], nil
@@ -55,23 +55,23 @@ func parse(markup string) (*node, error) {
 	return &root, nil
 }
 
-// toElement converts an XML node to an Element.
+// toElement 将 XML 节点转换为 Element。
 func (n *node) toElement() Element {
 	if n == nil {
 		return nil
 	}
 
-	// Get the tag name
+	// 获取标签名
 	tagName := n.XMLName.Local
 	props := n.Props()
 
 	var elem Element
 
-	// Check custom component registry first
+	// 首先检查自定义组件注册表
 	if factory, ok := GetComponent(tagName); ok {
 		elem = factory(props, n.childElements())
 	} else {
-		// Then check built-in elements
+		// 然后检查内置元素
 		switch tagName {
 		case "vstack":
 			elem = n.toVStack(props)
@@ -96,7 +96,7 @@ func (n *node) toElement() Element {
 		case "scrollview":
 			elem = n.toScrollView(props)
 		case "":
-			// Anonymous text node (no tag, just content)
+			// 匿名文本节点（无标签，只有内容）
 			content := strings.TrimSpace(n.Content)
 			if content != "" {
 				elem = NewText(content)
@@ -104,12 +104,12 @@ func (n *node) toElement() Element {
 				return nil
 			}
 		default:
-			// Unknown element, treat as a container
+			// 未知元素，视为容器
 			elem = NewVStack(n.childElements()...)
 		}
 	}
 
-	// Set ID if provided
+	// 如果提供了 ID，则设置
 	if elem != nil && props.Has("id") {
 		if setter, ok := elem.(interface{ SetID(string) }); ok {
 			setter.SetID(props.Get("id"))
@@ -119,12 +119,12 @@ func (n *node) toElement() Element {
 	return elem
 }
 
-// childElements converts child nodes to Elements.
+// childElements 将子节点转换为 Elements。
 func (n *node) childElements() []Element {
 	var elements []Element
 
 	for _, child := range n.Children {
-		// Check if this is a text node
+		// 检查是否为文本节点
 		if child.XMLName.Local == "" && strings.TrimSpace(child.Content) != "" {
 			elements = append(elements, NewText(strings.TrimSpace(child.Content)))
 			continue
@@ -138,7 +138,7 @@ func (n *node) childElements() []Element {
 	return elements
 }
 
-// toVStack converts node to VStack element.
+// toVStack 将节点转换为 VStack 元素。
 func (n *node) toVStack(props Props) Element {
 	spacing := parseIntAttr(props, "spacing", 0)
 	width := parseSizeConstraint(props.Get("width"))
@@ -162,7 +162,7 @@ func (n *node) toVStack(props Props) Element {
 	return vstack
 }
 
-// toHStack converts node to HStack element.
+// toHStack 将节点转换为 HStack 元素。
 func (n *node) toHStack(props Props) Element {
 	spacing := parseIntAttr(props, "spacing", 0)
 	width := parseSizeConstraint(props.Get("width"))
@@ -186,7 +186,7 @@ func (n *node) toHStack(props Props) Element {
 	return hstack
 }
 
-// toZStack converts node to ZStack element.
+// toZStack 将节点转换为 ZStack 元素。
 func (n *node) toZStack(props Props) Element {
 	width := parseSizeConstraint(props.Get("width"))
 	height := parseSizeConstraint(props.Get("height"))
@@ -210,16 +210,16 @@ func (n *node) toZStack(props Props) Element {
 	return zstack
 }
 
-// toText converts node to Text element.
+// toText 将节点转换为 Text 元素。
 func (n *node) toText(props Props) Element {
-	// Collect text from content and children
+	// 从内容和子节点收集文本
 	var text string
 
 	if n.Content != "" {
 		text = strings.TrimSpace(n.Content)
 	}
 
-	// Also collect text from child text nodes
+	// 也从子文本节点收集文本
 	for _, child := range n.Children {
 		if child.XMLName.Local == "" && child.Content != "" {
 			if text != "" {
@@ -231,7 +231,7 @@ func (n *node) toText(props Props) Element {
 
 	textElem := NewText(text)
 
-	// Parse granular style attributes
+	// 解析精细样式属性
 	if fontWeight := props.Get("font-weight"); fontWeight == FontWeightBold {
 		textElem = textElem.Bold()
 	}
@@ -272,7 +272,7 @@ func (n *node) toText(props Props) Element {
 	return textElem
 }
 
-// toBox converts node to Box element.
+// toBox 将节点转换为 Box 元素。
 func (n *node) toBox(props Props) Element {
 	var child Element
 	children := n.childElements()
@@ -280,7 +280,7 @@ func (n *node) toBox(props Props) Element {
 		child = children[0]
 	}
 
-	// Parse border color if present
+	// 如果存在边框颜色，则解析
 	borderColorStr := props.Get("border-color")
 	var borderColor color.Color
 	if borderColorStr != "" {
@@ -289,14 +289,14 @@ func (n *node) toBox(props Props) Element {
 		}
 	}
 
-	// Parse width and height constraints
+	// 解析宽度和高度约束
 	width := parseSizeConstraint(props.Get("width"))
 	height := parseSizeConstraint(props.Get("height"))
 
-	// Parse padding
+	// 解析内边距
 	padding := parseIntAttr(props, "padding", 0)
 
-	// Parse margin
+	// 解析外边距
 	margin := parseIntAttr(props, "margin", 0)
 	marginTop := parseIntAttr(props, "margin-top", 0)
 	marginRight := parseIntAttr(props, "margin-right", 0)
@@ -338,7 +338,7 @@ func (n *node) toBox(props Props) Element {
 	return box
 }
 
-// toSpacer converts node to Spacer element.
+// toSpacer 将节点转换为 Spacer 元素。
 func (n *node) toSpacer(props Props) Element {
 	size := parseIntAttr(props, "size", 0)
 	if size > 0 {
@@ -347,7 +347,7 @@ func (n *node) toSpacer(props Props) Element {
 	return NewSpacer()
 }
 
-// toFlex converts node to Flex element.
+// toFlex 将节点转换为 Flex 元素。
 func (n *node) toFlex(props Props) Element {
 	var child Element
 	children := n.childElements()
@@ -373,7 +373,7 @@ func (n *node) toFlex(props Props) Element {
 	return flex
 }
 
-// toPositioned converts node to Positioned element.
+// toPositioned 将节点转换为 Positioned 元素。
 func (n *node) toPositioned(props Props) Element {
 	var child Element
 	children := n.childElements()
@@ -405,7 +405,7 @@ func (n *node) toPositioned(props Props) Element {
 	return positioned
 }
 
-// toDivider converts node to Divider element.
+// toDivider 将节点转换为 Divider 元素。
 func (n *node) toDivider(props Props) Element {
 	vertical := parseBoolAttr(props, "vertical", false)
 	char := props.Get("char")
@@ -417,7 +417,7 @@ func (n *node) toDivider(props Props) Element {
 		divider = NewDivider()
 	}
 
-	// Parse foreground color
+	// 解析前景色
 	if fgColor := props.Get("foreground-color"); fgColor != "" {
 		if c, err := parseColor(fgColor); err == nil {
 			divider = divider.ForegroundColor(c)
@@ -431,18 +431,18 @@ func (n *node) toDivider(props Props) Element {
 	return divider
 }
 
-// toSlot converts node to Slot element.
+// toSlot 将节点转换为 Slot 元素。
 func (n *node) toSlot(props Props) Element {
 	name := props.Get("name")
 	if name == "" {
-		// Slot requires a name
+		// Slot 需要一个名称
 		name = "unnamed"
 	}
 
 	return NewSlot(name)
 }
 
-// toScrollView converts node to ScrollView element.
+// toScrollView 将节点转换为 ScrollView 元素。
 func (n *node) toScrollView(props Props) Element {
 	var child Element
 	children := n.childElements()
@@ -450,18 +450,18 @@ func (n *node) toScrollView(props Props) Element {
 		child = children[0]
 	}
 
-	// Parse dimensions
+	// 解析尺寸
 	width := parseSizeConstraint(props.Get("width"))
 	height := parseSizeConstraint(props.Get("height"))
 
-	// Parse scroll options
+	// 解析滚动选项
 	offsetX := parseIntAttr(props, "offset-x", 0)
 	offsetY := parseIntAttr(props, "offset-y", 0)
 	showScrollbar := parseBoolAttr(props, "scrollbar", true)
 	vertical := parseBoolAttr(props, "vertical", true)
 	horizontal := parseBoolAttr(props, "horizontal", false)
 
-	// Parse scrollbar color
+	// 解析滚动条颜色
 	var scrollbarColor color.Color
 	if colorStr := props.Get("scrollbar-color"); colorStr != "" {
 		if c, err := parseColor(colorStr); err == nil {
@@ -495,7 +495,7 @@ func (n *node) toScrollView(props Props) Element {
 	return scrollView
 }
 
-// Helper functions for parsing attributes
+// 解析属性的辅助函数
 
 func parseIntAttr(props Props, key string, defaultValue int) int {
 	if val := props.Get(key); val != "" {

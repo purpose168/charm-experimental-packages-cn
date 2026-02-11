@@ -1,4 +1,4 @@
-// Package main demonstrates usage.
+// Package main 演示用法。
 package main
 
 import (
@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	var str string
 	printStr := func() {
 		if str != "" {
-			fmt.Printf("[Print] %s\n", str)
+			fmt.Printf("[打印] %s\n", str)
 			str = ""
 		}
 	}
@@ -29,7 +29,7 @@ func main() {
 		Print: func(r rune) { str += string(r) },
 		Execute: func(b byte) {
 			printStr()
-			fmt.Printf("[Execute] %q\n", b)
+			fmt.Printf("[执行] %q\n", b)
 		},
 		HandleCsi: func(cmd ansi.Cmd, params ansi.Params) {
 			printStr()

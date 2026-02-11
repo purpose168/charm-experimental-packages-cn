@@ -1,4 +1,4 @@
-// Package golden provides a helper function to assert the output of tests.
+// Package golden 提供一个辅助函数来断言测试的输出。
 package golden
 
 import (
@@ -15,15 +15,14 @@ import (
 
 var update = flag.Bool("update", false, "update .golden files")
 
-// RequireEqual is a helper function to assert the given output is
-// the expected from the golden files, printing its diff in case it is not.
+// RequireEqual 是一个辅助函数，用于断言给定的输出与金色文件中的预期输出一致，
+// 如果不一致则打印差异。
 //
-// Golden files contain the raw expected output of your tests, which can
-// contain control codes and escape sequences. When comparing the output of
-// your tests, [RequireEqual] will escape the control codes and sequences
-// before comparing the output with the golden files.
+// 金色文件包含测试的原始预期输出，可以包含控制代码和转义序列。
+// 当比较测试输出时，[RequireEqual] 会在将输出与金色文件比较之前
+// 转义控制代码和序列。
 //
-// You can update the golden files by running your tests with the -update flag.
+// 您可以通过使用 -update 标志运行测试来更新金色文件。
 func RequireEqual[T []byte | string](tb testing.TB, out T) {
 	tb.Helper()
 
@@ -52,16 +51,16 @@ func RequireEqual[T []byte | string](tb testing.TB, out T) {
 	}
 }
 
-// RequireEqualEscape is a helper function to assert the given output is
-// the expected from the golden files, printing its diff in case it is not.
+// RequireEqualEscape 是一个辅助函数，用于断言给定的输出与金色文件中的预期输出一致，
+// 如果不一致则打印差异。
 //
-// Deprecated: Use [RequireEqual] instead.
+// 已弃用: 使用 [RequireEqual] 代替。
 func RequireEqualEscape(tb testing.TB, out []byte, escapes bool) { //nolint:revive
 	RequireEqual(tb, out)
 }
 
-// escapeSeqs escapes control codes and escape sequences from the given string.
-// The only preserved exception is the newline character.
+// escapeSeqs 转义给定字符串中的控制代码和转义序列。
+// 唯一保留的例外是换行符。
 func escapeSeqs(in string) string {
 	s := strings.Split(in, "\n")
 	for i, l := range s {
@@ -73,8 +72,8 @@ func escapeSeqs(in string) string {
 	return strings.Join(s, "\n")
 }
 
-// normalizeWindowsLineBreaks replaces all \r\n with \n.
-// This is needed because Git for Windows checks out with \r\n by default.
+// normalizeWindowsLineBreaks 将所有 \r\n 替换为 \n。
+// 这是必要的，因为 Git for Windows 默认以 \r\n 检出文件。
 func normalizeWindowsLineBreaks(str string) string {
 	if runtime.GOOS == "windows" {
 		return strings.ReplaceAll(str, "\r\n", "\n")

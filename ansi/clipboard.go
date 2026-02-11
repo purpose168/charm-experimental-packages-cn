@@ -2,21 +2,21 @@ package ansi
 
 import "encoding/base64"
 
-// Clipboard names.
+// 剪贴板名称。
 const (
 	SystemClipboard  = 'c'
 	PrimaryClipboard = 'p'
 )
 
-// SetClipboard returns a sequence for manipulating the clipboard.
+// SetClipboard 返回一个用于操作剪贴板的序列。
 //
 //	OSC 52 ; Pc ; Pd ST
 //	OSC 52 ; Pc ; Pd BEL
 //
-// Where Pc is the clipboard name and Pd is the base64 encoded data.
-// Empty data or invalid base64 data will reset the clipboard.
+// 其中 Pc 是剪贴板名称，Pd 是 base64 编码的数据。
+// 空数据或无效的 base64 数据将重置剪贴板。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func SetClipboard(c byte, d string) string {
 	if d != "" {
 		d = base64.StdEncoding.EncodeToString([]byte(d))
@@ -24,52 +24,52 @@ func SetClipboard(c byte, d string) string {
 	return "\x1b]52;" + string(c) + ";" + d + "\x07"
 }
 
-// SetSystemClipboard returns a sequence for setting the system clipboard.
+// SetSystemClipboard 返回一个用于设置系统剪贴板的序列。
 //
-// This is equivalent to SetClipboard(SystemClipboard, d).
+// 这等同于 SetClipboard(SystemClipboard, d)。
 func SetSystemClipboard(d string) string {
 	return SetClipboard(SystemClipboard, d)
 }
 
-// SetPrimaryClipboard returns a sequence for setting the primary clipboard.
+// SetPrimaryClipboard 返回一个用于设置主剪贴板的序列。
 //
-// This is equivalent to SetClipboard(PrimaryClipboard, d).
+// 这等同于 SetClipboard(PrimaryClipboard, d)。
 func SetPrimaryClipboard(d string) string {
 	return SetClipboard(PrimaryClipboard, d)
 }
 
-// ResetClipboard returns a sequence for resetting the clipboard.
+// ResetClipboard 返回一个用于重置剪贴板的序列。
 //
-// This is equivalent to SetClipboard(c, "").
+// 这等同于 SetClipboard(c, "")。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func ResetClipboard(c byte) string {
 	return SetClipboard(c, "")
 }
 
-// ResetSystemClipboard is a sequence for resetting the system clipboard.
+// ResetSystemClipboard 是一个用于重置系统剪贴板的序列。
 //
-// This is equivalent to ResetClipboard(SystemClipboard).
+// 这等同于 ResetClipboard(SystemClipboard)。
 const ResetSystemClipboard = "\x1b]52;c;\x07"
 
-// ResetPrimaryClipboard is a sequence for resetting the primary clipboard.
+// ResetPrimaryClipboard 是一个用于重置主剪贴板的序列。
 //
-// This is equivalent to ResetClipboard(PrimaryClipboard).
+// 这等同于 ResetClipboard(PrimaryClipboard)。
 const ResetPrimaryClipboard = "\x1b]52;p;\x07"
 
-// RequestClipboard returns a sequence for requesting the clipboard.
+// RequestClipboard 返回一个用于请求剪贴板的序列。
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
+// 参见: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Operating-System-Commands
 func RequestClipboard(c byte) string {
 	return "\x1b]52;" + string(c) + ";?\x07"
 }
 
-// RequestSystemClipboard is a sequence for requesting the system clipboard.
+// RequestSystemClipboard 是一个用于请求系统剪贴板的序列。
 //
-// This is equivalent to RequestClipboard(SystemClipboard).
+// 这等同于 RequestClipboard(SystemClipboard)。
 const RequestSystemClipboard = "\x1b]52;c;?\x07"
 
-// RequestPrimaryClipboard is a sequence for requesting the primary clipboard.
+// RequestPrimaryClipboard 是一个用于请求主剪贴板的序列。
 //
-// This is equivalent to RequestClipboard(PrimaryClipboard).
+// 这等同于 RequestClipboard(PrimaryClipboard)。
 const RequestPrimaryClipboard = "\x1b]52;p;?\x07"

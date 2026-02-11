@@ -1,4 +1,4 @@
-// Package sixel provides sixel graphics format functionality.
+// Package sixel 提供 sixel 图形格式功能。
 package sixel
 
 import (
@@ -9,11 +9,10 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
-// ErrInvalidColor is returned when a Sixel color is invalid.
-var ErrInvalidColor = fmt.Errorf("invalid color")
+// ErrInvalidColor 在 Sixel 颜色无效时返回。
+var ErrInvalidColor = fmt.Errorf("无效颜色")
 
-// WriteColor writes a Sixel color to a writer. If pu is 0, the rest of the
-// parameters are ignored.
+// WriteColor 向写入器写入 Sixel 颜色。如果 pu 为 0，则忽略其余参数。
 func WriteColor(w io.Writer, pc, pu, px, py, pz int) (int, error) {
 	if pu <= 0 || pu > 2 {
 		return fmt.Fprintf(w, "#%d", pc) //nolint:wrapcheck
@@ -22,16 +21,15 @@ func WriteColor(w io.Writer, pc, pu, px, py, pz int) (int, error) {
 	return fmt.Fprintf(w, "#%d;%d;%d;%d;%d", pc, pu, px, py, pz) //nolint:wrapcheck
 }
 
-// ConvertChannel converts a color channel from color.Color 0xffff to 0-100
-// Sixel RGB format.
+// ConvertChannel 将颜色通道从 color.Color 的 0xffff 范围转换为
+// Sixel RGB 格式的 0-100 范围。
 func ConvertChannel(c uint32) uint32 {
-	// We add 328 because that is about 0.5 in the sixel 0-100 color range, we're trying to
-	// round to the nearest value
+	// 我们加 328 是因为那大约是 sixel 0-100 颜色范围内的 0.5，我们试图
+	// 四舍五入到最近的值
 	return (c + 328) * 100 / 0xffff
 }
 
-// FromColor returns a Sixel color from a color.Color. It converts the color
-// channels to the 0-100 range.
+// FromColor 从 color.Color 返回 Sixel 颜色。它将颜色通道转换为 0-100 范围。
 func FromColor(c color.Color) Color {
 	if c == nil {
 		return Color{}
@@ -39,25 +37,24 @@ func FromColor(c color.Color) Color {
 
 	r, g, b, _ := c.RGBA()
 	return Color{
-		Pu: 2, // Always use RGB format "2"
+		Pu: 2, // 始终使用 RGB 格式 "2"
 		Px: int(ConvertChannel(r)),
 		Py: int(ConvertChannel(g)),
 		Pz: int(ConvertChannel(b)),
 	}
 }
 
-// DecodeColor decodes a Sixel color from a byte slice. It returns the Color and
-// the number of bytes read.
+// DecodeColor 从字节切片解码 Sixel 颜色。它返回颜色和读取的字节数。
 func DecodeColor(data []byte) (c Color, n int) {
 	if len(data) == 0 || data[0] != ColorIntroducer {
 		return c, n
 	}
 
-	if len(data) < 2 { // The minimum length is 2: the introducer and a digit.
+	if len(data) < 2 { // 最小长度是 2：引导符和数字。
 		return c, n
 	}
 
-	// Parse the color number and optional color system.
+	// 解析颜色编号和可选的颜色系统。
 	pc := &c.Pc
 	for n = 1; n < len(data); n++ {
 		if data[n] == ';' {
@@ -74,7 +71,7 @@ func DecodeColor(data []byte) (c Color, n int) {
 		}
 	}
 
-	// Parse the color components.
+	// 解析颜色分量。
 	ptr := &c.Px
 	for ; n < len(data); n++ {
 		if data[n] == ';' { //nolint:nestif
@@ -96,22 +93,21 @@ func DecodeColor(data []byte) (c Color, n int) {
 	return c, n
 }
 
-// Color represents a Sixel color.
+// Color 表示 Sixel 颜色。
 type Color struct {
-	// Pc is the color number (0-255).
+	// Pc 是颜色编号 (0-255)。
 	Pc int
-	// Pu is an optional color system
-	//  - 0: default color map
+	// Pu 是可选的颜色系统
+	//  - 0: 默认颜色映射
 	//  - 1: HLS
 	//  - 2: RGB
 	Pu int
-	// Color components range from 0-100 for RGB values. For HLS format, the Px
-	// (Hue) component ranges from 0-360 degrees while L (Lightness) and S
-	// (Saturation) are 0-100.
+	// 颜色分量范围从 0-100 表示 RGB 值。对于 HLS 格式，Px（色相）分量范围从 0-360 度，
+	// 而 L（亮度）和 S（饱和度）为 0-100。
 	Px, Py, Pz int
 }
 
-// RGBA implements the color.Color interface.
+// RGBA 实现 color.Color 接口。
 func (c Color) RGBA() (r, g, b, a uint32) {
 	switch c.Pu {
 	case 1:

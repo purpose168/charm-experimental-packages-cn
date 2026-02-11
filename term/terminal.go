@@ -4,8 +4,7 @@ import (
 	"io"
 )
 
-// File represents a file that has a file descriptor and can be read from,
-// written to, and closed.
+// File 表示一个具有文件描述符并且可以读取、写入和关闭的文件。
 type File interface {
 	io.ReadWriteCloser
 	Fd() uintptr

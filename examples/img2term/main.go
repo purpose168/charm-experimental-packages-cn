@@ -1,4 +1,4 @@
-// Package main demonstrates usage.
+// Package main 演示使用方法。
 package main
 
 import (
@@ -12,11 +12,11 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/ansi/sixel"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/sixel"
 )
 
-// $ go run . ../../fixtures/JigokudaniMonkeyPark.png
+// $ go run . ../../fixtures/JigokudaniMonkeyPark.png // 运行示例命令
 func main() {
 	flag.Parse()
 	args := flag.Args()

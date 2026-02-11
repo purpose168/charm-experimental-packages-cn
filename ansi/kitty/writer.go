@@ -9,32 +9,28 @@ import (
 	"io"
 	"os"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 var (
-	// GraphicsTempDir is the directory where temporary files are stored.
-	// This is used in [WriteKittyGraphics] along with [os.CreateTemp].
+	// GraphicsTempDir 是存储临时文件的目录。
+	// 这在 [WriteKittyGraphics] 中与 [os.CreateTemp] 一起使用。
 	GraphicsTempDir = ""
 
-	// GraphicsTempPattern is the pattern used to create temporary files.
-	// This is used in [WriteKittyGraphics] along with [os.CreateTemp].
-	// The Kitty Graphics protocol requires the file path to contain the
-	// substring "tty-graphics-protocol".
+	// GraphicsTempPattern 是用于创建临时文件的模式。
+	// 这在 [WriteKittyGraphics] 中与 [os.CreateTemp] 一起使用。
+	// Kitty 图形协议要求文件路径包含子字符串 "tty-graphics-protocol"。
 	GraphicsTempPattern = "tty-graphics-protocol-*"
 )
 
-// EncodeGraphics writes an image using the Kitty Graphics protocol with the
-// given options to w. It chunks the written data if o.Chunk is true.
+// EncodeGraphics 使用 Kitty 图形协议和给定的选项将图像写入 w。如果 o.Chunk 为 true，则分块写入数据。
 //
-// You can omit m and use nil when rendering an image from a file. In this
-// case, you must provide a file path in o.File and use o.Transmission =
-// [File]. You can also use o.Transmission = [TempFile] to write
-// the image to a temporary file. In that case, the file path is ignored, and
-// the image is written to a temporary file that is automatically deleted by
-// the terminal.
+// 当从文件渲染图像时，您可以省略 m 并使用 nil。在这种情况下，
+// 您必须在 o.File 中提供文件路径，并使用 o.Transmission = [File]。
+// 您还可以使用 o.Transmission = [TempFile] 将图像写入临时文件。
+// 在这种情况下，文件路径将被忽略，图像将被写入由终端自动删除的临时文件。
 //
-// See https://sw.kovidgoyal.net/kitty/graphics-protocol/
+// 请参阅 https://sw.kovidgoyal.net/kitty/graphics-protocol/
 func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 	if o == nil {
 		o = &Options{}
@@ -44,7 +40,7 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 		o.Transmission = File
 	}
 
-	var data bytes.Buffer // the data to be encoded into base64
+	var data bytes.Buffer // 要编码为 base64 的数据
 	e := &Encoder{
 		Compress: o.Compression == Zlib,
 		Format:   o.Format,
@@ -83,7 +79,7 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 			return fmt.Errorf("file is not a regular file")
 		}
 
-		// Write the file path to the buffer
+		// 将文件路径写入缓冲区
 		if _, err := data.WriteString(f.Name()); err != nil {
 			return fmt.Errorf("failed to write file path to buffer: %w", err)
 		}
@@ -100,14 +96,14 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 			return fmt.Errorf("failed to encode image to file: %w", err)
 		}
 
-		// Write the file path to the buffer
+		// 将文件路径写入缓冲区
 		if _, err := data.WriteString(f.Name()); err != nil {
 			return fmt.Errorf("failed to write file path to buffer: %w", err)
 		}
 	}
 
-	// Encode image to base64
-	var payload bytes.Buffer // the base64 encoded image to be written to w
+	// 将图像编码为 base64
+	var payload bytes.Buffer // 要写入 w 的 base64 编码图像
 	b64 := base64.NewEncoder(base64.StdEncoding, &payload)
 	if _, err := data.WriteTo(b64); err != nil {
 		return fmt.Errorf("failed to write base64 encoded image to payload: %w", err)
@@ -116,13 +112,13 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 		return err //nolint:wrapcheck
 	}
 
-	// If not chunking, write all at once
+	// 如果不分块，一次性写入所有内容
 	if !o.Chunk {
 		_, err := io.WriteString(w, ansi.KittyGraphics(payload.Bytes(), o.Options()...))
 		return err //nolint:wrapcheck
 	}
 
-	// Write in chunks
+	// 分块写入
 	var (
 		err error
 		n   int
@@ -131,12 +127,12 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 	isFirstChunk := true
 	chunkFormatter := o.ChunkFormatter
 	if chunkFormatter == nil {
-		// Default to no formatting
+		// 默认不进行格式化
 		chunkFormatter = func(s string) string { return s }
 	}
 
 	for {
-		// Stop if we read less than the chunk size [MaxChunkSize].
+		// 如果读取的大小小于块大小 [MaxChunkSize]，则停止。
 		n, err = io.ReadFull(&payload, chunk)
 		if errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, io.EOF) {
 			break
@@ -154,19 +150,19 @@ func EncodeGraphics(w io.Writer, m image.Image, o *Options) error {
 		isFirstChunk = false
 	}
 
-	// Write the last chunk
+	// 写入最后一个块
 	opts := buildChunkOptions(o, isFirstChunk, true)
 	_, err = io.WriteString(w, chunkFormatter(ansi.KittyGraphics(chunk[:n], opts...)))
 	return err //nolint:wrapcheck
 }
 
-// buildChunkOptions creates the options slice for a chunk.
+// buildChunkOptions 为块创建选项切片。
 func buildChunkOptions(o *Options, isFirstChunk, isLastChunk bool) []string {
 	var opts []string
 	if isFirstChunk {
 		opts = o.Options()
 	} else {
-		// These options are allowed in subsequent chunks
+		// 这些选项在后续块中是允许的
 		if o.Quite > 0 {
 			opts = append(opts, fmt.Sprintf("q=%d", o.Quite))
 		}
@@ -176,7 +172,7 @@ func buildChunkOptions(o *Options, isFirstChunk, isLastChunk bool) []string {
 	}
 
 	if !isFirstChunk || !isLastChunk {
-		// We don't need to encode the (m=) option when we only have one chunk.
+		// 当我们只有一个块时，不需要编码 (m=) 选项。
 		if isLastChunk {
 			opts = append(opts, "m=0")
 		} else {

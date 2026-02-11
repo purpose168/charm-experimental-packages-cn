@@ -1,7 +1,7 @@
 package ansi
 
-// BracketedPasteStart is the control sequence to enable bracketed paste mode.
+// BracketedPasteStart 是启用括号粘贴模式的控制序列。
 const BracketedPasteStart = "\x1b[200~"
 
-// BracketedPasteEnd is the control sequence to disable bracketed paste mode.
+// BracketedPasteEnd 是禁用括号粘贴模式的控制序列。
 const BracketedPasteEnd = "\x1b[201~"

@@ -1,7 +1,7 @@
-// Package main demonstrates usage.
+// Package main 演示了使用方法。
 package main
 
-// This example demonstrates various Lip Gloss style and layout features.
+// 本示例演示了各种 Lip Gloss 样式和布局功能。
 
 import (
 	"fmt"
@@ -12,48 +12,44 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/colorprofile"
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/cellbuf"
-	"github.com/charmbracelet/x/input"
-	"github.com/charmbracelet/x/term"
 	"github.com/lucasb-eyer/go-colorful"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/cellbuf"
+	"github.com/purpose168/charm-experimental-packages-cn/input"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 	"github.com/rivo/uniseg"
 )
 
 const (
-	// In real life situations we'd adjust the document to fit the width we've
-	// detected. In the case of this example we're hardcoding the width, and
-	// later using the detected width only to truncate in order to avoid jaggy
-	// wrapping.
+	// 在实际情况中，我们会根据检测到的宽度调整文档大小。
+	// 在本示例中，我们硬编码宽度，稍后仅使用检测到的宽度进行截断，以避免锯齿状换行。
 	width = 96
 
-	// How wide to render various columns in the layout.
+	// 布局中各列的渲染宽度。
 	columnWidth = 30
 )
 
 var (
-	// Whether the detected background color is dark. We detect this in init().
+	// 检测到的背景颜色是否为深色。我们在 init() 中检测。
 	hasDarkBG bool
 
-	// A helper function for choosing either a light or dark color based on the
-	// detected background color. We create this in init().
+	// 一个辅助函数，用于根据检测到的背景颜色选择亮色或暗色。我们在 init() 中创建。
 	lightDark lipgloss.LightDarkFunc
 )
 
 func init() {
-	// Detect the background color.
+	// 检测背景颜色。
 	hasDarkBG = lipgloss.HasDarkBackground(os.Stdin, os.Stdout)
 
-	// Create a new helper function for choosing either a light or dark color
-	// based on the detected background color.
+	// 创建一个新的辅助函数，用于根据检测到的背景颜色选择亮色或暗色。
 	lightDark = lipgloss.LightDark(hasDarkBG)
 }
 
 func main() {
-	// Style definitions.
+	// 样式定义。
 	var (
 
-		// General.
+		// 通用样式。
 
 		subtle    = lightDark(lipgloss.Color("#D9DCCF"), lipgloss.Color("#383838"))
 		highlight = lightDark(lipgloss.Color("#874BFD"), lipgloss.Color("#7D56F4"))
@@ -67,7 +63,7 @@ func main() {
 
 		url = lipgloss.NewStyle().Foreground(special).Render
 
-		// Tabs.
+		// 标签样式。
 
 		activeTabBorder = lipgloss.Border{
 			Top:         "─",
@@ -103,7 +99,7 @@ func main() {
 			BorderLeft(false).
 			BorderRight(false)
 
-		// Title.
+		// 标题样式。
 
 		titleStyle = lipgloss.NewStyle().
 				MarginLeft(1).
@@ -120,7 +116,7 @@ func main() {
 				BorderTop(true).
 				BorderForeground(subtle)
 
-		// Dialog.
+		// 对话框样式。
 
 		dialogBoxStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
@@ -143,7 +139,7 @@ func main() {
 					MarginRight(2).
 					Underline(true)
 
-		// List.
+		// 列表样式。
 
 		list = lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder(), false, true, false, false).
@@ -173,7 +169,7 @@ func main() {
 				Render(s)
 		}
 
-		// Paragraphs/History.
+		// 段落/历史记录样式。
 
 		historyStyle = lipgloss.NewStyle().
 				Align(lipgloss.Left).
@@ -184,7 +180,7 @@ func main() {
 				Height(19).
 				Width(columnWidth)
 
-		// Status Bar.
+		// 状态栏样式。
 
 		statusNugget = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#FFFDF5")).
@@ -209,7 +205,7 @@ func main() {
 
 		fishCakeStyle = statusNugget.Background(lipgloss.Color("#6124DF"))
 
-		// Page.
+		// 页面样式。
 
 		docStyle = lipgloss.NewStyle().Padding(1, 2, 1, 2)
 	)
@@ -217,7 +213,7 @@ func main() {
 	physicalWidth, physicalHeight, _ := term.GetSize(os.Stdout.Fd())
 	doc := strings.Builder{}
 
-	// Tabs.
+	// 标签部分。
 	{
 		row := lipgloss.JoinHorizontal(
 			lipgloss.Top,
@@ -232,7 +228,7 @@ func main() {
 		doc.WriteString(row + "\n\n")
 	}
 
-	// Title.
+	// 标题部分。
 	{
 		var (
 			colors = colorGrid(1, 5)
@@ -249,21 +245,21 @@ func main() {
 		}
 
 		desc := lipgloss.JoinVertical(lipgloss.Left,
-			descStyle.Render("Style Definitions for Nice Terminal Layouts"),
-			infoStyle.Render("From Charm"+divider+url("https://github.com/charmbracelet/lipgloss")),
+			descStyle.Render("美观终端布局的样式定义"),
+			infoStyle.Render("来自 Charm"+divider+url("https://github.com/charmbracelet/lipgloss")),
 		)
 
 		row := lipgloss.JoinHorizontal(lipgloss.Top, title.String(), desc)
 		doc.WriteString(row + "\n\n")
 	}
 
-	// Dialog.
-	okButton := activeButtonStyle.Render("Yes")
-	cancelButton := buttonStyle.Render("Maybe")
+	// 对话框部分。
+	okButton := activeButtonStyle.Render("是")
+	cancelButton := buttonStyle.Render("也许")
 
 	grad := applyGradient(
 		lipgloss.NewStyle(),
-		"Are you sure you want to eat marmalade?",
+		"你确定要吃橘子酱吗？",
 		lipgloss.Color("#EDFF82"),
 		lipgloss.Color("#F25D94"),
 	)
@@ -286,7 +282,7 @@ func main() {
 
 	doc.WriteString(dialog + "\n\n")
 
-	// Color grid.
+	// 颜色网格部分。
 	colors := func() string {
 		colors := colorGrid(14, 8)
 
@@ -305,17 +301,17 @@ func main() {
 	lists := lipgloss.JoinHorizontal(lipgloss.Top,
 		list.Render(
 			lipgloss.JoinVertical(lipgloss.Left,
-				listHeader("Citrus Fruits to Try"),
-				listDone("Grapefruit"),
-				listDone("Yuzu"),
-				listItem("Citron"),
-				listItem("Kumquat"),
-				listItem("Pomelo"),
+				listHeader("尝试的柑橘类水果"),
+				listDone("西柚"),
+				listDone("柚子"),
+				listItem("香橼"),
+				listItem("金桔"),
+				listItem("柚子"),
 			),
 		),
 		list.Width(columnWidth).Render(
 			lipgloss.JoinVertical(lipgloss.Left,
-				listHeader("Actual Lip Gloss Vendors"),
+				listHeader("实际的唇彩供应商"),
 				listItem("Glossier"),
 				listItem("Claire‘s Boutique"),
 				listDone("Nyx"),
@@ -327,12 +323,12 @@ func main() {
 
 	doc.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, lists, colors))
 
-	// Marmalade history.
+	// 橘子酱历史部分。
 	{
 		const (
-			historyA = "The Romans learned from the Greeks that quinces slowly cooked with honey would “set” when cool. The Apicius gives a recipe for preserving whole quinces, stems and leaves attached, in a bath of honey diluted with defrutum: Roman marmalade. Preserves of quince and lemon appear (along with rose, apple, plum and pear) in the Book of ceremonies of the Byzantine Emperor Constantine VII Porphyrogennetos."
-			historyB = "Medieval quince preserves, which went by the French name cotignac, produced in a clear version and a fruit pulp version, began to lose their medieval seasoning of spices in the 16th century. In the 17th century, La Varenne provided recipes for both thick and clear cotignac."
-			historyC = "In 1524, Henry VIII, King of England, received a “box of marmalade” from Mr. Hull of Exeter. This was probably marmelada, a solid quince paste from Portugal, still made and sold in southern Europe today. It became a favourite treat of Anne Boleyn and her ladies in waiting."
+			historyA = "罗马人从希腊人那里了解到，用蜂蜜慢煮的榅桲在冷却后会\"凝固\"。《阿皮基乌斯》中记载了一种保存完整榅桲（连梗带叶）的方法，将其浸泡在用水稀释的蜂蜜中：这就是罗马橘子酱。榅桲和柠檬的蜜饯（以及玫瑰、苹果、李子和梨）出现在拜占庭皇帝君士坦丁七世·波菲罗格涅图斯的《礼仪书》中。"
+			historyB = "中世纪的榅桲蜜饯，在法语中称为 cotignac，有清澈版本和果肉版本，在 16 世纪开始失去其中世纪的香料调味。在 17 世纪，拉瓦雷恩提供了制作浓稠和清澈 cotignac 的食谱。"
+			historyC = "1524 年，英格兰国王亨利八世收到了埃克塞特的赫尔先生送的一盒\"橘子酱\"。这可能是 marmelada，一种来自葡萄牙的固体榅桲酱，至今仍在南欧制作和销售。它成为安妮·博林和她的侍女们的最爱。"
 		)
 
 		doc.WriteString(lipgloss.JoinHorizontal(
@@ -345,21 +341,21 @@ func main() {
 		doc.WriteString("\n\n")
 	}
 
-	// Status bar.
+	// 状态栏部分。
 	{
 		w := lipgloss.Width
 
-		lightDarkState := "Light"
+		lightDarkState := "浅色"
 		if hasDarkBG {
-			lightDarkState = "Dark"
+			lightDarkState = "深色"
 		}
 
-		statusKey := statusStyle.Render("STATUS")
+		statusKey := statusStyle.Render("状态")
 		encoding := encodingStyle.Render("UTF-8")
-		fishCake := fishCakeStyle.Render("🍥 Fish Cake")
+		fishCake := fishCakeStyle.Render("🍥 鱼饼")
 		statusVal := statusText.
 			Width(width - w(statusKey) - w(encoding) - w(fishCake)).
-			Render("Ravishingly " + lightDarkState + "!")
+			Render("令人陶醉的" + lightDarkState + "模式！")
 
 		bar := lipgloss.JoinHorizontal(lipgloss.Top,
 			statusKey,
@@ -384,7 +380,7 @@ func main() {
 
 	defer scr.Close() //nolint:errcheck
 
-	// Enable mouse events.
+	// 启用鼠标事件。
 	modes := []ansi.Mode{
 		ansi.ButtonEventMouseMode,
 		ansi.SgrExtMouseMode,
@@ -395,14 +391,14 @@ func main() {
 
 	state, err := term.MakeRaw(os.Stdin.Fd())
 	if err != nil {
-		log.Fatalf("making raw: %v", err)
+		log.Fatalf("设置为原始模式: %v", err)
 	}
 
 	defer term.Restore(os.Stdin.Fd(), state) //nolint:errcheck
 
 	drv, err := input.NewReader(os.Stdin, termType, 0)
 	if err != nil {
-		log.Fatalf("creating input driver: %v", err)
+		log.Fatalf("创建输入驱动: %v", err)
 	}
 
 	dialogWidth := lipgloss.Width(dialogUI) + dialogBoxStyle.GetHorizontalFrameSize()
@@ -418,13 +414,13 @@ func main() {
 		scr.Flush() //nolint:errcheck,gosec
 	}
 
-	// First render
+	// 首次渲染
 	render()
 
 	for {
 		evs, err := drv.ReadEvents()
 		if err != nil {
-			log.Fatalf("reading events: %v", err)
+			log.Fatalf("读取事件: %v", err)
 		}
 
 		for _, ev := range evs {
@@ -481,22 +477,19 @@ func colorGrid(xSteps, ySteps int) [][]string {
 	return grid
 }
 
-// applyGradient applies a gradient to the given string string.
+// applyGradient 对给定的字符串应用渐变效果。
 func applyGradient(base lipgloss.Style, input string, from, to color.Color) string {
-	// We want to get the graphemes of the input string, which is the number of
-	// characters as a human would see them.
+	// 我们想要获取输入字符串的字形，即人类看到的字符数量。
 	//
-	// We definitely don't want to use len(), because that returns the
-	// bytes. The rune count would get us closer but there are times, like with
-	// emojis, where the rune count is greater than the number of actual
-	// characters.
+	// 我们绝对不想使用 len()，因为它返回的是字节数。
+	// 符文计数会更接近，但在某些情况下，比如表情符号，符文计数会大于实际字符数。
 	g := uniseg.NewGraphemes(input)
 	var chars []string
 	for g.Next() {
 		chars = append(chars, g.Str())
 	}
 
-	// Genrate the blend.
+	// 生成混合色。
 	a, _ := colorful.MakeColor(to)
 	b, _ := colorful.MakeColor(from)
 	var output strings.Builder

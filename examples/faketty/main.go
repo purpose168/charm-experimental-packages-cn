@@ -1,7 +1,7 @@
 //go:build !windows
 // +build !windows
 
-// Package main demonstrates usage.
+// Package main 演示用法。
 package main
 
 import (
@@ -21,15 +21,15 @@ var (
 )
 
 func init() {
-	flag.IntVar(&rows, "rows", 24, "number of rows")
-	flag.IntVar(&cols, "cols", 80, "number of columns")
+	flag.IntVar(&rows, "rows", 24, "行数")
+	flag.IntVar(&cols, "cols", 80, "列数")
 	flag.Parse()
 }
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "usage: %s [command] [args...]\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "       %s -cols=80 -rows=24 [command] [args...]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "用法: %s [命令] [参数...]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "       %s -cols=80 -rows=24 [命令] [参数...]\n", os.Args[0])
 
 		os.Exit(1)
 	}
@@ -44,11 +44,11 @@ func main() {
 
 	ptm1, pts1, err := pty.Open()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating pty: %v\n", err)
+		fmt.Fprintf(os.Stderr, "创建 pty 错误: %v\n", err)
 		os.Exit(1)
 	}
 	if err := pty.Setsize(ptm1, &winsize); err != nil {
-		fmt.Fprintf(os.Stderr, "error setting pty size: %v\n", err)
+		fmt.Fprintf(os.Stderr, "设置 pty 大小错误: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -58,23 +58,23 @@ func main() {
 
 	ptm2, pts2, err := pty.Open()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating pty: %v\n", err)
+		fmt.Fprintf(os.Stderr, "创建 pty 错误: %v\n", err)
 		os.Exit(1)
 	}
 
 	if err := pty.Setsize(ptm2, &winsize); err != nil {
-		fmt.Fprintf(os.Stderr, "error setting pty size: %v\n", err)
+		fmt.Fprintf(os.Stderr, "设置 pty 大小错误: %v\n", err)
 		os.Exit(1)
 	}
 
 	go io.Copy(newStderr, ptm2) //nolint:errcheck
 
 	if err := syscall.Dup2(int(newStdin.Fd()), int(os.Stdin.Fd())); err != nil {
-		fmt.Fprintf(os.Stderr, "error duplicating stdin file descriptor: %v\n", err)
+		fmt.Fprintf(os.Stderr, "复制标准输入文件描述符错误: %v\n", err)
 		os.Exit(1)
 	}
 	if err := syscall.Dup2(int(newStdout.Fd()), int(os.Stdout.Fd())); err != nil {
-		fmt.Fprintf(os.Stderr, "error duplicating stdout file descriptor: %v\n", err)
+		fmt.Fprintf(os.Stderr, "复制标准输出文件描述符错误: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -85,7 +85,7 @@ func main() {
 	c.Stdin = newStdin
 
 	if err := c.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "error running command: %v\n", err)
+		fmt.Fprintf(os.Stderr, "运行命令错误: %v\n", err)
 		os.Exit(1)
 	}
 }

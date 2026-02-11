@@ -4,11 +4,11 @@
 package xpty
 
 import (
-	"github.com/charmbracelet/x/termios"
+	"github.com/purpose168/charm-experimental-packages-cn/termios"
 	"golang.org/x/sys/unix"
 )
 
-// setWinsize sets window size for the PTY.
+// setWinsize 设置 PTY 的窗口大小。
 func (p *UnixPty) setWinsize(width, height, x, y int) error {
 	var rErr error
 	if err := p.Control(func(fd uintptr) {
@@ -24,7 +24,7 @@ func (p *UnixPty) setWinsize(width, height, x, y int) error {
 	return rErr
 }
 
-// size returns the size of the PTY.
+// size 返回 PTY 的大小。
 func (p *UnixPty) size() (width, height int, err error) {
 	var rErr error
 	if err := p.Control(func(fd uintptr) {

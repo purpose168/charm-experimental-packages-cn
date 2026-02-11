@@ -24,13 +24,12 @@ func (c *ConPty) start(cmd *exec.Cmd) error {
 
 	cmd.Process, err = os.FindProcess(pid)
 	if err != nil {
-		// If we can't find the process via os.FindProcess, terminate the
-		// process as that's what we rely on for all further operations on the
-		// object.
+		// 如果我们无法通过 os.FindProcess 找到进程，终止该进程
+		// 因为我们依赖于该进程对象进行所有进一步的操作。
 		if tErr := windows.TerminateProcess(windows.Handle(proc), 1); tErr != nil {
-			return fmt.Errorf("failed to terminate process after process not found: %w", tErr)
+			return fmt.Errorf("在进程未找到后终止进程失败: %w", tErr)
 		}
-		return fmt.Errorf("failed to find process after starting: %w", err)
+		return fmt.Errorf("启动后找不到进程: %w", err)
 	}
 
 	return nil

@@ -11,17 +11,15 @@ import (
 	"github.com/bits-and-blooms/bitset"
 )
 
-// Sixels are a protocol for writing images to the terminal by writing a large blob of ANSI-escaped data.
-// They function by encoding columns of 6 pixels into a single character (in much the same way base64
-// encodes data 6 bits at a time). Sixel images are paletted, with a palette established at the beginning
-// of the image blob and pixels identifying palette entires by index while writing the pixel data.
+// Sixels 是一种通过写入大量 ANSI 转义数据来向终端写入图像的协议。
+// 它们的工作原理是将 6 像素的列编码为单个字符（与 base64 每 6 位编码数据的方式非常相似）。
+// Sixel 图像是调色板图像，在图像 blob 的开头建立调色板，像素在写入像素数据时通过索引标识调色板条目。
 //
-// Sixels are written one 6-pixel-tall band at a time, one color at a time. For each band, a single
-// color's pixels are written, then a carriage return is written to bring the "cursor" back to the
-// beginning of a band where a new color is selected and pixels written. This continues until the entire
-// band has been drawn, at which time a line break is written to begin the next band.
+// Sixel 每次写入一个 6 像素高的带（band），一次写入一种颜色。对于每个带，先写入单一颜色的像素，
+// 然后写入回车符将"光标"带回带的开头，在那里选择新颜色并写入像素。这将持续进行，直到绘制完整个带，
+// 此时写入换行符开始绘制下一个带。
 
-// Sixel control functions.
+// Sixel 控制函数。
 const (
 	LineBreak        byte = '-'
 	CarriageReturn   byte = '$'
@@ -30,13 +28,12 @@ const (
 	RasterAttribute  byte = '"'
 )
 
-// Encoder is a Sixel encoder. It encodes an image to Sixel data format.
+// Encoder 是一个 Sixel 编码器。它将图像编码为 Sixel 数据格式。
 type Encoder struct{}
 
-// Encode will accept an Image and write sixel data to a Writer. The sixel data
-// will be everything after the 'q' that ends the DCS parameters and before the ST
-// that ends the sequence.  That means it includes the pixel metrics and color
-// palette.
+// Encode 接受一个 Image 并向 Writer 写入 sixel 数据。Sixel 数据将是
+// 结束 DCS 参数的 'q' 之后、结束序列的 ST 之前的所有内容。
+// 这意味着它包括像素指标和调色板。
 func (e *Encoder) Encode(w io.Writer, img image.Image) error {
 	if img == nil {
 		return nil
@@ -44,9 +41,9 @@ func (e *Encoder) Encode(w io.Writer, img image.Image) error {
 
 	imageBounds := img.Bounds()
 
-	// Set the default raster 1:1 aspect ratio if it's not set
+	// 如果未设置，则设置默认的光栅 1:1 宽高比
 	if _, err := WriteRaster(w, 1, 1, imageBounds.Dx(), imageBounds.Dy()); err != nil {
-		return fmt.Errorf("error encoding raster: %w", err)
+		return fmt.Errorf("编码光栅时出错: %w", err)
 	}
 
 	palette := newSixelPalette(img, MaxColors)
@@ -70,10 +67,10 @@ func (e *Encoder) Encode(w io.Writer, img image.Image) error {
 }
 
 func (e *Encoder) encodePaletteColor(w io.Writer, paletteIndex int, c sixelColor) {
-	// Initializing palette entries
+	// 初始化调色板条目
 	// #<a>;<b>;<c>;<d>;<e>
-	// a = palette index
-	// b = color type, 2 is RGB
+	// a = 调色板索引
+	// b = 颜色类型，2 表示 RGB
 	// c = R
 	// d = G
 	// e = B
@@ -88,13 +85,11 @@ func (e *Encoder) encodePaletteColor(w io.Writer, paletteIndex int, c sixelColor
 	io.WriteString(w, strconv.Itoa(int(c.Blue)))  //nolint:errcheck,gosec
 }
 
-// sixelBuilder is a temporary structure used to create a SixelImage. It handles
-// breaking pixels out into bits, and then encoding them into a sixel data string. RLE
-// handling is included.
+// sixelBuilder 是一个临时结构，用于创建 SixelImage。它处理将像素分解为位，
+// 然后将它们编码为 sixel 数据字符串。包括 RLE 处理。
 //
-// Making use of a sixelBuilder is done in two phases.  First, SetColor is used to write all
-// pixels to the internal BitSet data.  Then, GeneratePixels is called to retrieve a string
-// representing the pixel data encoded in the sixel format.
+// 使用 sixelBuilder 分两个阶段完成。首先，使用 SetColor 将所有像素写入内部 BitSet 数据。
+// 然后，调用 GeneratePixels 检索以 sixel 格式编码的像素数据字符串。
 type sixelBuilder struct {
 	SixelPalette sixelPalette
 
@@ -108,7 +103,7 @@ type sixelBuilder struct {
 	repeatCount int
 }
 
-// newSixelBuilder creates a sixelBuilder and prepares it for writing.
+// newSixelBuilder 创建一个 sixelBuilder 并准备写入。
 func newSixelBuilder(width, height int, palette sixelPalette) sixelBuilder {
 	scratch := sixelBuilder{
 		imageWidth:   width,
@@ -119,7 +114,7 @@ func newSixelBuilder(width, height int, palette sixelPalette) sixelBuilder {
 	return scratch
 }
 
-// BandHeight returns the number of six-pixel bands this image consists of.
+// BandHeight 返回此图像由多少个 6 像素带组成。
 func (s *sixelBuilder) BandHeight() int {
 	bandHeight := s.imageHeight / 6
 	if s.imageHeight%6 != 0 {
@@ -129,8 +124,7 @@ func (s *sixelBuilder) BandHeight() int {
 	return bandHeight
 }
 
-// SetColor will write a single pixel to sixelBuilder's internal bitset data to be used by
-// GeneratePixels.
+// SetColor 将单个像素写入 sixelBuilder 的内部位集数据，供 GeneratePixels 使用。
 func (s *sixelBuilder) SetColor(x int, y int, color color.Color) {
 	bandY := y / 6
 	paletteIndex := s.SixelPalette.ColorIndex(sixelConvertColor(color))
@@ -139,16 +133,15 @@ func (s *sixelBuilder) SetColor(x int, y int, color color.Color) {
 	s.pixelBands.Set(uint(bit)) //nolint:gosec
 }
 
-// GeneratePixels is used to write the pixel data to the internal imageData string builder.
-// All pixels in the image must be written to the sixelBuilder using SetColor before this method is
-// called. This method returns a string that represents the pixel data.  Sixel strings consist of five parts:
+// GeneratePixels 用于将像素数据写入内部的 imageData 字符串构建器。
+// 在调用此方法之前，必须使用 SetColor 将图像中的所有像素写入 sixelBuilder。
+// 此方法返回一个表示像素数据的字符串。Sixel 字符串由五部分组成：
 // ISC <header> <palette> <pixels> ST
-// The header contains some arbitrary options indicating how the sixel image is to be drawn.
-// The palette maps palette indices to RGB colors
-// The pixels indicates which pixels are to be drawn with which palette colors.
+// header 包含一些任意选项，指示如何绘制 sixel 图像。
+// palette 将调色板索引映射到 RGB 颜色
+// pixels 指示使用哪些调色板颜色绘制哪些像素。
 //
-// GeneratePixels only produces the <pixels> part of the string.  The rest is written by
-// Style.RenderSixelImage.
+// GeneratePixels 仅生成字符串的 <pixels> 部分。其余部分由 Style.RenderSixelImage 写入。
 func (s *sixelBuilder) GeneratePixels() string {
 	s.imageData = strings.Builder{}
 	bandHeight := s.BandHeight()
@@ -162,7 +155,7 @@ func (s *sixelBuilder) GeneratePixels() string {
 
 		for paletteIndex := range s.SixelPalette.PaletteColors {
 			if s.SixelPalette.PaletteColors[paletteIndex].Alpha < 1 {
-				// Don't draw anything for purely transparent pixels
+				// 不为完全透明的像素绘制任何内容
 				continue
 			}
 
@@ -171,7 +164,7 @@ func (s *sixelBuilder) GeneratePixels() string {
 
 			firstSetBitInBand, anySet := s.pixelBands.NextSet(firstColorBit)
 			if !anySet || firstSetBitInBand >= nextColorBit {
-				// Color not appearing in this row
+				// 此行中不出现该颜色
 				continue
 			}
 
@@ -215,8 +208,8 @@ func (s *sixelBuilder) GeneratePixels() string {
 	return s.imageData.String()
 }
 
-// writeImageRune will write a single line of six pixels to pixel data.  The data
-// doesn't get written to the imageData, it gets buffered for the purposes of RLE.
+// writeImageRune 将单个像素行（6 个像素）写入像素数据。数据不会直接写入 imageData，
+// 而是会被缓冲以用于 RLE 处理。
 func (s *sixelBuilder) writeImageRune(r byte) {
 	if r == s.repeatByte {
 		s.repeatCount++
@@ -228,8 +221,7 @@ func (s *sixelBuilder) writeImageRune(r byte) {
 	s.repeatCount = 1
 }
 
-// writeControlRune will write a special rune such as a new line or carriage return
-// rune. It will call flushRepeats first, if necessary.
+// writeControlRune 将特殊字符（如换行符或回车符）写入。如果需要，它将首先调用 flushRepeats。
 func (s *sixelBuilder) writeControlRune(r byte) {
 	if s.repeatCount > 0 {
 		s.flushRepeats()
@@ -240,14 +232,14 @@ func (s *sixelBuilder) writeControlRune(r byte) {
 	s.imageData.WriteByte(r)
 }
 
-// flushRepeats is used to actually write the current repeatByte to the imageData when
-// it is about to change. This buffering is used to manage RLE in the sixelBuilder.
+// flushRepeats 用于在实际更改时将当前的 repeatByte 写入 imageData。
+// 此缓冲用于管理 sixelBuilder 中的 RLE。
 func (s *sixelBuilder) flushRepeats() {
 	if s.repeatCount == 0 {
 		return
 	}
 
-	// Only write using the RLE form if it's actually providing space savings
+	// 仅在实际提供空间节省时才使用 RLE 形式写入
 	if s.repeatCount > 3 {
 		WriteRepeat(&s.imageData, s.repeatCount, s.repeatByte) //nolint:errcheck,gosec
 		return

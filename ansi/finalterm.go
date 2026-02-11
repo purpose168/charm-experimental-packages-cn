@@ -2,22 +2,21 @@ package ansi
 
 import "strings"
 
-// FinalTerm returns an escape sequence that is used for shell integrations.
-// Originally, FinalTerm designed the protocol hence the name.
+// FinalTerm 返回一个用于 shell 集成的转义序列。
+// 最初由 FinalTerm 设计了该协议，因此得名。
 //
 //	OSC 133 ; Ps ; Pm ST
 //	OSC 133 ; Ps ; Pm BEL
 //
-// See: https://iterm2.com/documentation-shell-integration.html
+// 请参阅：https://iterm2.com/documentation-shell-integration.html
 func FinalTerm(pm ...string) string {
 	return "\x1b]133;" + strings.Join(pm, ";") + "\x07"
 }
 
-// FinalTermPrompt returns an escape sequence that is used for shell
-// integrations prompt marks. This is sent just before the start of the shell
-// prompt.
+// FinalTermPrompt 返回一个用于 shell 集成提示符标记的转义序列。
+// 它在 shell 提示符开始之前发送。
 //
-// This is an alias for FinalTerm("A").
+// 这是 FinalTerm("A") 的别名。
 func FinalTermPrompt(pm ...string) string {
 	if len(pm) == 0 {
 		return FinalTerm("A")
@@ -25,11 +24,10 @@ func FinalTermPrompt(pm ...string) string {
 	return FinalTerm(append([]string{"A"}, pm...)...)
 }
 
-// FinalTermCmdStart returns an escape sequence that is used for shell
-// integrations command start marks. This is sent just after the end of the
-// shell prompt, before the user enters a command.
+// FinalTermCmdStart 返回一个用于 shell 集成命令开始标记的转义序列。
+// 它在 shell 提示符结束之后、用户输入命令之前发送。
 //
-// This is an alias for FinalTerm("B").
+// 这是 FinalTerm("B") 的别名。
 func FinalTermCmdStart(pm ...string) string {
 	if len(pm) == 0 {
 		return FinalTerm("B")
@@ -37,11 +35,10 @@ func FinalTermCmdStart(pm ...string) string {
 	return FinalTerm(append([]string{"B"}, pm...)...)
 }
 
-// FinalTermCmdExecuted returns an escape sequence that is used for shell
-// integrations command executed marks. This is sent just before the start of
-// the command output.
+// FinalTermCmdExecuted 返回一个用于 shell 集成命令执行标记的转义序列。
+// 它在命令输出开始之前发送。
 //
-// This is an alias for FinalTerm("C").
+// 这是 FinalTerm("C") 的别名。
 func FinalTermCmdExecuted(pm ...string) string {
 	if len(pm) == 0 {
 		return FinalTerm("C")
@@ -49,16 +46,13 @@ func FinalTermCmdExecuted(pm ...string) string {
 	return FinalTerm(append([]string{"C"}, pm...)...)
 }
 
-// FinalTermCmdFinished returns an escape sequence that is used for shell
-// integrations command finished marks.
+// FinalTermCmdFinished 返回一个用于 shell 集成命令完成标记的转义序列。
 //
-// If the command was sent after
-// [FinalTermCmdStart], it indicates that the command was aborted. If the
-// command was sent after [FinalTermCmdExecuted], it indicates the end of the
-// command output. If neither was sent, [FinalTermCmdFinished] should be
-// ignored.
+// 如果在 [FinalTermCmdStart] 之后发送，表示命令已中止。
+// 如果在 [FinalTermCmdExecuted] 之后发送，表示命令输出结束。
+// 如果之前都没有发送，[FinalTermCmdFinished] 应该被忽略。
 //
-// This is an alias for FinalTerm("D").
+// 这是 FinalTerm("D") 的别名。
 func FinalTermCmdFinished(pm ...string) string {
 	if len(pm) == 0 {
 		return FinalTerm("D")

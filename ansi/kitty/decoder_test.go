@@ -10,8 +10,9 @@ import (
 	"testing"
 )
 
+// TestDecoder_Decode 测试解码器的解码功能。
 func TestDecoder_Decode(t *testing.T) {
-	// Helper function to create compressed data
+	// 辅助函数：创建压缩数据
 	compress := func(data []byte) []byte {
 		var buf bytes.Buffer
 		w := zlib.NewWriter(&buf)
@@ -35,10 +36,10 @@ func TestDecoder_Decode(t *testing.T) {
 				Height: 2,
 			},
 			input: []byte{
-				255, 0, 0, 255, // Red pixel
-				0, 0, 255, 255, // Blue pixel
-				0, 0, 255, 255, // Blue pixel
-				255, 0, 0, 255, // Red pixel
+				255, 0, 0, 255, // 红色像素
+				0, 0, 255, 255, // 蓝色像素
+				0, 0, 255, 255, // 蓝色像素
+				255, 0, 0, 255, // 红色像素
 			},
 			want: func() image.Image {
 				img := image.NewRGBA(image.Rect(0, 0, 2, 2))
@@ -58,10 +59,10 @@ func TestDecoder_Decode(t *testing.T) {
 				Height: 2,
 			},
 			input: []byte{
-				255, 0, 0, // Red pixel
-				0, 0, 255, // Blue pixel
-				0, 0, 255, // Blue pixel
-				255, 0, 0, // Red pixel
+				255, 0, 0, // 红色像素
+				0, 0, 255, // 蓝色像素
+				0, 0, 255, // 蓝色像素
+				255, 0, 0, // 红色像素
 			},
 			want: func() image.Image {
 				img := image.NewRGBA(image.Rect(0, 0, 2, 2))
@@ -101,7 +102,7 @@ func TestDecoder_Decode(t *testing.T) {
 			name: "PNG format",
 			decoder: Decoder{
 				Format: PNG,
-				// Width and height are embedded and inferred from the PNG data
+				// 宽度和高度嵌入在 PNG 数据中并从中推断
 			},
 			input: func() []byte {
 				img := image.NewRGBA(image.Rect(0, 0, 1, 1))
@@ -135,7 +136,7 @@ func TestDecoder_Decode(t *testing.T) {
 				Width:  2,
 				Height: 2,
 			},
-			input:   []byte{255, 0, 0}, // Incomplete pixel data
+			input:   []byte{255, 0, 0}, // 不完整的像素数据
 			want:    nil,
 			wantErr: true,
 		},
@@ -147,7 +148,7 @@ func TestDecoder_Decode(t *testing.T) {
 				Height:     2,
 				Decompress: true,
 			},
-			input:   []byte{1, 2, 3}, // Invalid zlib data
+			input:   []byte{1, 2, 3}, // 无效的 zlib 数据
 			want:    nil,
 			wantErr: true,
 		},
@@ -181,19 +182,19 @@ func TestDecoder_Decode(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Decode() output mismatch")
+				t.Errorf("Decode() 输出不匹配")
 				if bounds := got.Bounds(); bounds != tt.want.Bounds() {
-					t.Errorf("bounds got %v, want %v", bounds, tt.want.Bounds())
+					t.Errorf("边界范围得到 %v，需要 %v", bounds, tt.want.Bounds())
 				}
 
-				// Compare pixels
+				// 比较像素
 				bounds := got.Bounds()
 				for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 					for x := bounds.Min.X; x < bounds.Max.X; x++ {
 						gotColor := got.At(x, y)
 						wantColor := tt.want.At(x, y)
 						if !reflect.DeepEqual(gotColor, wantColor) {
-							t.Errorf("pixel at (%d,%d) = %v, want %v", x, y, gotColor, wantColor)
+							t.Errorf("像素位置 (%d,%d) = %v，需要 %v", x, y, gotColor, wantColor)
 						}
 					}
 				}
@@ -202,6 +203,7 @@ func TestDecoder_Decode(t *testing.T) {
 	}
 }
 
+// TestDecoder_DecodeEdgeCases 测试解码器的边界情况处理。
 func TestDecoder_DecodeEdgeCases(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -227,16 +229,16 @@ func TestDecoder_DecodeEdgeCases(t *testing.T) {
 				Height: 1,
 			},
 			input:   []byte{255, 0, 0, 255},
-			wantErr: false, // The image package handles this gracefully
+			wantErr: false, // image 包优雅地处理了这种情况
 		},
 		{
 			name: "very large dimensions",
 			decoder: Decoder{
 				Format: RGBA,
 				Width:  1,
-				Height: 1000000, // Very large height
+				Height: 1000000, // 非常大的高度
 			},
-			input:   []byte{255, 0, 0, 255}, // Not enough data
+			input:   []byte{255, 0, 0, 255}, // 数据不足
 			wantErr: true,
 		},
 	}

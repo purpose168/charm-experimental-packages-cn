@@ -9,13 +9,13 @@ import (
 	"github.com/sourcegraph/jsonrpc2"
 )
 
-// Handler is a function that handles incoming messages.
+// Handler 是处理传入消息的函数。
 type Handler func(ctx context.Context, method string, params json.RawMessage) (any, error)
 
-// NotificationHandler is a function that handles incoming notifications.
+// NotificationHandler 是处理传入通知的函数。
 type NotificationHandler func(ctx context.Context, method string, params json.RawMessage)
 
-// Router routes incoming messages to appropriate handlers.
+// Router 将传入的消息路由到相应的处理程序。
 type Router struct {
 	mu                   sync.RWMutex
 	handlers             map[string]Handler
@@ -23,7 +23,7 @@ type Router struct {
 	defaultHandler       Handler
 }
 
-// NewRouter creates a new message router.
+// NewRouter 创建一个新的消息路由器。
 func NewRouter() *Router {
 	return &Router{
 		handlers:             make(map[string]Handler),
@@ -31,33 +31,33 @@ func NewRouter() *Router {
 	}
 }
 
-// Handle registers a handler for a specific method.
+// Handle 为特定方法注册一个处理程序。
 func (r *Router) Handle(method string, handler Handler) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.handlers[method] = handler
 }
 
-// HandleNotification registers a notification handler for a specific method.
+// HandleNotification 为特定方法注册一个通知处理程序。
 func (r *Router) HandleNotification(method string, handler NotificationHandler) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.notificationHandlers[method] = handler
 }
 
-// SetDefaultHandler sets the default handler for unregistered methods.
+// SetDefaultHandler 为未注册的方法设置默认处理程序。
 func (r *Router) SetDefaultHandler(handler Handler) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.defaultHandler = handler
 }
 
-// Route routes a message to the appropriate handler.
+// Route 将消息路由到相应的处理程序。
 func (r *Router) Route(ctx context.Context, req *jsonrpc2.Request) (any, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	// Check if it's a notification (no ID)
+	// 检查是否为通知（无 ID）
 	if req.ID == (jsonrpc2.ID{}) {
 		if handler, ok := r.notificationHandlers[req.Method]; ok {
 			handler(ctx, req.Method, *req.Params)
@@ -65,12 +65,12 @@ func (r *Router) Route(ctx context.Context, req *jsonrpc2.Request) (any, error) 
 		return nil, nil
 	}
 
-	// It's a request
+	// 是请求
 	if handler, ok := r.handlers[req.Method]; ok {
 		return handler(ctx, req.Method, *req.Params)
 	}
 
-	// Use default handler if available
+	// 如果有默认处理程序，则使用
 	if r.defaultHandler != nil {
 		return r.defaultHandler(ctx, req.Method, *req.Params)
 	}
@@ -78,21 +78,21 @@ func (r *Router) Route(ctx context.Context, req *jsonrpc2.Request) (any, error) 
 	return nil, fmt.Errorf("no handler for method: %s", req.Method)
 }
 
-// MessageType represents the type of a JSON-RPC message.
+// MessageType 表示 JSON-RPC 消息的类型。
 type MessageType int
 
 const (
-	// RequestMessage is a request that expects a response.
+	// RequestMessage 是一个需要响应的请求。
 	RequestMessage MessageType = iota
-	// NotificationMessage is a notification that doesn't expect a response.
+	// NotificationMessage 是一个不需要响应的通知。
 	NotificationMessage
-	// ResponseMessage is a response to a request.
+	// ResponseMessage 是对请求的响应。
 	ResponseMessage
-	// ErrorMessage is an error response.
+	// ErrorMessage 是错误响应。
 	ErrorMessage
 )
 
-// ParseMessageType determines the type of a JSON-RPC message.
+// ParseMessageType 确定 JSON-RPC 消息的类型。
 func ParseMessageType(msg *Message) MessageType {
 	if msg.Error != nil {
 		return ErrorMessage

@@ -1,15 +1,17 @@
 package ansi
 
 import (
+	"fmt"
 	"image/color"
 	"testing"
 )
 
+// TestSetPalette 测试 SetPalette 函数的功能，该函数设置控制台调色板颜色
 func TestSetPalette(t *testing.T) {
 	cases := []struct {
-		index int
-		color color.Color
-		want  string
+		index int         // 调色板索引
+		color color.Color // 颜色
+		want  string      // 预期结果
 	}{
 		{-1, color.RGBA{255, 0, 0, 255}, ""},
 		{0, nil, ""},
@@ -35,7 +37,12 @@ func TestSetPalette(t *testing.T) {
 	for _, c := range cases {
 		got := SetPalette(c.index, c.color)
 		if got != c.want {
-			t.Errorf("SetPalette(%d, %v) = %q; want %q", c.index, c.color, got, c.want)
+			colorStr := "nil"
+			if c.color != nil {
+				r, g, b, _ := c.color.RGBA()
+				colorStr = fmt.Sprintf("#%02x%02x%02x", uint8(r>>8), uint8(g>>8), uint8(b>>8))
+			}
+			t.Errorf("SetPalette(%d, %s) = %q; want %q", c.index, colorStr, got, c.want)
 		}
 	}
 }

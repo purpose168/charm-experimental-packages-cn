@@ -1,4 +1,4 @@
-// Package editor provides functionality for opening files in external editors.
+// editor 包提供在外部编辑器中打开文件的功能
 package editor
 
 import (
@@ -13,23 +13,31 @@ import (
 )
 
 const (
-	defaultEditor        = "nano"
-	defaultEditorWindows = "notepad"
+	defaultEditor        = "nano"         // 默认编辑器（非 Windows 平台）
+	defaultEditorWindows = "notepad"      // 默认编辑器（Windows 平台）
 )
 
-// Option defines an editor option.
+// Option 定义编辑器选项
 //
-// An Option may act differently in some editors, or not be supported in
-// some of them.
+// Option 在某些编辑器中可能有不同的行为，或者在某些编辑器中不被支持
+//
+// 参数：
+//   - editor: 编辑器名称
+//   - filename: 文件名
+//
+// 返回值：
+//   - []string: 编辑器参数
+//   - bool: 路径是否已包含在参数中
+
 type Option func(editor, filename string) (args []string, pathInArgs bool)
 
-// OpenAtLine opens the file at the given line number in supported editors.
+// OpenAtLine 在支持的编辑器中打开文件到指定行号
 //
-// Deprecated: use LineNumber instead.
+// 已废弃：请使用 LineNumber 代替
 func OpenAtLine(n int) Option { return LineNumber(n) }
 
-// LineNumber opens the file at the given line number in supported editors. If
-// [number] is less than line 1, the file will be opened at line 1.
+// LineNumber 在支持的编辑器中打开文件到指定行号。
+// 如果 [number] 小于第 1 行，文件将在第 1 行打开
 func LineNumber(number int) Option {
 	number = max(1, number)
 	plusLineEditors := []string{"vi", "vim", "nvim", "nano", "emacs", "kak", "gedit"}
@@ -47,7 +55,7 @@ func LineNumber(number int) Option {
 	}
 }
 
-// EndOfLine opens the file at the end of the line in supported editors.
+// EndOfLine 在支持的编辑器中打开文件到行尾
 func EndOfLine() Option {
 	return func(editor, _ string) (args []string, pathInArgs bool) {
 		switch editor {
@@ -58,9 +66,9 @@ func EndOfLine() Option {
 	}
 }
 
-// AtPosition opens the file at the given line and column in supported editors.
-// If line or column is less than 1, they will be set to 1.
-// If the editor only supports line numbers, the column will be ignored.
+// AtPosition 在支持的编辑器中打开文件到指定的行和列。
+// 如果行或列小于 1，它们将被设置为 1。
+// 如果编辑器只支持行号，列将被忽略。
 func AtPosition(line, column int) Option {
 	line = max(line, 1)
 	column = max(column, 1)
@@ -85,24 +93,21 @@ func AtPosition(line, column int) Option {
 	}
 }
 
-// Cmd returns a *exec.Cmd editing the given path with $EDITOR or nano if no
-// $EDITOR is set.
-// Deprecated: use Command or CommandContext instead.
+// Cmd 返回一个 *exec.Cmd，使用 $EDITOR 或 nano（如果未设置 $EDITOR）编辑给定路径
+// 已废弃：请使用 Command 或 CommandContext 代替
 func Cmd(app, path string, options ...Option) (*exec.Cmd, error) {
 	return CommandContext(context.Background(), app, path, options...)
 }
 
-// Command returns a *exec.Cmd editing the given path with $EDITOR or nano if
-// no $EDITOR is set.
+// Command 返回一个 *exec.Cmd，使用 $EDITOR 或 nano（如果未设置 $EDITOR）编辑给定路径
 func Command(app, path string, options ...Option) (*exec.Cmd, error) {
 	return CommandContext(context.Background(), app, path, options...)
 }
 
-// CommandContext returns a *exec.Cmd editing the given path with $EDITOR or nano
-// if no $EDITOR is set.
+// CommandContext 返回一个 *exec.Cmd，使用 $EDITOR 或 nano（如果未设置 $EDITOR）编辑给定路径
 func CommandContext(ctx context.Context, app, path string, options ...Option) (*exec.Cmd, error) {
 	if os.Getenv("SNAP_REVISION") != "" {
-		return nil, fmt.Errorf("did you install with Snap? %[1]s is sandboxed and unable to open an editor. Please install %[1]s with Go or another package manager to enable editing", app)
+		return nil, fmt.Errorf("您是通过 Snap 安装的吗？%[1]s 被沙箱化，无法打开编辑器。请使用 Go 或其他包管理器安装 %[1]s 以启用编辑功能", app)
 	}
 
 	editor, args := getEditor()
@@ -123,6 +128,8 @@ func CommandContext(ctx context.Context, app, path string, options ...Option) (*
 	return exec.CommandContext(ctx, editor, args...), nil
 }
 
+// getEditor 获取编辑器命令和参数
+// 首先从 EDITOR 环境变量获取，如果未设置则使用默认编辑器
 func getEditor() (string, []string) {
 	editor := strings.Fields(os.Getenv("EDITOR"))
 	if len(editor) > 1 {

@@ -5,11 +5,11 @@ import (
 	"runtime"
 )
 
-// readPasswordLine reads from reader until it finds \n or io.EOF.
-// The slice returned does not include the \n.
-// readPasswordLine also ignores any \r it finds.
-// Windows uses \r as end of line. So, on Windows, readPasswordLine
-// reads until it finds \r and ignores any \n it finds during processing.
+// readPasswordLine 从读取器读取直到找到 \n 或 io.EOF。
+// 返回的切片不包含 \n。
+// readPasswordLine 还会忽略它找到的任何 \r。
+// Windows 使用 \r 作为行尾。因此，在 Windows 上，readPasswordLine
+// 读取直到找到 \r，并忽略处理过程中找到的任何 \n。
 func readPasswordLine(reader io.Reader) ([]byte, error) {
 	var buf [1]byte
 	var ret []byte

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 		<box border="rounded" margin="1">
 			<text font-weight="bold" foreground-color="cyan" alignment="center">Advanced Layout Demo</text>
 		</box>
-		
+
 		<!-- Flexible content area that grows to fill space -->
 		<flex grow="1">
 			<box border="normal" margin-left="2" margin-right="2">
@@ -33,20 +33,20 @@ func main() {
 				</vstack>
 			</box>
 		</flex>
-		
+
 		<!-- Footer with margin -->
 		<box margin-top="1" margin-bottom="1">
 			<text foreground-color="gray" alignment="center">Press any key to exit</text>
 		</box>
 	</vstack>
-	
+
 	<!-- Overlay notification in top-right corner -->
 	<positioned right="2" y="2">
 		<box border="thick" padding="1" border-color="yellow">
 			<text font-weight="bold" foreground-color="yellow">NEW!</text>
 		</box>
 	</positioned>
-	
+
 	<!-- Bottom-right status indicator -->
 	<positioned right="3" bottom="2">
 		<box border="rounded" padding="1">

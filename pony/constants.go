@@ -1,6 +1,6 @@
 package pony
 
-// Border styles.
+// 边框样式。
 const (
 	BorderNone    = "none"
 	BorderNormal  = "normal"
@@ -10,16 +10,16 @@ const (
 	BorderHidden  = "hidden"
 )
 
-// Alignment constants.
+// 对齐常量。
 const (
-	AlignmentLeading  = "leading"  // Horizontal: left side
-	AlignmentCenter   = "center"   // Horizontal and vertical: center
-	AlignmentTrailing = "trailing" // Horizontal: right side
-	AlignmentTop      = "top"      // Vertical: top
-	AlignmentBottom   = "bottom"   // Vertical: bottom
+	AlignmentLeading  = "leading"  // 水平方向：左侧
+	AlignmentCenter   = "center"   // 水平和垂直方向：居中
+	AlignmentTrailing = "trailing" // 水平方向：右侧
+	AlignmentTop      = "top"      // 垂直方向：顶部
+	AlignmentBottom   = "bottom"   // 垂直方向：底部
 )
 
-// Size constraint units.
+// 尺寸约束单位。
 const (
 	UnitAuto    = "auto"
 	UnitMin     = "min"
@@ -27,7 +27,7 @@ const (
 	UnitPercent = "%"
 )
 
-// Underline styles (matching UV).
+// 下划线样式（匹配 UV）。
 const (
 	UnderlineNone   = "none"
 	UnderlineSingle = "single"
@@ -38,18 +38,18 @@ const (
 	UnderlineSolid  = "solid"
 )
 
-// Text decoration styles.
+// 文本装饰样式。
 const (
 	DecorationUnderline     = "underline"
 	DecorationStrikethrough = "strikethrough"
 )
 
-// Font weight values.
+// 字重值。
 const (
 	FontWeightBold = "bold"
 )
 
-// Font style values.
+// 字体样式值。
 const (
 	FontStyleItalic = "italic"
 )

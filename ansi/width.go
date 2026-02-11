@@ -3,25 +3,23 @@ package ansi
 import (
 	"bytes"
 
-	"github.com/charmbracelet/x/ansi/parser"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 )
 
-// Strip removes ANSI escape codes from a string.
+// Strip 从字符串中移除 ANSI 转义码。
 func Strip(s string) string {
 	var (
-		buf    bytes.Buffer         // buffer for collecting printable characters
-		ri     int                  // rune index
-		rw     int                  // rune width
-		pstate = parser.GroundState // initial state
+		buf    bytes.Buffer         // 用于收集可打印字符的缓冲区
+		ri     int                  // 符文索引
+		rw     int                  // 符文宽度
+		pstate = parser.GroundState // 初始状态
 	)
 
-	// This implements a subset of the Parser to only collect runes and
-	// printable characters.
+	// 这里实现了解析器的一个子集，仅收集符文和可打印字符。
 	for i := range len(s) {
 		if pstate == parser.Utf8State {
-			// During this state, collect rw bytes to form a valid rune in the
-			// buffer. After getting all the rune bytes into the buffer,
-			// transition to GroundState and reset the counters.
+			// 在这个状态下，收集 rw 个字节以在缓冲区中形成有效的符文。
+			// 将所有符文字节放入缓冲区后，转换到 GroundState 并重置计数器。
 			buf.WriteByte(s[i])
 			ri++
 			if ri < rw {
@@ -37,18 +35,18 @@ func Strip(s string) string {
 		switch action {
 		case parser.CollectAction:
 			if state == parser.Utf8State {
-				// This action happens when we transition to the Utf8State.
+				// 当我们转换到 Utf8State 时会发生此操作。
 				rw = utf8ByteLen(s[i])
 				buf.WriteByte(s[i])
 				ri++
 			}
 		case parser.PrintAction, parser.ExecuteAction:
-			// collects printable ASCII and non-printable characters
+			// 收集可打印的 ASCII 和不可打印的字符
 			buf.WriteByte(s[i])
 		}
 
-		// Transition to the next state.
-		// The Utf8State is managed separately above.
+		// 转换到下一个状态。
+		// Utf8State 在上面单独管理。
 		if pstate != parser.Utf8State {
 			pstate = state
 		}
@@ -57,20 +55,16 @@ func Strip(s string) string {
 	return buf.String()
 }
 
-// StringWidth returns the width of a string in cells. This is the number of
-// cells that the string will occupy when printed in a terminal. ANSI escape
-// codes are ignored and wide characters (such as East Asians and emojis) are
-// accounted for.
-// This treats the text as a sequence of grapheme clusters.
+// StringWidth 返回字符串在单元格中的宽度。这是字符串在终端中打印时将占用的单元格数。
+// 忽略 ANSI 转义码，并考虑宽字符（如东亚字符和表情符号）。
+// 此函数将文本视为字形集群的序列。
 func StringWidth(s string) int {
 	return stringWidth(GraphemeWidth, s)
 }
 
-// StringWidthWc returns the width of a string in cells. This is the number of
-// cells that the string will occupy when printed in a terminal. ANSI escape
-// codes are ignored and wide characters (such as East Asians and emojis) are
-// accounted for.
-// This treats the text as a sequence of wide characters and runes.
+// StringWidthWc 返回字符串在单元格中的宽度。这是字符串在终端中打印时将占用的单元格数。
+// 忽略 ANSI 转义码，并考虑宽字符（如东亚字符和表情符号）。
+// 此函数将文本视为宽字符和符文的序列。
 func StringWidthWc(s string) int {
 	return stringWidth(WcWidth, s)
 }

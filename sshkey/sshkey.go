@@ -1,4 +1,4 @@
-// Package sshkey provides utilities for parsing SSH private keys with passphrase support.
+// Package sshkey 提供用于解析带密码短语支持的 SSH 私钥的工具。
 package sshkey
 
 import (
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// Open reads the path, and parses the key.
+// Open 读取路径并解析密钥。
 func Open(keyPath string) (ssh.Signer, error) {
 	pemBytes, err := os.ReadFile(keyPath)
 	if err != nil {
@@ -19,18 +19,16 @@ func Open(keyPath string) (ssh.Signer, error) {
 	return Parse(keyPath, pemBytes)
 }
 
-// Parse tries to parse the given PEM into a ssh.Signer.
-// If the key is encrypted, it will ask for the passphrase.
-// The 'identifier' is used to identify the key to the user when asking for the
-// passphrase.
+// Parse 尝试将给定的 PEM 解析为 ssh.Signer。
+// 如果密钥已加密，它会要求输入密码短语。
+// 'identifier' 用于在要求密码短语时向用户标识密钥。
 func Parse(identifier string, pemBytes []byte) (ssh.Signer, error) {
 	return doParse(identifier, pemBytes, ssh.ParsePrivateKey, ssh.ParsePrivateKeyWithPassphrase)
 }
 
-// ParseRaw tries to parse the given PEM into a private key.
-// If the key is encrypted, it will ask for the passphrase.
-// The 'identifier' is used to identify the key to the user when asking for the
-// passphrase.
+// ParseRaw 尝试将给定的 PEM 解析为私钥。
+// 如果密钥已加密，它会要求输入密码短语。
+// 'identifier' 用于在要求密码短语时向用户标识密钥。
 func ParseRaw(identifier string, pemBytes []byte) (any, error) {
 	return doParse(identifier, pemBytes, ssh.ParseRawPrivateKey, ssh.ParseRawPrivateKeyWithPassphrase)
 }

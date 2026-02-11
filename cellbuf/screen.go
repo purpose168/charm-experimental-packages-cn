@@ -9,32 +9,26 @@ import (
 	"sync"
 
 	"github.com/charmbracelet/colorprofile"
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/term"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
-// ErrInvalidDimensions is returned when the dimensions of a window are invalid
-// for the operation.
+// ErrInvalidDimensions 当窗口尺寸对于操作无效时返回
 var ErrInvalidDimensions = errors.New("invalid dimensions")
 
-// notLocal returns whether the coordinates are not considered local movement
-// using the defined thresholds.
-// This takes the number of columns, and the coordinates of the current and
-// target positions.
+// notLocal 使用定义的阈值返回坐标是否不被视为本地移动
+// 接收列数以及当前和目标位置的坐标
 func notLocal(cols, fx, fy, tx, ty int) bool {
-	// The typical distance for a [ansi.CUP] sequence. Anything less than this
-	// is considered local movement.
+	// [ansi.CUP] 序列的典型距离。小于此值的被视为本地移动
 	const longDist = 8 - 1
 	return (tx > longDist) &&
 		(tx < cols-1-longDist) &&
 		(abs(ty-fy)+abs(tx-fx) > longDist)
 }
 
-// relativeCursorMove returns the relative cursor movement sequence using one or two
-// of the following sequences [ansi.CUU], [ansi.CUD], [ansi.CUF], [ansi.CUB],
-// [ansi.VPA], [ansi.HPA].
-// When overwrite is true, this will try to optimize the sequence by using the
-// screen cells values to move the cursor instead of using escape sequences.
+// relativeCursorMove 返回使用以下序列之一或两个的相对光标移动序列：
+// [ansi.CUU], [ansi.CUD], [ansi.CUF], [ansi.CUB], [ansi.VPA], [ansi.HPA]
+// 当 overwrite 为 true 时，会尝试通过使用屏幕单元格值而不是转义序列来优化移动光标
 func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBackspace bool) string {
 	var seq strings.Builder
 
@@ -45,7 +39,7 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 			yseq = ansi.VerticalPositionAbsolute(ty + 1)
 		}
 
-		// OPTIM: Use [ansi.LF] and [ansi.ReverseIndex] as optimizations.
+		// 优化：使用 [ansi.LF] 和 [ansi.ReverseIndex] 作为优化
 
 		if ty > fy {
 			n := ty - fy
@@ -54,8 +48,7 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 			}
 			shouldScroll := !s.opts.AltScreen && fy+n >= s.scrollHeight
 			if lf := strings.Repeat("\n", n); shouldScroll || (fy+n < height && len(lf) < len(yseq)) {
-				//nolint:godox
-				// TODO: Ensure we're not unintentionally scrolling the screen down.
+				// TODO: 确保我们不会无意中向下滚动屏幕
 				yseq = lf
 				s.scrollHeight = max(s.scrollHeight, fy+n)
 				if s.opts.MapNL {
@@ -68,8 +61,7 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 				yseq = cuu
 			}
 			if n == 1 && fy-1 > 0 {
-				//nolint:godox
-				// TODO: Ensure we're not unintentionally scrolling the screen up.
+				// TODO: 确保我们不会无意中向上滚动屏幕
 				yseq = ansi.ReverseIndex
 			}
 		}
@@ -99,11 +91,8 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 					cht := ansi.CursorHorizontalForwardTab(tabs)
 					tab := strings.Repeat("\t", tabs)
 					if false && s.caps.Contains(capCHT) && len(cht) < len(tab) {
-						//nolint:godox
-						// TODO: The linux console and some terminals such as
-						// Alacritty don't support [ansi.CHT]. Enable this when
-						// we have a way to detect this, or after 5 years when
-						// we're sure everyone has updated their terminals :P
+						// Linux 控制台和一些终端如 Alacritty 不支持 [ansi.CHT]
+						// 当我们有方法检测到这一点时，或者 5 年后当我们确定每个人都更新了终端时再启用 :P
 						seq.WriteString(cht)
 					} else {
 						seq.WriteString(tab)
@@ -118,7 +107,7 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 				xseq = cuf
 			}
 
-			// If we have no attribute and style changes, overwrite is cheaper.
+			// 如果没有属性和样式更改，覆盖更便宜
 			var ovw string
 			if overwrite && ty >= 0 {
 				for i := 0; i < n; i++ {
@@ -151,11 +140,11 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 		} else if tx < fx {
 			n := fx - tx
 			if useTabs && s.caps.Contains(capCBT) {
-				// VT100 does not support backward tabs [ansi.CBT].
+				// VT100 不支持向后制表符 [ansi.CBT]
 
 				col := fx
 
-				var cbt int // cursor backward tabs count
+				var cbt int // 光标向后制表符计数
 				for s.tabs.Prev(col) >= tx {
 					col = s.tabs.Prev(col)
 					cbt++
@@ -185,33 +174,31 @@ func relativeCursorMove(s *Screen, fx, fy, tx, ty int, overwrite, useTabs, useBa
 	return seq.String()
 }
 
-// moveCursor moves and returns the cursor movement sequence to move the cursor
-// to the specified position.
-// When overwrite is true, this will try to optimize the sequence by using the
-// screen cells values to move the cursor instead of using escape sequences.
+// moveCursor 移动并返回将光标移动到指定位置的光标移动序列
+// 当 overwrite 为 true 时，会尝试通过使用屏幕单元格值而不是转义序列来优化移动光标
 func moveCursor(s *Screen, x, y int, overwrite bool) (seq string) {
 	fx, fy := s.cur.X, s.cur.Y
 
 	if !s.opts.RelativeCursor {
-		// Method #0: Use [ansi.CUP] if the distance is long.
+		// 方法 #0：如果距离较长，使用 [ansi.CUP]
 		seq = ansi.CursorPosition(x+1, y+1)
 		if fx == -1 || fy == -1 || notLocal(s.newbuf.Width(), fx, fy, x, y) {
 			return seq
 		}
 	}
 
-	// Optimize based on options.
+	// 根据选项进行优化
 	trials := 0
 	if s.opts.HardTabs {
-		trials |= 2 // 0b10 in binary
+		trials |= 2 // 二进制 0b10
 	}
 	if s.opts.Backspace {
-		trials |= 1 // 0b01 in binary
+		trials |= 1 // 二进制 0b01
 	}
 
-	// Try all possible combinations of hard tabs and backspace optimizations.
+	// 尝试硬制表符和退格键优化的所有可能组合
 	for i := 0; i <= trials; i++ {
-		// Skip combinations that are not enabled.
+		// 跳过未启用的组合
 		if i & ^trials != 0 {
 			continue
 		}
@@ -219,20 +206,20 @@ func moveCursor(s *Screen, x, y int, overwrite bool) (seq string) {
 		useHardTabs := i&2 != 0
 		useBackspace := i&1 != 0
 
-		// Method #1: Use local movement sequences.
+		// 方法 #1：使用本地移动序列
 		nseq := relativeCursorMove(s, fx, fy, x, y, overwrite, useHardTabs, useBackspace)
 		if (i == 0 && len(seq) == 0) || len(nseq) < len(seq) {
 			seq = nseq
 		}
 
-		// Method #2: Use [ansi.CR] and local movement sequences.
+		// 方法 #2：使用 [ansi.CR] 和本地移动序列
 		nseq = "\r" + relativeCursorMove(s, 0, fy, x, y, overwrite, useHardTabs, useBackspace)
 		if len(nseq) < len(seq) {
 			seq = nseq
 		}
 
 		if !s.opts.RelativeCursor {
-			// Method #3: Use [ansi.CursorHomePosition] and local movement sequences.
+			// 方法 #3：使用 [ansi.CursorHomePosition] 和本地移动序列
 			nseq = ansi.CursorHomePosition + relativeCursorMove(s, 0, 0, x, y, overwrite, useHardTabs, useBackspace)
 			if len(nseq) < len(seq) {
 				seq = nseq
@@ -243,11 +230,10 @@ func moveCursor(s *Screen, x, y int, overwrite bool) (seq string) {
 	return seq
 }
 
-// moveCursor moves the cursor to the specified position.
+// moveCursor 将光标移动到指定位置
 func (s *Screen) moveCursor(x, y int, overwrite bool) {
 	if !s.opts.AltScreen && s.cur.X == -1 && s.cur.Y == -1 {
-		// First cursor movement in inline mode, move the cursor to the first
-		// column before moving to the target position.
+		// 内联模式下的第一次光标移动，在移动到目标位置之前，先将光标移动到第一列
 		s.buf.WriteByte('\r')
 		s.cur.X, s.cur.Y = 0, 0
 	}
@@ -256,37 +242,32 @@ func (s *Screen) moveCursor(x, y int, overwrite bool) {
 }
 
 func (s *Screen) move(x, y int) {
-	// XXX: Make sure we use the max height and width of the buffer in case
-	// we're in the middle of a resize operation.
+	// 确保在调整大小操作过程中使用缓冲区的最大高度和宽度
 	width := max(s.newbuf.Width(), s.curbuf.Width())
 	height := max(s.newbuf.Height(), s.curbuf.Height())
 
 	if width > 0 && x >= width {
-		// Handle autowrap
+		// 处理自动换行
 		y += (x / width)
 		x %= width
 	}
 
-	// XXX: Disable styles if there's any
-	// Some move operations such as [ansi.LF] can apply styles to the new
-	// cursor position, thus, we need to reset the styles before moving the
-	// cursor.
+	// 如果有样式，禁用它们
+	// 一些移动操作如 [ansi.LF] 会将样式应用到新的光标位置，因此我们需要在移动光标之前重置样式
 	blank := s.clearBlank()
 	resetPen := y != s.cur.Y && !blank.Equal(&BlankCell)
 	if resetPen {
 		s.updatePen(nil)
 	}
 
-	// Reset wrap around (phantom cursor) state
+	// 重置环绕（幻象光标）状态
 	if s.atPhantom {
 		s.cur.X = 0
 		s.buf.WriteByte('\r')
-		s.atPhantom = false // reset phantom cell state
+		s.atPhantom = false // 重置幻象单元格状态
 	}
 
-	//nolint:godox
-	// TODO: Investigate if we need to handle this case and/or if we need the
-	// following code.
+	// TODO: 调查我们是否需要处理这种情况和/或是否需要以下代码
 	//
 	// if width > 0 && s.cur.X >= width {
 	// 	l := (s.cur.X + 1) / width
@@ -312,159 +293,153 @@ func (s *Screen) move(x, y int) {
 	}
 
 	if x == s.cur.X && y == s.cur.Y {
-		// We give up later because we need to run checks for the phantom cell
-		// and others before we can determine if we can give up.
+		// 我们稍后放弃，因为我们需要运行幻象单元格和其他检查，然后才能确定是否可以放弃
 		return
 	}
 
-	// We set the new cursor in [Screen.moveCursor].
-	s.moveCursor(x, y, true) // Overwrite cells if possible
+	// 我们在 [Screen.moveCursor] 中设置新光标
+	s.moveCursor(x, y, true) // 尽可能覆盖单元格
 }
 
-// Cursor represents a terminal Cursor.
+// Cursor 表示终端光标
 type Cursor struct {
 	Style
 	Link
 	Position
 }
 
-// ScreenOptions are options for the screen.
+// ScreenOptions 是屏幕的选项
 type ScreenOptions struct {
-	// Term is the terminal type to use when writing to the screen. When empty,
-	// `$TERM` is used from [os.Getenv].
+	// Term 是写入屏幕时使用的终端类型。为空时，使用 [os.Getenv] 中的 `$TERM`
 	Term string
-	// Profile is the color profile to use when writing to the screen.
+	// Profile 是写入屏幕时使用的颜色配置文件
 	Profile colorprofile.Profile
-	// RelativeCursor is whether to use relative cursor movements. This is
-	// useful when alt-screen is not used or when using inline mode.
+	// RelativeCursor 是否使用相对光标移动。当不使用替代屏幕或使用内联模式时很有用
 	RelativeCursor bool
-	// AltScreen is whether to use the alternate screen buffer.
+	// AltScreen 是否使用替代屏幕缓冲区
 	AltScreen bool
-	// ShowCursor is whether to show the cursor.
+	// ShowCursor 是否显示光标
 	ShowCursor bool
-	// HardTabs is whether to use hard tabs to optimize cursor movements.
+	// HardTabs 是否使用硬制表符来优化光标移动
 	HardTabs bool
-	// Backspace is whether to use backspace characters to move the cursor.
+	// Backspace 是否使用退格字符来移动光标
 	Backspace bool
-	// MapNL whether we have ONLCR mapping enabled. When we set the terminal to
-	// raw mode, the ONLCR mode gets disabled. ONLCR maps any newline/linefeed
-	// (`\n`) character to carriage return + line feed (`\r\n`).
+	// MapNL 是否启用了 ONLCR 映射。当我们将终端设置为原始模式时，ONLCR 模式会被禁用
+	// ONLCR 将任何换行/换行符 (`\n`) 映射为回车 + 换行 (`\r\n`)
 	MapNL bool
 }
 
-// lineData represents the metadata for a line.
+// lineData 表示一行的元数据
 type lineData struct {
-	// first and last changed cell indices
+	// 第一个和最后一个更改的单元格索引
 	firstCell, lastCell int
-	// old index used for scrolling
+	// 用于滚动的旧索引
 	oldIndex int //nolint:unused
 }
 
-// Screen represents the terminal screen.
+// Screen 表示终端屏幕
 type Screen struct {
 	w                io.Writer
-	buf              *bytes.Buffer // buffer for writing to the screen
-	curbuf           *Buffer       // the current buffer
-	newbuf           *Buffer       // the new buffer
+	buf              *bytes.Buffer // 用于写入屏幕的缓冲区
+	curbuf           *Buffer       // 当前缓冲区
+	newbuf           *Buffer       // 新缓冲区
 	tabs             *TabStops
 	touch            map[int]lineData
-	queueAbove       []string  // the queue of strings to write above the screen
-	oldhash, newhash []uint64  // the old and new hash values for each line
-	hashtab          []hashmap // the hashmap table
-	oldnum           []int     // old indices from previous hash
-	cur, saved       Cursor    // the current and saved cursors
+	queueAbove       []string  // 要在屏幕上方写入的字符串队列
+	oldhash, newhash []uint64  // 每行的旧和新哈希值
+	hashtab          []hashmap // 哈希表
+	oldnum           []int     // 来自先前哈希的旧索引
+	cur, saved       Cursor    // 当前和保存的光标
 	opts             ScreenOptions
 	mu               sync.Mutex
 	method           ansi.Method
-	scrollHeight     int          // keeps track of how many lines we've scrolled down (inline mode)
-	altScreenMode    bool         // whether alternate screen mode is enabled
-	cursorHidden     bool         // whether text cursor mode is enabled
-	clear            bool         // whether to force clear the screen
-	caps             capabilities // terminal control sequence capabilities
-	queuedText       bool         // whether we have queued non-zero width text queued up
-	atPhantom        bool         // whether the cursor is out of bounds and at a phantom cell
+	scrollHeight     int          // 跟踪我们向下滚动的行数（内联模式）
+	altScreenMode    bool         // 是否启用了替代屏幕模式
+	cursorHidden     bool         // 是否启用了文本光标模式
+	clear            bool         // 是否强制清除屏幕
+	caps             capabilities // 终端控制序列功能
+	queuedText       bool         // 是否有非零宽度文本排队
+	atPhantom        bool         // 光标是否越界并位于幻象单元格
 }
 
-// SetMethod sets the method used to calculate the width of cells.
+// SetMethod 设置用于计算单元格宽度的方法
 func (s *Screen) SetMethod(method ansi.Method) {
 	s.method = method
 }
 
-// UseBackspaces sets whether to use backspace characters to move the cursor.
+// UseBackspaces 设置是否使用退格字符来移动光标
 func (s *Screen) UseBackspaces(v bool) {
 	s.opts.Backspace = v
 }
 
-// UseHardTabs sets whether to use hard tabs to optimize cursor movements.
+// UseHardTabs 设置是否使用硬制表符来优化光标移动
 func (s *Screen) UseHardTabs(v bool) {
 	s.opts.HardTabs = v
 }
 
-// SetColorProfile sets the color profile to use when writing to the screen.
+// SetColorProfile 设置写入屏幕时使用的颜色配置文件
 func (s *Screen) SetColorProfile(p colorprofile.Profile) {
 	s.opts.Profile = p
 }
 
-// SetRelativeCursor sets whether to use relative cursor movements.
+// SetRelativeCursor 设置是否使用相对光标移动
 func (s *Screen) SetRelativeCursor(v bool) {
 	s.opts.RelativeCursor = v
 }
 
-// EnterAltScreen enters the alternate screen buffer.
+// EnterAltScreen 进入替代屏幕缓冲区
 func (s *Screen) EnterAltScreen() {
 	s.opts.AltScreen = true
 	s.clear = true
 	s.saved = s.cur
 }
 
-// ExitAltScreen exits the alternate screen buffer.
+// ExitAltScreen 退出替代屏幕缓冲区
 func (s *Screen) ExitAltScreen() {
 	s.opts.AltScreen = false
 	s.clear = true
 	s.cur = s.saved
 }
 
-// ShowCursor shows the cursor.
+// ShowCursor 显示光标
 func (s *Screen) ShowCursor() {
 	s.opts.ShowCursor = true
 }
 
-// HideCursor hides the cursor.
+// HideCursor 隐藏光标
 func (s *Screen) HideCursor() {
 	s.opts.ShowCursor = false
 }
 
-// Bounds implements Window.
+// Bounds 实现 Window 接口
 func (s *Screen) Bounds() Rectangle {
-	// Always return the new buffer bounds.
+	// 始终返回新缓冲区的边界
 	return s.newbuf.Bounds()
 }
 
-// Cell implements Window.
+// Cell 实现 Window 接口
 func (s *Screen) Cell(x int, y int) *Cell {
 	return s.newbuf.Cell(x, y)
 }
 
-// Redraw forces a full redraw of the screen.
+// Redraw 强制全屏重绘
 func (s *Screen) Redraw() {
 	s.mu.Lock()
 	s.clear = true
 	s.mu.Unlock()
 }
 
-// Clear clears the screen with blank cells. This is a convenience method for
-// [Screen.Fill] with a nil cell.
+// Clear 用空白单元格清除屏幕。这是 [Screen.Fill] 传入 nil 单元格的便捷方法
 func (s *Screen) Clear() bool {
 	return s.ClearRect(s.newbuf.Bounds())
 }
 
-// ClearRect clears the given rectangle with blank cells. This is a convenience
-// method for [Screen.FillRect] with a nil cell.
+// ClearRect 用空白单元格清除给定的矩形。这是 [Screen.FillRect] 传入 nil 单元格的便捷方法
 func (s *Screen) ClearRect(r Rectangle) bool {
 	return s.FillRect(nil, r)
 }
 
-// SetCell implements Window.
+// SetCell 实现 Window 接口
 func (s *Screen) SetCell(x int, y int, cell *Cell) (v bool) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -486,12 +461,12 @@ func (s *Screen) SetCell(x int, y int, cell *Cell) (v bool) {
 	return s.newbuf.SetCell(x, y, cell)
 }
 
-// Fill implements Window.
+// Fill 实现 Window 接口
 func (s *Screen) Fill(cell *Cell) bool {
 	return s.FillRect(cell, s.newbuf.Bounds())
 }
 
-// FillRect implements Window.
+// FillRect 实现 Window 接口
 func (s *Screen) FillRect(cell *Cell, r Rectangle) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -502,27 +477,27 @@ func (s *Screen) FillRect(cell *Cell, r Rectangle) bool {
 	return true
 }
 
-// capabilities represents a mask of supported ANSI escape sequences.
+// capabilities 表示支持的 ANSI 转义序列的掩码
 type capabilities uint
 
 const (
-	// Vertical Position Absolute [ansi.VPA].
+	// 垂直位置绝对定位 [ansi.VPA]
 	capVPA capabilities = 1 << iota
-	// Horizontal Position Absolute [ansi.HPA].
+	// 水平位置绝对定位 [ansi.HPA]
 	capHPA
-	// Cursor Horizontal Tab [ansi.CHT].
+	// 光标水平制表符 [ansi.CHT]
 	capCHT
-	// Cursor Backward Tab [ansi.CBT].
+	// 光标向后制表符 [ansi.CBT]
 	capCBT
-	// Repeat Previous Character [ansi.REP].
+	// 重复前一个字符 [ansi.REP]
 	capREP
-	// Erase Character [ansi.ECH].
+	// 擦除字符 [ansi.ECH]
 	capECH
-	// Insert Character [ansi.ICH].
+	// 插入字符 [ansi.ICH]
 	capICH
-	// Scroll Down [ansi.SD].
+	// 向下滚动 [ansi.SD]
 	capSD
-	// Scroll Up [ansi.SU].
+	// 向上滚动 [ansi.SU]
 	capSU
 
 	noCaps  capabilities = 0
@@ -530,18 +505,14 @@ const (
 		capSD | capSU
 )
 
-// Contains returns whether the capabilities contains the given capability.
+// Contains 返回 capabilities 是否包含给定的功能
 func (v capabilities) Contains(c capabilities) bool {
 	return v&c == c
 }
 
-// xtermCaps returns whether the terminal is xterm-like. This means that the
-// terminal supports ECMA-48 and ANSI X3.64 escape sequences.
-// xtermCaps returns a list of control sequence capabilities for the given
-// terminal type. This only supports a subset of sequences that can
-// be different among terminals.
-// NOTE: A hybrid approach would be to support Terminfo databases for a full
-// set of capabilities.
+// xtermCaps 返回终端是否类似 xterm。这意味着终端支持 ECMA-48 和 ANSI X3.64 转义序列
+// xtermCaps 为给定的终端类型返回控制序列功能列表。这仅支持在不同终端之间可能不同的子集序列
+// 注意：混合方法是支持 Terminfo 数据库以获得完整的功能集
 func xtermCaps(termtype string) (v capabilities) {
 	parts := strings.Split(termtype, "-")
 	if len(parts) == 0 {
@@ -562,13 +533,13 @@ func xtermCaps(termtype string) (v capabilities) {
 		v = allCaps
 	case "alacritty":
 		v = allCaps
-		v &^= capCHT // NOTE: alacritty added support for [ansi.CHT] in 2024-12-28 #62d5b13.
+		v &^= capCHT // 注意：alacritty 在 2024-12-28 #62d5b13 中添加了对 [ansi.CHT] 的支持
 	case "screen":
-		// See https://www.gnu.org/software/screen/manual/screen.html#Control-Sequences-1
+		// 参见 https://www.gnu.org/software/screen/manual/screen.html#Control-Sequences-1
 		v = allCaps
 		v &^= capREP
 	case "linux":
-		// See https://man7.org/linux/man-pages/man4/console_codes.4.html
+		// 参见 https://man7.org/linux/man-pages/man4/console_codes.4.html
 		v = capVPA | capHPA | capECH | capICH
 	}
 

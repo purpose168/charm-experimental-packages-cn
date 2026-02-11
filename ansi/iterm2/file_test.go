@@ -73,12 +73,12 @@ func TestFile_String(t *testing.T) {
 		want string
 	}{
 		{
-			name: "empty file",
+			name: "空文件",
 			file: file{},
 			want: "",
 		},
 		{
-			name: "basic file",
+			name: "基本文件",
 			file: file{
 				Name: "test.png",
 				Size: 1024,
@@ -86,7 +86,7 @@ func TestFile_String(t *testing.T) {
 			want: "name=test.png;size=1024",
 		},
 		{
-			name: "file with dimensions",
+			name: "带尺寸的文件",
 			file: file{
 				Name:   "test.png",
 				Width:  "100px",
@@ -95,7 +95,7 @@ func TestFile_String(t *testing.T) {
 			want: "name=test.png;width=100px;height=auto",
 		},
 		{
-			name: "file with all options",
+			name: "带所有选项的文件",
 			file: file{
 				Name:              "test.png",
 				Size:              1024,

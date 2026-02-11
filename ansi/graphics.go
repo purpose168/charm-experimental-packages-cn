@@ -6,21 +6,18 @@ import (
 	"strings"
 )
 
-// SixelGraphics returns a sequence that encodes the given sixel image payload to
-// a DCS sixel sequence.
+// SixelGraphics 返回一个将给定的 sixel 图像负载编码为 DCS sixel 序列的序列。
 //
 //	DCS p1; p2; p3; q [sixel payload] ST
 //
-// p1 = pixel aspect ratio, deprecated and replaced by pixel metrics in the payload
+// p1 = 像素宽高比，已废弃，被负载中的像素指标替换
 //
-// p2 = This is supposed to be 0 for transparency, but terminals don't seem to
-// to use it properly. Value 0 leaves an unsightly black bar on all terminals
-// I've tried and looks correct with value 1.
+// p2 = 这应该是用于透明度的 0，但终端似乎不能正确使用它。
+// 在我尝试过的所有终端上，值 0 会留下难看的黑色条，而值 1 看起来是正确的。
 //
-// p3 = Horizontal grid size parameter. Everyone ignores this and uses a fixed grid
-// size, as far as I can tell.
+// p3 = 水平网格大小参数。据我所知，所有人都忽略这个参数并使用固定的网格大小。
 //
-// See https://shuford.invisible-island.net/all_about_sixels.txt
+// 参见 https://shuford.invisible-island.net/all_about_sixels.txt
 func SixelGraphics(p1, p2, p3 int, payload []byte) string {
 	var buf bytes.Buffer
 
@@ -43,12 +40,11 @@ func SixelGraphics(p1, p2, p3 int, payload []byte) string {
 	return buf.String()
 }
 
-// KittyGraphics returns a sequence that encodes the given image in the Kitty
-// graphics protocol.
+// KittyGraphics 返回一个将给定图像编码为 Kitty 图形协议的序列。
 //
-//	APC G [comma separated options] ; [base64 encoded payload] ST
+//	APC G [逗号分隔的选项] ; [base64 编码的有效负载] ST
 //
-// See https://sw.kovidgoyal.net/kitty/graphics-protocol/
+// 参见 https://sw.kovidgoyal.net/kitty/graphics-protocol/
 func KittyGraphics(payload []byte, opts ...string) string {
 	var buf bytes.Buffer
 	buf.WriteString("\x1b_G")

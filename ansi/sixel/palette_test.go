@@ -83,7 +83,7 @@ func runTests(t *testing.T, img image.Image, testCases map[string]testCase) {
 		t.Run(testName, func(t *testing.T) {
 			palette := newSixelPalette(img, test.maxColors)
 			if len(palette.PaletteColors) != len(test.expectedPalette) {
-				t.Errorf("Expected colors %+v in palette, but got %+v", test.expectedPalette, palette.PaletteColors)
+				t.Errorf("期望调色板中有颜色 %+v，但得到 %+v", test.expectedPalette, palette.PaletteColors)
 				return
 			}
 
@@ -94,7 +94,7 @@ func runTests(t *testing.T, img image.Image, testCases map[string]testCase) {
 				}
 
 				if !foundColor {
-					t.Errorf("Expected colors %+v in palette, but got %+v", test.expectedPalette, palette.PaletteColors)
+					t.Errorf("期望调色板中有颜色 %+v，但得到 %+v", test.expectedPalette, palette.PaletteColors)
 					return
 				}
 			}
@@ -102,18 +102,18 @@ func runTests(t *testing.T, img image.Image, testCases map[string]testCase) {
 			for lookupRawColor, lookupPaletteColor := range palette.colorConvert {
 				paletteIndex, inReverseLookup := palette.paletteIndexes[lookupRawColor]
 				if !inReverseLookup {
-					t.Errorf("Color %+v maps to color %+v in the colorConvert map, but %+v is does not have a corresponding palette index.", lookupRawColor, lookupPaletteColor, lookupPaletteColor)
+					t.Errorf("颜色 %+v 在 colorConvert 映射中映射到颜色 %+v，但 %+v 没有对应的调色板索引。", lookupRawColor, lookupPaletteColor, lookupPaletteColor)
 					return
 				}
 
 				if paletteIndex >= len(palette.PaletteColors) {
-					t.Errorf("Image color %+v maps to palette index %d, but there are only %d palette colors.", lookupRawColor, paletteIndex, len(palette.PaletteColors))
+					t.Errorf("图像颜色 %+v 映射到调色板索引 %d，但只有 %d 种调色板颜色。", lookupRawColor, paletteIndex, len(palette.PaletteColors))
 					return
 				}
 
 				colorFromPalette := palette.PaletteColors[paletteIndex]
 				if colorFromPalette != lookupPaletteColor {
-					t.Errorf("Image color %+v maps to palette color %+v and palette index %d, but palette index %d is actually palette color %+v", lookupRawColor, lookupPaletteColor, paletteIndex, paletteIndex, colorFromPalette)
+					t.Errorf("图像颜色 %+v 映射到调色板颜色 %+v 和调色板索引 %d，但调色板索引 %d 实际上是调色板颜色 %+v", lookupRawColor, lookupPaletteColor, paletteIndex, paletteIndex, colorFromPalette)
 					return
 				}
 			}

@@ -1,3 +1,2 @@
-// Package termios provides low-level terminal I/O control for Unix-like
-// systems.
+// Package termios 为类 Unix 系统提供低级终端 I/O 控制。
 package termios

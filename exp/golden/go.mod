@@ -1,4 +1,4 @@
-module github.com/charmbracelet/x/exp/golden
+module github.com/purpose168/charm-experimental-packages-cn/exp/golden
 
 go 1.24.0
 

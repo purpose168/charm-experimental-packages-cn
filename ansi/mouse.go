@@ -4,26 +4,26 @@ import (
 	"fmt"
 )
 
-// MouseButton represents the button that was pressed during a mouse message.
+// MouseButton 表示鼠标消息期间按下的按钮。
 type MouseButton byte
 
-// Mouse event buttons
+// 鼠标事件按钮
 //
-// This is based on X11 mouse button codes.
+// 基于 X11 鼠标按钮代码。
 //
-//	1 = left button
-//	2 = middle button (pressing the scroll wheel)
-//	3 = right button
-//	4 = turn scroll wheel up
-//	5 = turn scroll wheel down
-//	6 = push scroll wheel left
-//	7 = push scroll wheel right
-//	8 = 4th button (aka browser backward button)
-//	9 = 5th button (aka browser forward button)
+//	1 = 左键
+//	2 = 中键（按下滚轮）
+//	3 = 右键
+//	4 = 向上滚动滚轮
+//	5 = 向下滚动滚轮
+//	6 = 向左推动滚轮
+//	7 = 向右推动滚轮
+//	8 = 第 4 个按钮（即浏览器后退按钮）
+//	9 = 第 5 个按钮（即浏览器前进按钮）
 //	10
 //	11
 //
-// Other buttons are not supported.
+// 其他按钮不受支持。
 const (
 	MouseNone MouseButton = iota
 	MouseButton1
@@ -65,44 +65,43 @@ var mouseButtons = map[MouseButton]string{
 	MouseButton11:   "button11",
 }
 
-// String returns a string representation of the mouse button.
+// String 返回鼠标按钮的字符串表示。
 func (b MouseButton) String() string {
 	return mouseButtons[b]
 }
 
-// EncodeMouseButton returns a byte representing a mouse button.
-// The button is a bitmask of the following leftmost values:
+// EncodeMouseButton 返回表示鼠标按钮的字节。
+// 按钮是以下最左侧值的位掩码：
 //
-//   - The first two bits are the button number:
-//     0 = left button, wheel up, or button no. 8 aka (backwards)
-//     1 = middle button, wheel down, or button no. 9 aka (forwards)
-//     2 = right button, wheel left, or button no. 10
-//     3 = release event, wheel right, or button no. 11
+//   - 前两位是按钮编号：
+//     0 = 左键、滚轮向上或第 8 号按钮（即后退）
+//     1 = 中键、滚轮向下或第 9 号按钮（即前进）
+//     2 = 右键、滚轮向左或第 10 号按钮
+//     3 = 释放事件、滚轮向右或第 11 号按钮
 //
-//   - The third bit indicates whether the shift key was pressed.
+//   - 第三位表示是否按下了 Shift 键。
 //
-//   - The fourth bit indicates the alt key was pressed.
+//   - 第四位表示是否按下了 Alt 键。
 //
-//   - The fifth bit indicates the control key was pressed.
+//   - 第五位表示是否按下了 Control 键。
 //
-//   - The sixth bit indicates motion events. Combined with button number 3, i.e.
-//     release event, it represents a drag event.
+//   - 第六位表示移动事件。与按钮编号 3（即释放事件）组合，表示拖动事件。
 //
-//   - The seventh bit indicates a wheel event.
+//   - 第七位表示滚轮事件。
 //
-//   - The eighth bit indicates additional buttons.
+//   - 第八位表示附加按钮。
 //
-// If button is [MouseNone], and motion is false, this returns a release event.
-// If button is undefined, this function returns 0xff.
+// 如果按钮是 [MouseNone]，且 motion 为 false，则返回释放事件。
+// 如果按钮未定义，此函数返回 0xff。
 func EncodeMouseButton(b MouseButton, motion, shift, alt, ctrl bool) (m byte) {
-	// mouse bit shifts
+	// 鼠标位偏移
 	const (
 		bitShift  = 0b0000_0100
 		bitAlt    = 0b0000_1000
 		bitCtrl   = 0b0001_0000
 		bitMotion = 0b0010_0000
 		bitWheel  = 0b0100_0000
-		bitAdd    = 0b1000_0000 // additional buttons 8-11
+		bitAdd    = 0b1000_0000 // 附加按钮 8-11
 
 		bitsMask = 0b0000_0011
 	)
@@ -118,7 +117,7 @@ func EncodeMouseButton(b MouseButton, motion, shift, alt, ctrl bool) (m byte) {
 		m = byte(b - MouseBackward)
 		m |= bitAdd
 	} else {
-		m = 0xff // invalid button
+		m = 0xff // 无效按钮
 	}
 
 	if shift {
@@ -137,26 +136,26 @@ func EncodeMouseButton(b MouseButton, motion, shift, alt, ctrl bool) (m byte) {
 	return m
 }
 
-// x10Offset is the offset for X10 mouse events.
-// See https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
+// x10Offset 是 X10 鼠标事件的偏移量。
+// 请参阅 https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
 const x10Offset = 32
 
-// MouseX10 returns an escape sequence representing a mouse event in X10 mode.
-// Note that this requires the terminal support X10 mouse modes.
+// MouseX10 返回表示 X10 模式下鼠标事件的转义序列。
+// 请注意，这需要终端支持 X10 鼠标模式。
 //
 //	CSI M Cb Cx Cy
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
 func MouseX10(b byte, x, y int) string {
 	return "\x1b[M" + string(b+x10Offset) + string(byte(x)+x10Offset+1) + string(byte(y)+x10Offset+1)
 }
 
-// MouseSgr returns an escape sequence representing a mouse event in SGR mode.
+// MouseSgr 返回表示 SGR 模式下鼠标事件的转义序列。
 //
 //	CSI < Cb ; Cx ; Cy M
-//	CSI < Cb ; Cx ; Cy m (release)
+//	CSI < Cb ; Cx ; Cy m (释放)
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
 func MouseSgr(b byte, x, y int, release bool) string {
 	s := 'M'
 	if release {

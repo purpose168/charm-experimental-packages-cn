@@ -1,6 +1,6 @@
 package input
 
-import "github.com/charmbracelet/x/ansi"
+import "github.com/purpose168/charm-experimental-packages-cn/ansi"
 
 // ModeReportEvent is a message that represents a mode report event (DECRPM).
 //

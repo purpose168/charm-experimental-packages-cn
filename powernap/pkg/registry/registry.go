@@ -1,5 +1,4 @@
-// Package registry provides a registry for managing multiple language server
-// instances.
+// Package registry 提供了一个用于管理多个语言服务器实例的注册表。
 package registry
 
 import (
@@ -14,12 +13,12 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/charmbracelet/x/powernap/pkg/config"
-	"github.com/charmbracelet/x/powernap/pkg/lsp"
-	"github.com/charmbracelet/x/powernap/pkg/lsp/protocol"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/config"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp"
+	"github.com/purpose168/charm-experimental-packages-cn/powernap/pkg/lsp/protocol"
 )
 
-// Registry manages multiple language server instances.
+// Registry 管理多个语言服务器实例。
 type Registry struct {
 	mu      sync.RWMutex
 	clients map[string]*lsp.Client
@@ -27,7 +26,7 @@ type Registry struct {
 	logger  *slog.Logger
 }
 
-// New creates a new registry.
+// New 创建一个新的注册表。
 func New() *Registry {
 	return &Registry{
 		clients: make(map[string]*lsp.Client),
@@ -36,7 +35,7 @@ func New() *Registry {
 	}
 }
 
-// NewWithLogger creates a new registry with a custom logger.
+// NewWithLogger 创建一个带有自定义日志记录器的新注册表。
 func NewWithLogger(logger *slog.Logger) *Registry {
 	return &Registry{
 		clients: make(map[string]*lsp.Client),
@@ -45,7 +44,7 @@ func NewWithLogger(logger *slog.Logger) *Registry {
 	}
 }
 
-// LoadConfig loads server configurations from a config manager.
+// LoadConfig 从配置管理器加载服务器配置。
 func (r *Registry) LoadConfig(cfg *config.Manager) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -54,7 +53,7 @@ func (r *Registry) LoadConfig(cfg *config.Manager) error {
 	return nil
 }
 
-// StartServer starts a language server for the given name and project path.
+// StartServer 为给定的名称和项目路径启动语言服务器。
 func (r *Registry) StartServer(ctx context.Context, name string, projectPath string) (*lsp.Client, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -117,7 +116,7 @@ func (r *Registry) StartServer(ctx context.Context, name string, projectPath str
 	return client, nil
 }
 
-// StopServer stops a running language server.
+// StopServer 停止运行中的语言服务器。
 func (r *Registry) StopServer(ctx context.Context, name string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -147,7 +146,7 @@ func (r *Registry) StopServer(ctx context.Context, name string) error {
 	return nil
 }
 
-// RestartServer restarts a language server.
+// RestartServer 重启语言服务器。
 func (r *Registry) RestartServer(ctx context.Context, name string, projectPath string) (*lsp.Client, error) {
 	// Stop the server if it's running
 	if err := r.StopServer(ctx, name); err != nil {
@@ -159,7 +158,7 @@ func (r *Registry) RestartServer(ctx context.Context, name string, projectPath s
 	return r.StartServer(ctx, name, projectPath)
 }
 
-// GetClient returns a running client by name.
+// GetClient 通过名称返回运行中的客户端。
 func (r *Registry) GetClient(name string) (*lsp.Client, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -168,8 +167,8 @@ func (r *Registry) GetClient(name string) (*lsp.Client, bool) {
 	return client, exists
 }
 
-// GetClientsForFile returns all appropriate clients for the given file.
-// This allows multiple language servers to handle the same file type (e.g., gopls and golangci-lint for Go files).
+// GetClientsForFile 返回给定文件的所有适用客户端。
+// 这允许多个语言服务器处理同一文件类型（例如，Go 文件的 gopls 和 golangci-lint）。
 func (r *Registry) GetClientsForFile(ctx context.Context, filePath string) ([]*lsp.Client, error) {
 	// Convert to absolute path
 	absPath, err := filepath.Abs(filePath)
@@ -230,9 +229,9 @@ func (r *Registry) GetClientsForFile(ctx context.Context, filePath string) ([]*l
 	return clients, nil
 }
 
-// GetClientForFile returns a single appropriate client for the given file.
-// This is a convenience method that returns the first available client.
-// For multiple servers support, use GetClientsForFile instead.
+// GetClientForFile 返回给定文件的单个适用客户端。
+// 这是一个返回第一个可用客户端的便捷方法。
+// 对于多服务器支持，请使用 GetClientsForFile 代替。
 func (r *Registry) GetClientForFile(ctx context.Context, filePath string) (*lsp.Client, error) {
 	clients, err := r.GetClientsForFile(ctx, filePath)
 	if err != nil {
@@ -246,7 +245,7 @@ func (r *Registry) GetClientForFile(ctx context.Context, filePath string) (*lsp.
 	return clients[0], nil
 }
 
-// ListClients returns a list of running clients.
+// ListClients 返回运行中客户端的列表。
 func (r *Registry) ListClients() []string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -259,7 +258,7 @@ func (r *Registry) ListClients() []string {
 	return names
 }
 
-// StopAll stops all running language servers.
+// StopAll 停止所有运行中的语言服务器。
 func (r *Registry) StopAll(ctx context.Context) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -286,7 +285,7 @@ func (r *Registry) StopAll(ctx context.Context) error {
 	return nil
 }
 
-// findProjectRoot finds the project root based on root markers.
+// findProjectRoot 根据根标记查找项目根目录。
 func (r *Registry) findProjectRoot(startPath string, rootMarkers []string) string {
 	currentPath := startPath
 
@@ -312,7 +311,7 @@ func (r *Registry) findProjectRoot(startPath string, rootMarkers []string) strin
 	return ""
 }
 
-// fileExists checks if a file exists.
+// fileExists 检查文件是否存在。
 func fileExists(path string) bool {
 	// Use os.Stat to check if the file/directory exists
 	if _, err := os.Stat(path); err != nil {

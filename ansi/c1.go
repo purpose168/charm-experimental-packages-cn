@@ -1,72 +1,72 @@
 package ansi
 
-// C1 control characters.
+// C1 控制字符。
 //
-// These range from (0x80-0x9F) as defined in ISO 6429 (ECMA-48).
-// See: https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+// 这些是 ISO 6429 (ECMA-48) 中定义的字符范围 (0x80-0x9F)。
+// 参见: https://en.wikipedia.org/wiki/C0_and_C1_control_codes
 const (
-	// PAD is the padding character.
+	// PAD 是填充字符。
 	PAD = 0x80
-	// HOP is the high octet preset character.
+	// HOP 是高字节预置字符。
 	HOP = 0x81
-	// BPH is the break permitted here character.
+	// BPH 是此处允许换行字符。
 	BPH = 0x82
-	// NBH is the no break here character.
+	// NBH 是此处禁止换行字符。
 	NBH = 0x83
-	// IND is the index character.
+	// IND 是索引字符。
 	IND = 0x84
-	// NEL is the next line character.
+	// NEL 是下一行字符。
 	NEL = 0x85
-	// SSA is the start of selected area character.
+	// SSA 是选定区域开始字符。
 	SSA = 0x86
-	// ESA is the end of selected area character.
+	// ESA 是选定区域结束字符。
 	ESA = 0x87
-	// HTS is the horizontal tab set character.
+	// HTS 是水平制表设置字符。
 	HTS = 0x88
-	// HTJ is the horizontal tab with justification character.
+	// HTJ 是带对齐的水平制表符。
 	HTJ = 0x89
-	// VTS is the vertical tab set character.
+	// VTS 是垂直制表设置字符。
 	VTS = 0x8A
-	// PLD is the partial line forward character.
+	// PLD 是部分行前进字符。
 	PLD = 0x8B
-	// PLU is the partial line backward character.
+	// PLU 是部分行后退字符。
 	PLU = 0x8C
-	// RI is the reverse index character.
+	// RI 是反向索引字符。
 	RI = 0x8D
-	// SS2 is the single shift 2 character.
+	// SS2 是单移位 2 字符。
 	SS2 = 0x8E
-	// SS3 is the single shift 3 character.
+	// SS3 是单移位 3 字符。
 	SS3 = 0x8F
-	// DCS is the device control string character.
+	// DCS 是设备控制字符串字符。
 	DCS = 0x90
-	// PU1 is the private use 1 character.
+	// PU1 是私有使用 1 字符。
 	PU1 = 0x91
-	// PU2 is the private use 2 character.
+	// PU2 是私有使用 2 字符。
 	PU2 = 0x92
-	// STS is the set transmit state character.
+	// STS 是设置传输状态字符。
 	STS = 0x93
-	// CCH is the cancel character.
+	// CCH 是取消字符。
 	CCH = 0x94
-	// MW is the message waiting character.
+	// MW 是消息等待字符。
 	MW = 0x95
-	// SPA is the start of guarded area character.
+	// SPA 是受保护区域开始字符。
 	SPA = 0x96
-	// EPA is the end of guarded area character.
+	// EPA 是受保护区域结束字符。
 	EPA = 0x97
-	// SOS is the start of string character.
+	// SOS 是字符串开始字符。
 	SOS = 0x98
-	// SGCI is the single graphic character introducer character.
+	// SGCI 是单图形字符引入符。
 	SGCI = 0x99
-	// SCI is the single character introducer character.
+	// SCI 是单字符引入符。
 	SCI = 0x9A
-	// CSI is the control sequence introducer character.
+	// CSI 是控制序列引入符。
 	CSI = 0x9B
-	// ST is the string terminator character.
+	// ST 是字符串终止符。
 	ST = 0x9C
-	// OSC is the operating system command character.
+	// OSC 是操作系统命令字符。
 	OSC = 0x9D
-	// PM is the privacy message character.
+	// PM 是隐私消息字符。
 	PM = 0x9E
-	// APC is the application program command character.
+	// APC 是应用程序命令字符。
 	APC = 0x9F
 )

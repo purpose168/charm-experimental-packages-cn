@@ -1,8 +1,8 @@
 package ansi
 
-// Keyboard Action Mode (KAM) controls locking of the keyboard.
+// 键盘动作模式（KAM）控制键盘锁定。
 //
-// Deprecated: use [ModeKeyboardAction] instead.
+// 已弃用：请改用 [ModeKeyboardAction]。
 const (
 	KeyboardActionMode = ANSIMode(2)
 
@@ -11,9 +11,9 @@ const (
 	RequestKeyboardActionMode = "\x1b[2$p"
 )
 
-// Insert/Replace Mode (IRM) determines whether characters are inserted or replaced.
+// 插入/替换模式（IRM）决定字符是插入还是替换。
 //
-// Deprecated: use [ModeInsertReplace] instead.
+// 已弃用：请改用 [ModeInsertReplace]。
 const (
 	InsertReplaceMode = ANSIMode(4)
 
@@ -22,9 +22,9 @@ const (
 	RequestInsertReplaceMode = "\x1b[4$p"
 )
 
-// BiDirectional Support Mode (BDSM) determines whether the terminal supports bidirectional text.
+// 双向支持模式（BDSM）决定终端是否支持双向文本。
 //
-// Deprecated: use [ModeBiDirectionalSupport] instead.
+// 已弃用：请改用 [ModeBiDirectionalSupport]。
 const (
 	BiDirectionalSupportMode = ANSIMode(8)
 
@@ -33,9 +33,9 @@ const (
 	RequestBiDirectionalSupportMode = "\x1b[8$p"
 )
 
-// Send Receive Mode (SRM) or Local Echo Mode determines whether the terminal echoes characters.
+// 发送接收模式（SRM）或本地回显模式决定终端是否回显字符。
 //
-// Deprecated: use [ModeSendReceive] instead.
+// 已弃用：请改用 [ModeSendReceive]。
 const (
 	SendReceiveMode = ANSIMode(12)
 	LocalEchoMode   = SendReceiveMode
@@ -49,9 +49,9 @@ const (
 	RequestLocalEchoMode = "\x1b[12$p"
 )
 
-// Line Feed/New Line Mode (LNM) determines whether the terminal interprets line feed as new line.
+// 换行/新行模式（LNM）决定终端是否将换行解释为新行。
 //
-// Deprecated: use [ModeLineFeedNewLine] instead.
+// 已弃用：请改用 [ModeLineFeedNewLine]。
 const (
 	LineFeedNewLineMode = ANSIMode(20)
 
@@ -60,9 +60,9 @@ const (
 	RequestLineFeedNewLineMode = "\x1b[20$p"
 )
 
-// Cursor Keys Mode (DECCKM) determines whether cursor keys send ANSI or application sequences.
+// 光标键模式（DECCKM）决定光标键发送 ANSI 序列还是应用序列。
 //
-// Deprecated: use [ModeCursorKeys] instead.
+// 已弃用：请改用 [ModeCursorKeys]。
 const (
 	CursorKeysMode = DECMode(1)
 
@@ -71,17 +71,17 @@ const (
 	RequestCursorKeysMode = "\x1b[?1$p"
 )
 
-// Cursor Keys mode.
+// 光标键模式。
 //
-// Deprecated: use [SetModeCursorKeys] and [ResetModeCursorKeys] instead.
+// 已弃用：请改用 [SetModeCursorKeys] 和 [ResetModeCursorKeys]。
 const (
 	EnableCursorKeys  = "\x1b[?1h"
 	DisableCursorKeys = "\x1b[?1l"
 )
 
-// Origin Mode (DECOM) determines whether the cursor moves to home or margin position.
+// 原点模式（DECOM）决定光标移动到起始位置还是边缘位置。
 //
-// Deprecated: use [ModeOrigin] instead.
+// 已弃用：请改用 [ModeOrigin]。
 const (
 	OriginMode = DECMode(6)
 
@@ -90,9 +90,9 @@ const (
 	RequestOriginMode = "\x1b[?6$p"
 )
 
-// Auto Wrap Mode (DECAWM) determines whether the cursor wraps to the next line.
+// 自动换行模式（DECAWM）决定光标是否换行到下一行。
 //
-// Deprecated: use [ModeAutoWrap] instead.
+// 已弃用：请改用 [ModeAutoWrap]。
 const (
 	AutoWrapMode = DECMode(7)
 

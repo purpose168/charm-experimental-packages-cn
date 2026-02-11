@@ -1,7 +1,5 @@
-// Package ansi defines common ANSI escape sequences based on the ECMA-48
-// specs.
+// Package ansi 基于 ECMA-48 规范定义了常见的 ANSI 转义序列。
 //
-// All sequences use 7-bit C1 control codes, which are supported by most
-// terminal emulators. OSC sequences are terminated by a BEL for wider
-// compatibility with terminals.
+// 所有序列都使用 7 位 C1 控制代码，这些代码被大多数终端模拟器支持。
+// OSC 序列以 BEL 结尾，以获得更广泛的终端兼容性。
 package ansi

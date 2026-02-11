@@ -9,11 +9,11 @@ import (
 	"fmt"
 )
 
-// DocumentChange is a union of various file edit operations.
+// DocumentChange 是各种文件编辑操作的联合类型。
 //
-// Exactly one field of this struct is non-nil; see [DocumentChange.Valid].
+// 此结构体中恰好有一个字段非空；请参阅 [DocumentChange.Valid]。
 //
-// See https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#resourceChanges
+// 参见 https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#resourceChanges
 type DocumentChange struct {
 	TextDocumentEdit *TextDocumentEdit
 	CreateFile       *CreateFile
@@ -21,8 +21,8 @@ type DocumentChange struct {
 	DeleteFile       *DeleteFile
 }
 
-// Valid reports whether the DocumentChange sum-type value is valid,
-// that is, exactly one of create, delete, edit, or rename.
+// Valid 报告 DocumentChange 联合类型值是否有效，
+// 即恰好有一个创建、删除、编辑或重命名操作。
 func (d DocumentChange) Valid() bool {
 	n := 0
 	if d.TextDocumentEdit != nil {
@@ -40,7 +40,7 @@ func (d DocumentChange) Valid() bool {
 	return n == 1
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
+// UnmarshalJSON 实现 json.Unmarshaler 接口。
 func (d *DocumentChange) UnmarshalJSON(data []byte) error {
 	var m map[string]any
 	if err := json.Unmarshal(data, &m); err != nil {
@@ -68,7 +68,7 @@ func (d *DocumentChange) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("DocumentChanges: unexpected kind: %q", kind)
 }
 
-// MarshalJSON implements json.Marshaler.
+// MarshalJSON 实现 json.Marshaler 接口。
 func (d *DocumentChange) MarshalJSON() ([]byte, error) {
 	if d.TextDocumentEdit != nil {
 		return json.Marshal(d.TextDocumentEdit) //nolint:wrapcheck

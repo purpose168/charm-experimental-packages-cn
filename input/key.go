@@ -5,19 +5,18 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 const (
-	// KeyExtended is a special key code used to signify that a key event
-	// contains multiple runes.
+	// KeyExtended 是一个特殊的键码，用于表示一个键事件包含多个符文。
 	KeyExtended = unicode.MaxRune + 1
 )
 
-// Special key symbols.
+// 特殊键符号。
 const (
 
-	// Special keys.
+	// 特殊键。
 
 	KeyUp rune = KeyExtended + iota + 1
 	KeyDown
@@ -33,7 +32,7 @@ const (
 	KeyHome
 	KeyEnd
 
-	// Keypad keys.
+	// 键盘按键。
 
 	KeyKpEnter
 	KeyKpEqual
@@ -55,8 +54,8 @@ const (
 	KeyKp9
 
 	//nolint:godox
-	// The following are keys defined in the Kitty keyboard protocol.
-	// TODO: Investigate the names of these keys.
+	// 以下是 Kitty 键盘协议中定义的键。
+	// TODO: 调查这些键的名称。
 
 	KeyKpSep
 	KeyKpUp
@@ -71,7 +70,7 @@ const (
 	KeyKpDelete
 	KeyKpBegin
 
-	// Function keys.
+	// 功能键。
 
 	KeyF1
 	KeyF2
@@ -138,8 +137,8 @@ const (
 	KeyF63
 
 	//nolint:godox
-	// The following are keys defined in the Kitty keyboard protocol.
-	// TODO: Investigate the names of these keys.
+	// 以下是 Kitty 键盘协议中定义的键。
+	// TODO: 调查这些键的名称。
 
 	KeyCapsLock
 	KeyScrollLock
@@ -178,7 +177,7 @@ const (
 	KeyIsoLevel3Shift
 	KeyIsoLevel5Shift
 
-	// Special names in C0.
+	// C0 中的特殊名称。
 
 	KeyBackspace = rune(ansi.DEL)
 	KeyTab       = rune(ansi.HT)
@@ -187,25 +186,24 @@ const (
 	KeyEscape    = rune(ansi.ESC)
 	KeyEsc       = KeyEscape
 
-	// Special names in G0.
+	// G0 中的特殊名称。
 
 	KeySpace = rune(ansi.SP)
 )
 
-// KeyPressEvent represents a key press event.
+// KeyPressEvent 表示按键按下事件。
 type KeyPressEvent Key
 
-// String implements [fmt.Stringer] and is quite useful for matching key
-// events. For details, on what this returns see [Key.String].
+// String 实现了 [fmt.Stringer] 接口，对于匹配键事件非常有用。
+// 有关其返回内容的详细信息，请参见 [Key.String]。
 func (k KeyPressEvent) String() string {
 	return Key(k).String()
 }
 
-// Keystroke returns the keystroke representation of the [Key]. While less type
-// safe than looking at the individual fields, it will usually be more
-// convenient and readable to use this method when matching against keys.
+// Keystroke 返回 [Key] 的按键表示形式。虽然在类型安全性上不如查看各个字段，
+// 但在匹配按键时，使用此方法通常会更方便、更易读。
 //
-// Note that modifier keys are always printed in the following order:
+// 注意，修饰键始终按以下顺序打印：
 //   - ctrl
 //   - alt
 //   - shift
@@ -213,32 +211,29 @@ func (k KeyPressEvent) String() string {
 //   - hyper
 //   - super
 //
-// For example, you'll always see "ctrl+shift+alt+a" and never
-// "shift+ctrl+alt+a".
+// 例如，您将始终看到 "ctrl+shift+alt+a"，而不是 "shift+ctrl+alt+a"。
 func (k KeyPressEvent) Keystroke() string {
 	return Key(k).Keystroke()
 }
 
-// Key returns the underlying key event. This is a syntactic sugar for casting
-// the key event to a [Key].
+// Key 返回底层的键事件。这是将键事件转换为 [Key] 的语法糖。
 func (k KeyPressEvent) Key() Key {
 	return Key(k)
 }
 
-// KeyReleaseEvent represents a key release event.
+// KeyReleaseEvent 表示按键释放事件。
 type KeyReleaseEvent Key
 
-// String implements [fmt.Stringer] and is quite useful for matching key
-// events. For details, on what this returns see [Key.String].
+// String 实现了 [fmt.Stringer] 接口，对于匹配键事件非常有用。
+// 有关其返回内容的详细信息，请参见 [Key.String]。
 func (k KeyReleaseEvent) String() string {
 	return Key(k).String()
 }
 
-// Keystroke returns the keystroke representation of the [Key]. While less type
-// safe than looking at the individual fields, it will usually be more
-// convenient and readable to use this method when matching against keys.
+// Keystroke 返回 [Key] 的按键表示形式。虽然在类型安全性上不如查看各个字段，
+// 但在匹配按键时，使用此方法通常会更方便、更易读。
 //
-// Note that modifier keys are always printed in the following order:
+// 注意，修饰键始终按以下顺序打印：
 //   - ctrl
 //   - alt
 //   - shift
@@ -246,34 +241,29 @@ func (k KeyReleaseEvent) String() string {
 //   - hyper
 //   - super
 //
-// For example, you'll always see "ctrl+shift+alt+a" and never
-// "shift+ctrl+alt+a".
+// 例如，您将始终看到 "ctrl+shift+alt+a"，而不是 "shift+ctrl+alt+a"。
 func (k KeyReleaseEvent) Keystroke() string {
 	return Key(k).Keystroke()
 }
 
-// Key returns the underlying key event. This is a convenience method and
-// syntactic sugar to satisfy the [KeyEvent] interface, and cast the key event to
-// [Key].
+// Key 返回底层的键事件。这是一个便捷方法和语法糖，用于满足 [KeyEvent] 接口，
+// 并将键事件转换为 [Key]。
 func (k KeyReleaseEvent) Key() Key {
 	return Key(k)
 }
 
-// KeyEvent represents a key event. This can be either a key press or a key
-// release event.
+// KeyEvent 表示键事件。这可以是按键按下或按键释放事件。
 type KeyEvent interface {
 	fmt.Stringer
 
-	// Key returns the underlying key event.
+	// Key 返回底层的键事件。
 	Key() Key
 }
 
-// Key represents a Key press or release event. It contains information about
-// the Key pressed, like the runes, the type of Key, and the modifiers pressed.
-// There are a couple general patterns you could use to check for key presses
-// or releases:
+// Key 表示按键按下或释放事件。它包含有关按下的键的信息，如符文、键的类型和按下的修饰键。
+// 有几种通用模式可用于检查按键按下或释放：
 //
-//	// Switch on the string representation of the key (shorter)
+//	// 根据键的字符串表示进行切换（更简短）
 //	switch ev := ev.(type) {
 //	case KeyPressEvent:
 //	    switch ev.String() {
@@ -284,10 +274,10 @@ type KeyEvent interface {
 //	    }
 //	}
 //
-//	// Switch on the key type (more foolproof)
+//	// 根据键类型进行切换（更可靠）
 //	switch ev := ev.(type) {
 //	case KeyEvent:
-//	    // catch both KeyPressEvent and KeyReleaseEvent
+//	    // 同时捕获 KeyPressEvent 和 KeyReleaseEvent
 //	    switch key := ev.Key(); key.Code {
 //	    case KeyEnter:
 //	        fmt.Println("you pressed enter!")
@@ -299,60 +289,47 @@ type KeyEvent interface {
 //	    }
 //	}
 //
-// Note that [Key.Text] will be empty for special keys like [KeyEnter],
-// [KeyTab], and for keys that don't represent printable characters like key
-// combos with modifier keys. In other words, [Key.Text] is populated only for
-// keys that represent printable characters shifted or unshifted (like 'a',
-// 'A', '1', '!', etc.).
+// 注意，对于特殊键（如 [KeyEnter]、[KeyTab]）以及不表示可打印字符的键（如带修饰键的组合键），
+// [Key.Text] 将为空。换句话说，[Key.Text] 仅在键表示可打印字符（无论是否按下 Shift 键，如 'a'、'A'、'1'、'!' 等）时才会填充。
 type Key struct {
-	// Text contains the actual characters received. This usually the same as
-	// [Key.Code]. When [Key.Text] is non-empty, it indicates that the key
-	// pressed represents printable character(s).
+	// Text 包含接收到的实际字符。这通常与 [Key.Code] 相同。当 [Key.Text] 非空时，
+	// 表示按下的键代表可打印字符。
 	Text string
 
-	// Mod represents modifier keys, like [ModCtrl], [ModAlt], and so on.
+	// Mod 表示修饰键，如 [ModCtrl]、[ModAlt] 等。
 	Mod KeyMod
 
-	// Code represents the key pressed. This is usually a special key like
-	// [KeyTab], [KeyEnter], [KeyF1], or a printable character like 'a'.
+	// Code 表示按下的键。这通常是一个特殊键，如 [KeyTab]、[KeyEnter]、[KeyF1]，
+	// 或一个可打印字符，如 'a'。
 	Code rune
 
-	// ShiftedCode is the actual, shifted key pressed by the user. For example,
-	// if the user presses shift+a, or caps lock is on, [Key.ShiftedCode] will
-	// be 'A' and [Key.Code] will be 'a'.
+	// ShiftedCode 是用户实际按下的、经过 Shift 修饰的键。例如，
+	// 如果用户按下 shift+a，或 Caps Lock 处于开启状态，[Key.ShiftedCode] 将是 'A'，
+	// 而 [Key.Code] 将是 'a'。
 	//
-	// In the case of non-latin keyboards, like Arabic, [Key.ShiftedCode] is the
-	// unshifted key on the keyboard.
+	// 对于非拉丁键盘（如阿拉伯语），[Key.ShiftedCode] 是键盘上未按下 Shift 的键。
 	//
-	// This is only available with the Kitty Keyboard Protocol or the Windows
-	// Console API.
+	// 这仅在 Kitty 键盘协议或 Windows 控制台 API 中可用。
 	ShiftedCode rune
 
-	// BaseCode is the key pressed according to the standard PC-101 key layout.
-	// On international keyboards, this is the key that would be pressed if the
-	// keyboard was set to US PC-101 layout.
+	// BaseCode 是根据标准 PC-101 键盘布局按下的键。
+	// 在国际键盘上，这是当键盘设置为 US PC-101 布局时会按下的键。
 	//
-	// For example, if the user presses 'q' on a French AZERTY keyboard,
-	// [Key.BaseCode] will be 'q'.
+	// 例如，如果用户在法语 AZERTY 键盘上按下 'q'，[Key.BaseCode] 将是 'q'。
 	//
-	// This is only available with the Kitty Keyboard Protocol or the Windows
-	// Console API.
+	// 这仅在 Kitty 键盘协议或 Windows 控制台 API 中可用。
 	BaseCode rune
 
-	// IsRepeat indicates whether the key is being held down and sending events
-	// repeatedly.
+	// IsRepeat 表示键是否被按住并重复发送事件。
 	//
-	// This is only available with the Kitty Keyboard Protocol or the Windows
-	// Console API.
+	// 这仅在 Kitty 键盘协议或 Windows 控制台 API 中可用。
 	IsRepeat bool
 }
 
-// String implements [fmt.Stringer] and is quite useful for matching key
-// events. It will return the textual representation of the [Key] if there is
-// one, otherwise, it will fallback to [Key.Keystroke].
+// String 实现了 [fmt.Stringer] 接口，对于匹配键事件非常有用。
+// 如果 [Key] 有文本表示，它将返回该表示，否则将回退到 [Key.Keystroke]。
 //
-// For example, you'll always get "?" and instead of "shift+/" on a US ANSI
-// keyboard.
+// 例如，在 US ANSI 键盘上，您将始终得到 "?" 而不是 "shift+/"。
 func (k Key) String() string {
 	if len(k.Text) > 0 && k.Text != " " {
 		return k.Text
@@ -360,11 +337,10 @@ func (k Key) String() string {
 	return k.Keystroke()
 }
 
-// Keystroke returns the keystroke representation of the [Key]. While less type
-// safe than looking at the individual fields, it will usually be more
-// convenient and readable to use this method when matching against keys.
+// Keystroke 返回 [Key] 的按键表示形式。虽然在类型安全性上不如查看各个字段，
+// 但在匹配按键时，使用此方法通常会更方便、更易读。
 //
-// Note that modifier keys are always printed in the following order:
+// 注意，修饰键始终按以下顺序打印：
 //   - ctrl
 //   - alt
 //   - shift
@@ -372,8 +348,7 @@ func (k Key) String() string {
 //   - hyper
 //   - super
 //
-// For example, you'll always see "ctrl+shift+alt+a" and never
-// "shift+ctrl+alt+a".
+// 例如，您将始终看到 "ctrl+shift+alt+a"，而不是 "shift+ctrl+alt+a"。
 func (k Key) Keystroke() string {
 	var sb strings.Builder
 	if k.Mod.Contains(ModCtrl) && k.Code != KeyLeftCtrl && k.Code != KeyRightCtrl {
@@ -400,18 +375,16 @@ func (k Key) Keystroke() string {
 	} else {
 		code := k.Code
 		if k.BaseCode != 0 {
-			// If a [Key.BaseCode] is present, use it to represent a key using the standard
-			// PC-101 key layout.
+			// 如果存在 [Key.BaseCode]，使用它来表示标准 PC-101 键盘布局上的键。
 			code = k.BaseCode
 		}
 
 		switch code {
 		case KeySpace:
-			// Space is the only invisible printable character.
+			// 空格是唯一不可见的可打印字符。
 			sb.WriteString("space")
 		case KeyExtended:
-			// Write the actual text of the key when the key contains multiple
-			// runes.
+			// 当键包含多个符文时，写入键的实际文本。
 			sb.WriteString(k.Text)
 		default:
 			sb.WriteRune(code)

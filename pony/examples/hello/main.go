@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/charmbracelet/x/term"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
 func main() {
@@ -23,10 +23,10 @@ func main() {
 </vstack>
 `
 
-	// Get terminal size
+	// 获取终端大小
 	width, height, err := term.GetSize(os.Stdout.Fd())
 	if err != nil {
-		width, height = 80, 24 // fallback
+		width, height = 80, 24 // 备用值
 	}
 
 	t := pony.MustParse[any](tmpl)

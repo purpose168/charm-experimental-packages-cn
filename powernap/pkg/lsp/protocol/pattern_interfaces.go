@@ -5,39 +5,39 @@ import (
 	"log/slog"
 )
 
-// PatternInfo is an interface for types that represent glob patterns.
+// PatternInfo 是表示 glob 模式的类型的接口。
 type PatternInfo interface {
 	GetPattern() string
 	GetBasePath() string
 	isPattern() // marker method
 }
 
-// StringPattern implements PatternInfo for string patterns.
+// StringPattern 为字符串模式实现了 PatternInfo 接口。
 type StringPattern struct {
 	Pattern string
 }
 
-// GetPattern returns the glob pattern string.
+// GetPattern 返回 glob 模式字符串。
 func (p StringPattern) GetPattern() string { return p.Pattern }
 
-// GetBasePath returns an empty string for simple patterns.
+// GetBasePath 为简单模式返回空字符串。
 func (p StringPattern) GetBasePath() string { return "" }
 func (p StringPattern) isPattern()          {}
 
-// RelativePatternInfo implements PatternInfo for RelativePattern.
+// RelativePatternInfo 为 RelativePattern 实现了 PatternInfo 接口。
 type RelativePatternInfo struct {
 	RP       RelativePattern
 	BasePath string
 }
 
-// GetPattern returns the glob pattern string.
+// GetPattern 返回 glob 模式字符串。
 func (p RelativePatternInfo) GetPattern() string { return p.RP.Pattern }
 
-// GetBasePath returns the base path for the pattern.
+// GetBasePath 返回模式的基础路径。
 func (p RelativePatternInfo) GetBasePath() string { return p.BasePath }
 func (p RelativePatternInfo) isPattern()          {}
 
-// AsPattern converts GlobPattern to a PatternInfo object.
+// AsPattern 将 GlobPattern 转换为 PatternInfo 对象。
 func (g *GlobPattern) AsPattern() (PatternInfo, error) {
 	if g.Value == nil {
 		return nil, fmt.Errorf("nil pattern")

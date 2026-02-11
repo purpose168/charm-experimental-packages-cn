@@ -5,9 +5,10 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/charmbracelet/x/exp/slice"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/slice"
 )
 
+// TestGroupBy 测试 GroupBy 函数的功能
 func TestGroupBy(t *testing.T) {
 	expected := map[string][]string{
 		"a": {"andrey", "ayman"},
@@ -26,10 +27,11 @@ func TestGroupBy(t *testing.T) {
 	output := slice.GroupBy(input, func(s string) string { return string(s[0]) })
 
 	if !reflect.DeepEqual(expected, output) {
-		t.Errorf("Expected %v, got %v", expected, output)
+		t.Errorf("期望 %v, 得到 %v", expected, output)
 	}
 }
 
+// TestTake 测试 Take 函数的功能
 func TestTake(t *testing.T) {
 	for i, tc := range []struct {
 		input    []int
@@ -64,11 +66,12 @@ func TestTake(t *testing.T) {
 	} {
 		actual := slice.Take(tc.input, tc.take)
 		if len(actual) != len(tc.expected) {
-			t.Errorf("Test %d: Expected %v, got %v", i, tc.expected, actual)
+			t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tc.expected, actual)
 		}
 	}
 }
 
+// TestLast 测试 Last 函数的功能
 func TestLast(t *testing.T) {
 	for i, tc := range []struct {
 		input    []int
@@ -98,14 +101,15 @@ func TestLast(t *testing.T) {
 	} {
 		actual, ok := slice.Last(tc.input)
 		if ok != tc.ok {
-			t.Errorf("Test %d: Expected ok %v, got %v", i, tc.ok, ok)
+			t.Errorf("测试 %d: 期望 ok %v, 得到 %v", i, tc.ok, ok)
 		}
 		if actual != tc.expected {
-			t.Errorf("Test %d: Expected %v, got %v", i, tc.expected, actual)
+			t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tc.expected, actual)
 		}
 	}
 }
 
+// TestUniq 测试 Uniq 函数的功能
 func TestUniq(t *testing.T) {
 	for i, tc := range []struct {
 		input    []int
@@ -130,11 +134,12 @@ func TestUniq(t *testing.T) {
 	} {
 		actual := slice.Uniq(tc.input)
 		if !reflect.DeepEqual(actual, tc.expected) {
-			t.Errorf("Test %d: Expected %v, got %v", i, tc.expected, actual)
+			t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tc.expected, actual)
 		}
 	}
 }
 
+// TestIntersperse 测试 Intersperse 函数的功能
 func TestIntersperse(t *testing.T) {
 	for i, tc := range []struct {
 		input    []string
@@ -164,11 +169,12 @@ func TestIntersperse(t *testing.T) {
 	} {
 		actual := slice.Intersperse(tc.input, tc.insert)
 		if !reflect.DeepEqual(actual, tc.expected) {
-			t.Errorf("Test %d: Expected %v, got %v", i, tc.expected, actual)
+			t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tc.expected, actual)
 		}
 	}
 }
 
+// TestContainsAny 测试 ContainsAny 函数的功能
 func TestContainsAny(t *testing.T) {
 	for i, tc := range []struct {
 		input    []string
@@ -198,11 +204,12 @@ func TestContainsAny(t *testing.T) {
 	} {
 		actual := slice.ContainsAny(tc.input, tc.values...)
 		if actual != tc.expected {
-			t.Errorf("Test %d: Expected %v, got %v", i, tc.expected, actual)
+			t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tc.expected, actual)
 		}
 	}
 }
 
+// TestShift 测试 Shift 函数的功能
 func TestShift(t *testing.T) {
 	for i, tc := range []struct {
 		input         []int
@@ -237,17 +244,18 @@ func TestShift(t *testing.T) {
 	} {
 		actual, newSlice, ok := slice.Shift(tc.input)
 		if ok != tc.ok {
-			t.Errorf("test %d: expected ok %v, got %v", i, tc.ok, ok)
+			t.Errorf("测试 %d: 期望 ok %v, 得到 %v", i, tc.ok, ok)
 		}
 		if actual != tc.expectedVal {
-			t.Errorf("test %d: expected val %v, got %v", i, tc.expectedVal, actual)
+			t.Errorf("测试 %d: 期望 val %v, 得到 %v", i, tc.expectedVal, actual)
 		}
 		if !reflect.DeepEqual(newSlice, tc.expectedSlice) {
-			t.Errorf("test %d: expected slice %v, got %v", i, tc.expectedSlice, newSlice)
+			t.Errorf("测试 %d: 期望 slice %v, 得到 %v", i, tc.expectedSlice, newSlice)
 		}
 	}
 }
 
+// TestPop 测试 Pop 函数的功能
 func TestPop(t *testing.T) {
 	for i, tc := range []struct {
 		input         []int
@@ -282,17 +290,18 @@ func TestPop(t *testing.T) {
 	} {
 		actual, newSlice, ok := slice.Pop(tc.input)
 		if ok != tc.ok {
-			t.Errorf("test %d: expected ok %v, got %v", i, tc.ok, ok)
+			t.Errorf("测试 %d: 期望 ok %v, 得到 %v", i, tc.ok, ok)
 		}
 		if actual != tc.expectedVal {
-			t.Errorf("test %d: expected val %v, got %v", i, tc.expectedVal, actual)
+			t.Errorf("测试 %d: 期望 val %v, 得到 %v", i, tc.expectedVal, actual)
 		}
 		if !reflect.DeepEqual(newSlice, tc.expectedSlice) {
-			t.Errorf("test %d: expected slice %v, got %v", i, tc.expectedSlice, newSlice)
+			t.Errorf("测试 %d: 期望 slice %v, 得到 %v", i, tc.expectedSlice, newSlice)
 		}
 	}
 }
 
+// TestDeleteAt 测试 DeleteAt 函数的功能
 func TestDeleteAt(t *testing.T) {
 	for i, tc := range []struct {
 		input         []int
@@ -339,17 +348,18 @@ func TestDeleteAt(t *testing.T) {
 	} {
 		actual, newSlice, ok := slice.DeleteAt(tc.input, tc.index)
 		if ok != tc.ok {
-			t.Errorf("test %d: expected ok %v, got %v", i, tc.ok, ok)
+			t.Errorf("测试 %d: 期望 ok %v, 得到 %v", i, tc.ok, ok)
 		}
 		if actual != tc.expectedVal {
-			t.Errorf("test %d: expected val %v, got %v", i, tc.expectedVal, actual)
+			t.Errorf("测试 %d: 期望 val %v, 得到 %v", i, tc.expectedVal, actual)
 		}
 		if !reflect.DeepEqual(newSlice, tc.expectedSlice) {
-			t.Errorf("test %d: expected slice %v, got %v", i, tc.expectedSlice, newSlice)
+			t.Errorf("测试 %d: 期望 slice %v, 得到 %v", i, tc.expectedSlice, newSlice)
 		}
 	}
 }
 
+// TestIsSubset 测试 IsSubset 函数的功能
 func TestIsSubset(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -357,85 +367,85 @@ func TestIsSubset(t *testing.T) {
 		b        []string
 		expected bool
 	}{
-		// Basic subset cases
+		// 基本子集情况
 		{
-			name:     "empty subset of empty",
+			name:     "空集是空集的子集",
 			a:        []string{},
 			b:        []string{},
 			expected: true,
 		},
 		{
-			name:     "empty subset of non-empty",
+			name:     "空集是非空集的子集",
 			a:        []string{},
 			b:        []string{"a", "b", "c"},
 			expected: true,
 		},
 		{
-			name:     "non-empty not subset of empty",
+			name:     "非空集不是空集的子集",
 			a:        []string{"a"},
 			b:        []string{},
 			expected: false,
 		},
 		{
-			name:     "single element subset",
+			name:     "单个元素是子集",
 			a:        []string{"b"},
 			b:        []string{"a", "b", "c"},
 			expected: true,
 		},
 		{
-			name:     "single element not subset",
+			name:     "单个元素不是子集",
 			a:        []string{"d"},
 			b:        []string{"a", "b", "c"},
 			expected: false,
 		},
 		{
-			name:     "multiple elements subset",
+			name:     "多个元素是子集",
 			a:        []string{"a", "c"},
 			b:        []string{"a", "b", "c", "d"},
 			expected: true,
 		},
 		{
-			name:     "multiple elements not subset",
+			name:     "多个元素不是子集",
 			a:        []string{"a", "e"},
 			b:        []string{"a", "b", "c", "d"},
 			expected: false,
 		},
 		{
-			name:     "equal sets are subsets",
+			name:     "相等的集合是子集",
 			a:        []string{"a", "b", "c"},
 			b:        []string{"a", "b", "c"},
 			expected: true,
 		},
 		{
-			name:     "larger set not subset of smaller",
+			name:     "较大的集合不是较小集合的子集",
 			a:        []string{"a", "b", "c", "d"},
 			b:        []string{"a", "b"},
 			expected: false,
 		},
 
-		// Order independence
+		// 顺序无关
 		{
-			name:     "subset with different order",
+			name:     "不同顺序的子集",
 			a:        []string{"c", "a"},
 			b:        []string{"b", "a", "d", "c"},
 			expected: true,
 		},
 
-		// Duplicate handling
+		// 重复元素处理
 		{
-			name:     "duplicates in subset",
+			name:     "子集有重复元素",
 			a:        []string{"a", "a", "b"},
 			b:        []string{"a", "b", "c"},
 			expected: true,
 		},
 		{
-			name:     "duplicates in superset",
+			name:     "超集有重复元素",
 			a:        []string{"a", "b"},
 			b:        []string{"a", "a", "b", "b", "c"},
 			expected: true,
 		},
 		{
-			name:     "duplicates in both",
+			name:     "两者都有重复元素",
 			a:        []string{"a", "a", "b"},
 			b:        []string{"a", "a", "b", "b", "c"},
 			expected: true,
@@ -446,12 +456,13 @@ func TestIsSubset(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			actual := slice.IsSubset(tt.a, tt.b)
 			if actual != tt.expected {
-				t.Errorf("Test %d: Expected %v, got %v", i, tt.expected, actual)
+				t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tt.expected, actual)
 			}
 		})
 	}
 }
 
+// TestIsSubsetWithInts 测试 IsSubset 函数处理整数的功能
 func TestIsSubsetWithInts(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -460,19 +471,19 @@ func TestIsSubsetWithInts(t *testing.T) {
 		expected bool
 	}{
 		{
-			name:     "int subset",
+			name:     "整数子集",
 			a:        []int{1, 3},
 			b:        []int{1, 2, 3, 4},
 			expected: true,
 		},
 		{
-			name:     "int not subset",
+			name:     "整数不是子集",
 			a:        []int{1, 5},
 			b:        []int{1, 2, 3, 4},
 			expected: false,
 		},
 		{
-			name:     "empty int subset",
+			name:     "空整数子集",
 			a:        []int{},
 			b:        []int{1, 2, 3},
 			expected: true,
@@ -483,12 +494,13 @@ func TestIsSubsetWithInts(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			actual := slice.IsSubset(tt.a, tt.b)
 			if actual != tt.expected {
-				t.Errorf("Test %d: Expected %v, got %v", i, tt.expected, actual)
+				t.Errorf("测试 %d: 期望 %v, 得到 %v", i, tt.expected, actual)
 			}
 		})
 	}
 }
 
+// TestMapStringToInt 测试 Map 函数将字符串映射为整数的功能
 func TestMapStringToInt(t *testing.T) {
 	seq := slices.Values([]string{"a", "ab", "abc", "abcd"})
 	mapped := slice.Map(seq, func(s string) int { return len(s) })
@@ -497,6 +509,6 @@ func TestMapStringToInt(t *testing.T) {
 	result := slices.Collect(mapped)
 
 	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Expected %v, got %v", expected, result)
+		t.Errorf("期望 %v, 得到 %v", expected, result)
 	}
 }

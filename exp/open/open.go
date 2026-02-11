@@ -1,4 +1,4 @@
-// Package open provides functionality for opening files and URLs.
+// Package open 提供打开文件和 URL 的功能。
 package open
 
 import (
@@ -7,15 +7,15 @@ import (
 	"fmt"
 )
 
-// ErrNotSupported occurs when no ways to open a file are found.
+// ErrNotSupported 当找不到打开文件的方法时发生。
 var ErrNotSupported = errors.New("not supported")
 
-// Open the given input.
+// Open 打开给定的输入。
 func Open(ctx context.Context, input string) error {
 	return With(ctx, "", input)
 }
 
-// With opens the given input using the given app.
+// With 使用给定的应用程序打开给定的输入。
 func With(ctx context.Context, app, input string) error {
 	cmd := buildCmd(ctx, app, input)
 	if cmd == nil {

@@ -5,8 +5,8 @@ package termios
 
 import "golang.org/x/sys/unix"
 
-// see https://src.illumos.org/source/xref/illumos-gate/usr/src/lib/libc/port/gen/isatty.c
-// see https://github.com/omniti-labs/illumos-omnios/blob/master/usr/src/uts/common/sys/termios.h
+// 参见 https://src.illumos.org/source/xref/illumos-gate/usr/src/lib/libc/port/gen/isatty.c
+// 参见 https://github.com/omniti-labs/illumos-omnios/blob/master/usr/src/uts/common/sys/termios.h
 const (
 	ioctlSets       = unix.TCSETA
 	ioctlGets       = unix.TCGETA
@@ -15,9 +15,9 @@ const (
 )
 
 func setSpeed(*unix.Termios, uint32, uint32) {
-	// TODO: support setting speed on Solaris?
-	// see cfgetospeed(3C) and cfsetospeed(3C)
-	// see cfgetispeed(3C) and cfsetispeed(3C)
+	// TODO: 支持在 Solaris 上设置速度？
+	// 参见 cfgetospeed(3C) 和 cfsetospeed(3C)
+	// 参见 cfgetispeed(3C) 和 cfsetispeed(3C)
 	// https://github.com/omniti-labs/illumos-omnios/blob/master/usr/src/uts/common/sys/termios.h#L103
 }
 

@@ -6,7 +6,7 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// Box represents a container with an optional border.
+// Box 表示一个带有可选边框的容器。
 type Box struct {
 	BaseElement
 	child        Element
@@ -15,7 +15,7 @@ type Box struct {
 	width        SizeConstraint
 	height       SizeConstraint
 	padding      int
-	margin       int // margin on all sides
+	margin       int // 所有边的边距
 	marginTop    int
 	marginRight  int
 	marginBottom int
@@ -24,7 +24,7 @@ type Box struct {
 
 var _ Element = (*Box)(nil)
 
-// NewBox creates a new box element.
+// NewBox 创建一个新的 box 元素。
 func NewBox(child Element) *Box {
 	return &Box{
 		child:  child,
@@ -32,71 +32,71 @@ func NewBox(child Element) *Box {
 	}
 }
 
-// Border sets the border style and returns the box for chaining.
+// Border 设置边框样式并返回 box 以支持链式调用。
 func (b *Box) Border(border string) *Box {
 	b.border = border
 	return b
 }
 
-// BorderColor sets the border color and returns the box for chaining.
+// BorderColor 设置边框颜色并返回 box 以支持链式调用。
 func (b *Box) BorderColor(c color.Color) *Box {
 	b.borderColor = c
 	return b
 }
 
-// Padding sets the padding and returns the box for chaining.
+// Padding 设置内边距并返回 box 以支持链式调用。
 func (b *Box) Padding(padding int) *Box {
 	b.padding = padding
 	return b
 }
 
-// Margin sets the margin on all sides and returns the box for chaining.
+// Margin 设置所有边的边距并返回 box 以支持链式调用。
 func (b *Box) Margin(margin int) *Box {
 	b.margin = margin
 	return b
 }
 
-// MarginTop sets the top margin and returns the box for chaining.
+// MarginTop 设置顶部边距并返回 box 以支持链式调用。
 func (b *Box) MarginTop(margin int) *Box {
 	b.marginTop = margin
 	return b
 }
 
-// MarginRight sets the right margin and returns the box for chaining.
+// MarginRight 设置右侧边距并返回 box 以支持链式调用。
 func (b *Box) MarginRight(margin int) *Box {
 	b.marginRight = margin
 	return b
 }
 
-// MarginBottom sets the bottom margin and returns the box for chaining.
+// MarginBottom 设置底部边距并返回 box 以支持链式调用。
 func (b *Box) MarginBottom(margin int) *Box {
 	b.marginBottom = margin
 	return b
 }
 
-// MarginLeft sets the left margin and returns the box for chaining.
+// MarginLeft 设置左侧边距并返回 box 以支持链式调用。
 func (b *Box) MarginLeft(margin int) *Box {
 	b.marginLeft = margin
 	return b
 }
 
-// Width sets the width constraint and returns the box for chaining.
+// Width 设置宽度约束并返回 box 以支持链式调用。
 func (b *Box) Width(width SizeConstraint) *Box {
 	b.width = width
 	return b
 }
 
-// Height sets the height constraint and returns the box for chaining.
+// Height 设置高度约束并返回 box 以支持链式调用。
 func (b *Box) Height(height SizeConstraint) *Box {
 	b.height = height
 	return b
 }
 
-// Draw renders the box to the screen.
+// Draw 将 box 渲染到屏幕上。
 func (b *Box) Draw(scr uv.Screen, area uv.Rectangle) {
 	b.SetBounds(area)
 
-	// Apply margin (shrink the area before drawing)
+	// 应用边距（在绘制前缩小区域）
 	marginTop := b.marginTop
 	if marginTop == 0 {
 		marginTop = b.margin
@@ -126,7 +126,7 @@ func (b *Box) Draw(scr uv.Screen, area uv.Rectangle) {
 		)
 	}
 
-	// Draw border if specified
+	// 如果指定了边框，则绘制边框
 	if b.border != "" && b.border != BorderNone {
 		var uvBorder uv.Border
 		switch b.border {
@@ -144,23 +144,23 @@ func (b *Box) Draw(scr uv.Screen, area uv.Rectangle) {
 			uvBorder = uv.NormalBorder()
 		}
 
-		// Apply border color if specified
+		// 如果指定了边框颜色，则应用
 		if b.borderColor != nil {
 			uvBorder = uvBorder.Style(uv.Style{Fg: b.borderColor})
 		}
 
 		uvBorder.Draw(scr, area)
 
-		// Shrink area for child content (leave space for border)
+		// 为子内容缩小区域（为边框留出空间）
 		if area.Dx() > 2 && area.Dy() > 2 {
 			area = uv.Rect(area.Min.X+1, area.Min.Y+1, area.Dx()-2, area.Dy()-2)
 		}
 	}
 
-	// Apply padding
+	// 应用内边距
 	if b.padding > 0 {
-		padH := b.padding * 2 // left + right
-		padV := b.padding * 2 // top + bottom
+		padH := b.padding * 2 // 左侧 + 右侧
+		padV := b.padding * 2 // 顶部 + 底部
 		if area.Dx() > padH && area.Dy() > padV {
 			area = uv.Rect(
 				area.Min.X+b.padding,
@@ -171,15 +171,15 @@ func (b *Box) Draw(scr uv.Screen, area uv.Rectangle) {
 		}
 	}
 
-	// Draw child if present
+	// 如果存在子元素，则绘制子元素
 	if b.child != nil {
 		b.child.Draw(scr, area)
 	}
 }
 
-// Layout calculates the box size.
+// Layout 计算 box 的大小。
 func (b *Box) Layout(constraints Constraints) Size {
-	// Account for margin
+	// 考虑边距
 	marginTop := b.marginTop
 	if marginTop == 0 {
 		marginTop = b.margin
@@ -200,7 +200,7 @@ func (b *Box) Layout(constraints Constraints) Size {
 	marginWidth := marginLeft + marginRight
 	marginHeight := marginTop + marginBottom
 
-	// Account for border
+	// 考虑边框
 	borderWidth := 0
 	borderHeight := 0
 	if b.border != "" && b.border != BorderNone {
@@ -208,7 +208,7 @@ func (b *Box) Layout(constraints Constraints) Size {
 		borderHeight = 2
 	}
 
-	// Account for padding
+	// 考虑内边距
 	paddingWidth := b.padding * 2
 	paddingHeight := b.padding * 2
 
@@ -232,12 +232,12 @@ func (b *Box) Layout(constraints Constraints) Size {
 		Height: childSize.Height + marginHeight + borderHeight + paddingHeight,
 	}
 
-	// Apply width constraint if specified
+	// 如果指定了宽度约束，则应用
 	if !b.width.IsAuto() {
 		totalSize.Width = b.width.Apply(constraints.MaxWidth, totalSize.Width)
 	}
 
-	// Apply height constraint if specified
+	// 如果指定了高度约束，则应用
 	if !b.height.IsAuto() {
 		totalSize.Height = b.height.Apply(constraints.MaxHeight, totalSize.Height)
 	}
@@ -245,7 +245,7 @@ func (b *Box) Layout(constraints Constraints) Size {
 	return constraints.Constrain(totalSize)
 }
 
-// Children returns the child element.
+// Children 返回子元素。
 func (b *Box) Children() []Element {
 	if b.child == nil {
 		return nil

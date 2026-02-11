@@ -9,57 +9,57 @@ func TestSelectGraphicRendition(t *testing.T) {
 		want string
 	}{
 		{
-			name: "no attributes",
+			name: "无属性",
 			args: []Attr{},
 			want: "\x1b[m",
 		},
 		{
-			name: "single basic attribute",
+			name: "单个基本属性",
 			args: []Attr{BoldAttr},
 			want: "\x1b[1m",
 		},
 		{
-			name: "multiple basic attributes",
+			name: "多个基本属性",
 			args: []Attr{BoldAttr, ItalicAttr, UnderlineAttr},
 			want: "\x1b[1;3;4m",
 		},
 		{
-			name: "foreground colors",
+			name: "前景色",
 			args: []Attr{RedForegroundColorAttr, BoldAttr},
 			want: "\x1b[31;1m",
 		},
 		{
-			name: "background colors",
+			name: "背景色",
 			args: []Attr{BlueBackgroundColorAttr, BoldAttr},
 			want: "\x1b[44;1m",
 		},
 		{
-			name: "bright colors",
+			name: "亮色",
 			args: []Attr{BrightRedForegroundColorAttr, BrightBlueBackgroundColorAttr},
 			want: "\x1b[91;104m",
 		},
 		{
-			name: "reset attributes",
+			name: "重置属性",
 			args: []Attr{ResetAttr},
 			want: "\x1b[0m",
 		},
 		{
-			name: "negative attribute value",
+			name: "负属性值",
 			args: []Attr{-1},
 			want: "\x1b[0m",
 		},
 		{
-			name: "custom attribute value",
+			name: "自定义属性值",
 			args: []Attr{99},
 			want: "\x1b[99m",
 		},
 		{
-			name: "mixed known and custom attributes",
+			name: "混合已知和自定义属性",
 			args: []Attr{BoldAttr, 99, ItalicAttr},
 			want: "\x1b[1;99;3m",
 		},
 		{
-			name: "all text decorations",
+			name: "所有文本装饰",
 			args: []Attr{
 				BoldAttr,
 				FaintAttr,
@@ -73,7 +73,7 @@ func TestSelectGraphicRendition(t *testing.T) {
 			want: "\x1b[1;2;3;4;5;7;8;9m",
 		},
 		{
-			name: "all color reset attributes",
+			name: "所有颜色重置属性",
 			args: []Attr{
 				DefaultForegroundColorAttr,
 				DefaultBackgroundColorAttr,
@@ -82,7 +82,7 @@ func TestSelectGraphicRendition(t *testing.T) {
 			want: "\x1b[39;49;59m",
 		},
 		{
-			name: "extended color attributes",
+			name: "扩展颜色属性",
 			args: []Attr{
 				ExtendedForegroundColorAttr,
 				ExtendedBackgroundColorAttr,

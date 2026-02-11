@@ -7,11 +7,11 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// BoundsMap tracks all rendered elements and their positions for hit testing.
-// It is immutable after creation and safe for concurrent reads.
+// BoundsMap 跟踪所有渲染元素及其位置，用于点击测试。
+// 创建后不可变，并发读取安全。
 type BoundsMap struct {
 	elements   map[string]elementBounds
-	byPosition []elementBounds // ordered for z-index (last = on top)
+	byPosition []elementBounds // 按 z-index 排序（最后一个 = 在顶部）
 }
 
 type elementBounds struct {
@@ -20,15 +20,15 @@ type elementBounds struct {
 	bounds uv.Rectangle
 }
 
-// NewBoundsMap creates a new empty bounds map.
+// NewBoundsMap 创建一个新的空边界映射。
 func NewBoundsMap() *BoundsMap {
 	return &BoundsMap{
 		elements: make(map[string]elementBounds),
 	}
 }
 
-// Register records an element and its rendered bounds.
-// This should be called during the render pass.
+// Register 记录元素及其渲染边界。
+// 应在渲染过程中调用。
 func (bm *BoundsMap) Register(elem Element, bounds uv.Rectangle) {
 	eb := elementBounds{
 		id:     elem.ID(),
@@ -39,42 +39,39 @@ func (bm *BoundsMap) Register(elem Element, bounds uv.Rectangle) {
 	bm.byPosition = append(bm.byPosition, eb)
 }
 
-// HitTest returns the top-most element at the given screen coordinates.
-// When multiple elements overlap at a point, it prefers elements with explicitly
-// set IDs over auto-generated IDs (elem_*).
+// HitTest 返回给定屏幕坐标处的最顶层元素。
+// 当多个元素在某一点重叠时，优先选择具有显式设置的 ID 的元素，而不是自动生成的 ID (elem_*)。
 //
-// This behavior is crucial for interactive components: when you click inside
-// a component's rendered area, you want the component's ID, not its children's.
-// For example, clicking anywhere in an Input component should return the Input's
-// ID, not the Text or Box child inside it.
+// 这种行为对于交互组件至关重要：当你点击组件的渲染区域时，你希望获取组件的 ID，而不是其子元素的 ID。
+// 例如，点击 Input 组件中的任何位置都应该返回 Input 的 ID，而不是其内部的 Text 或 Box 子元素的 ID。
 //
-// To achieve this, set your component's ID on the root element it returns:
+// 要实现这一点，请在组件返回的根元素上设置组件的 ID：
 //
 //	func (i *Input) Render() pony.Element {
 //	    vstack := pony.NewVStack(...)
-//	    vstack.SetID(i.ID())  // Pass through component ID
+//	    vstack.SetID(i.ID())  // 传递组件 ID
 //	    return vstack
 //	}
 //
-// Returns nil if no element is found at that position.
+// 如果在该位置未找到元素，则返回 nil。
 func (bm *BoundsMap) HitTest(x, y int) Element {
 	var bestMatch Element
 	var bestMatchHasExplicitID bool
 
-	// Search from end (last drawn = on top)
+	// 从末尾搜索（最后绘制 = 在顶部）
 	for i := len(bm.byPosition) - 1; i >= 0; i-- {
 		eb := bm.byPosition[i]
 		if pointInRect(x, y, eb.bounds) {
-			// Check if this element has an explicit ID (not auto-generated)
+			// 检查此元素是否有显式 ID（非自动生成）
 			hasExplicitID := !strings.HasPrefix(eb.id, "elem_")
 
-			// First match or better match (explicit ID preferred)
+			// 第一个匹配项或更好的匹配项（优先选择显式 ID）
 			if bestMatch == nil || (!bestMatchHasExplicitID && hasExplicitID) {
 				bestMatch = eb.elem
 				bestMatchHasExplicitID = hasExplicitID
 			}
 
-			// If we found an element with explicit ID, that's our best match
+			// 如果找到具有显式 ID 的元素，那就是我们的最佳匹配项
 			if hasExplicitID {
 				return bestMatch
 			}
@@ -84,30 +81,29 @@ func (bm *BoundsMap) HitTest(x, y int) Element {
 	return bestMatch
 }
 
-// HitTestAll returns all elements at the given screen coordinates,
-// ordered from top to bottom (first element is visually on top).
+// HitTestAll 返回给定屏幕坐标处的所有元素，
+// 从上到下排序（第一个元素在视觉上位于顶部）。
 //
-// This is useful for nested interactive components like scroll views
-// with clickable children, where you need to know both the child
-// that was clicked and the parent containers.
+// 这对于带有可点击子元素的嵌套交互组件（如滚动视图）非常有用，
+// 你需要同时知道被点击的子元素和其父容器。
 //
-// Example usage:
+// 使用示例：
 //
 //	hits := boundsMap.HitTestAll(x, y)
 //	for _, elem := range hits {
 //	    switch elem.ID() {
 //	    case "list-item-5":
-//	        // Handle item click
+//	        // 处理项目点击
 //	    case "main-scroll-view":
-//	        // Also track that we're in the scroll view
+//	        // 同时跟踪我们在滚动视图中
 //	    }
 //	}
 //
-// Returns empty slice if no elements are found at that position.
+// 如果在该位置未找到元素，则返回空切片。
 func (bm *BoundsMap) HitTestAll(x, y int) []Element {
 	var hits []Element
 
-	// Search from end (last drawn = on top)
+	// 从末尾搜索（最后绘制 = 在顶部）
 	for i := len(bm.byPosition) - 1; i >= 0; i-- {
 		eb := bm.byPosition[i]
 		if pointInRect(x, y, eb.bounds) {
@@ -118,26 +114,23 @@ func (bm *BoundsMap) HitTestAll(x, y int) []Element {
 	return hits
 }
 
-// HitTestWithContainer returns the top element and the first parent
-// container with an explicit ID. This is useful for scroll views with
-// clickable items where you want to know both what was clicked and
-// which container it's in.
+// HitTestWithContainer 返回顶部元素和第一个带有显式 ID 的父容器。
+// 这对于带有可点击项目的滚动视图非常有用，你希望同时知道点击了什么以及它在哪个容器中。
 //
-// The "top" element is the visually topmost element at the coordinates.
-// The "container" is the first element in the hit stack (after top) that
-// has an explicit ID (not auto-generated with "elem_" prefix).
+// "顶部"元素是坐标处视觉上最顶层的元素。
+// "容器"是命中堆栈中（顶部之后）第一个具有显式 ID（非自动生成的 "elem_" 前缀）的元素。
 //
-// Example usage:
+// 使用示例：
 //
 //	top, container := boundsMap.HitTestWithContainer(x, y)
 //	if top != nil {
 //	    handleClick(top.ID())
 //	}
 //	if container != nil && container.ID() == "scroll-view" {
-//	    // We know we clicked inside a scroll view
+//	    // 我们知道我们点击了滚动视图内部
 //	}
 //
-// Returns (nil, nil) if no element is found at that position.
+// 如果在该位置未找到元素，则返回 (nil, nil)。
 func (bm *BoundsMap) HitTestWithContainer(x, y int) (top Element, container Element) {
 	hits := bm.HitTestAll(x, y)
 	if len(hits) == 0 {
@@ -146,7 +139,7 @@ func (bm *BoundsMap) HitTestWithContainer(x, y int) (top Element, container Elem
 
 	top = hits[0]
 
-	// Find first container (element with explicit ID that's not the top)
+	// 找到第一个容器（具有显式 ID 且不是顶部的元素）
 	for i := 1; i < len(hits); i++ {
 		if !strings.HasPrefix(hits[i].ID(), "elem_") {
 			container = hits[i]
@@ -157,19 +150,19 @@ func (bm *BoundsMap) HitTestWithContainer(x, y int) (top Element, container Elem
 	return top, container
 }
 
-// GetByID retrieves an element by its ID.
+// GetByID 通过 ID 检索元素。
 func (bm *BoundsMap) GetByID(id string) (Element, bool) {
 	eb, ok := bm.elements[id]
 	return eb.elem, ok
 }
 
-// GetBounds returns the rendered bounds for an element by ID.
+// GetBounds 通过 ID 返回元素的渲染边界。
 func (bm *BoundsMap) GetBounds(id string) (uv.Rectangle, bool) {
 	eb, ok := bm.elements[id]
 	return eb.bounds, ok
 }
 
-// AllElements returns all registered elements with their bounds.
+// AllElements 返回所有注册的元素及其边界。
 func (bm *BoundsMap) AllElements() []ElementWithBounds {
 	result := make([]ElementWithBounds, 0, len(bm.byPosition))
 	for _, eb := range bm.byPosition {
@@ -181,27 +174,27 @@ func (bm *BoundsMap) AllElements() []ElementWithBounds {
 	return result
 }
 
-// ElementWithBounds pairs an element with its rendered bounds.
+// ElementWithBounds 将元素与其渲染边界配对。
 type ElementWithBounds struct {
 	Element Element
 	Bounds  uv.Rectangle
 }
 
-// pointInRect checks if a point is inside a rectangle.
+// pointInRect 检查点是否在矩形内。
 func pointInRect(x, y int, rect uv.Rectangle) bool {
 	return x >= rect.Min.X && x < rect.Max.X &&
 		y >= rect.Min.Y && y < rect.Max.Y
 }
 
-// BaseElement provides common functionality for all elements.
-// Elements should embed this to get ID and bounds tracking.
+// BaseElement 为所有元素提供通用功能。
+// 元素应嵌入此结构以获得 ID 和边界跟踪。
 type BaseElement struct {
 	id     string
 	bounds uv.Rectangle
 }
 
-// ID returns the element's identifier.
-// If no ID was explicitly set, returns a pointer-based ID.
+// ID 返回元素的标识符。
+// 如果未显式设置 ID，则返回基于指针的 ID。
 func (b *BaseElement) ID() string {
 	if b.id == "" {
 		return fmt.Sprintf("elem_%p", b)
@@ -209,23 +202,23 @@ func (b *BaseElement) ID() string {
 	return b.id
 }
 
-// SetID sets the element's identifier.
+// SetID 设置元素的标识符。
 func (b *BaseElement) SetID(id string) {
 	b.id = id
 }
 
-// Bounds returns the element's last rendered bounds.
+// Bounds 返回元素最后渲染的边界。
 func (b *BaseElement) Bounds() uv.Rectangle {
 	return b.bounds
 }
 
-// SetBounds records the element's rendered bounds.
-// This should be called at the start of Draw().
+// SetBounds 记录元素的渲染边界。
+// 应在 Draw() 开始时调用。
 func (b *BaseElement) SetBounds(bounds uv.Rectangle) {
 	b.bounds = bounds
 }
 
-// walkAndRegister recursively walks an element tree and registers all elements.
+// walkAndRegister 递归遍历元素树并注册所有元素。
 func walkAndRegister(elem Element, bm *BoundsMap) {
 	bm.Register(elem, elem.Bounds())
 

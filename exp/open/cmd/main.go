@@ -1,11 +1,11 @@
-// Package main demonstrates open package usage.
+// Package main 演示 open 包的使用方法。
 package main
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/charmbracelet/x/exp/open"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/open"
 )
 
 func main() {

@@ -10,26 +10,25 @@ func TestNewCell(t *testing.T) {
 		mainRune rune
 		combRune []rune
 		want     *Cell
-	}{
+	}{{
+		name:     "简单 ASCII 字符",
+		mainRune: 'a',
+		want:     &Cell{Rune: 'a', Width: 1},
+	},
 		{
-			name:     "simple ascii",
-			mainRune: 'a',
-			want:     &Cell{Rune: 'a', Width: 1},
-		},
-		{
-			name:     "wide character",
+			name:     "宽字符",
 			mainRune: '世',
 			want:     &Cell{Rune: '世', Width: 2},
 		},
 		{
-			name:     "combining character",
+			name:     "组合字符",
 			mainRune: 'e',
-			combRune: []rune{'́'}, // accent
+			combRune: []rune{'́'}, // 重音符号
 			want:     &Cell{Rune: 'e', Comb: []rune{'́'}, Width: 1},
 		},
 		{
-			name:     "zero width",
-			mainRune: '\u200B', // zero-width space
+			name:     "零宽度字符",
+			mainRune: '\u200B', // 零宽度空格
 			want:     &Cell{Rune: '\u200B', Width: 0},
 		},
 	}
@@ -55,24 +54,23 @@ func TestNewCellString(t *testing.T) {
 		name string
 		str  string
 		want *Cell
-	}{
+	}{{
+		name: "空字符串",
+		str:  "",
+		want: &Cell{Width: 0},
+	},
 		{
-			name: "empty string",
-			str:  "",
-			want: &Cell{Width: 0},
-		},
-		{
-			name: "simple ascii",
+			name: "简单 ASCII 字符",
 			str:  "a",
 			want: &Cell{Rune: 'a', Width: 1},
 		},
 		{
-			name: "combining character",
-			str:  "é", // e with acute accent
+			name: "组合字符",
+			str:  "é", // 带重音符号的 e
 			want: &Cell{Rune: 'é', Width: 1},
 		},
 		{
-			name: "wide character",
+			name: "宽字符",
 			str:  "世",
 			want: &Cell{Rune: '世', Width: 2},
 		},
@@ -98,30 +96,29 @@ func TestLine(t *testing.T) {
 		wantStr   string
 		wantLen   int
 		wantWidth int
-	}{
+	}{{
+		name:      "空行",
+		line:      Line{},
+		wantStr:   "",
+		wantLen:   0,
+		wantWidth: 0,
+	},
 		{
-			name:      "empty line",
-			line:      Line{},
-			wantStr:   "",
-			wantLen:   0,
-			wantWidth: 0,
-		},
-		{
-			name:      "simple line",
+			name:      "简单行",
 			line:      Line{NewCell('a'), NewCell('b'), NewCell('c')},
 			wantStr:   "abc",
 			wantLen:   3,
 			wantWidth: 3,
 		},
 		{
-			name:      "line with nil cells",
+			name:      "包含 nil 单元格的行",
 			line:      Line{nil, NewCell('a'), nil},
 			wantStr:   " a",
 			wantLen:   3,
 			wantWidth: 3,
 		},
 		{
-			name:      "line with wide chars",
+			name:      "包含宽字符的行",
 			line:      Line{NewCell('世'), NewCell('界')},
 			wantStr:   "世界",
 			wantLen:   2,
@@ -145,7 +142,7 @@ func TestLine(t *testing.T) {
 }
 
 func TestBuffer(t *testing.T) {
-	t.Run("creation and resizing", func(t *testing.T) {
+	t.Run("创建和调整大小", func(t *testing.T) {
 		b := NewBuffer(3, 2)
 		if b.Width() != 3 {
 			t.Errorf("Buffer width = %d, want 3", b.Width())
@@ -156,40 +153,39 @@ func TestBuffer(t *testing.T) {
 
 		b.Resize(4, 3)
 		if b.Width() != 4 {
-			t.Errorf("After resize, buffer width = %d, want 4", b.Width())
+			t.Errorf("调整大小后，缓冲区宽度 = %d, 期望 4", b.Width())
 		}
 		if b.Height() != 3 {
-			t.Errorf("After resize, buffer height = %d, want 3", b.Height())
+			t.Errorf("调整大小后，缓冲区高度 = %d, 期望 3", b.Height())
 		}
 	})
 
-	t.Run("cell operations", func(t *testing.T) {
+	t.Run("单元格操作", func(t *testing.T) {
 		b := NewBuffer(3, 3)
 		cell := NewCell('A')
 
 		b.SetCell(1, 1, cell)
 		got := b.Cell(1, 1)
 		if got.Rune != 'A' {
-			t.Errorf("After SetCell, got rune %c, want A", got.Rune)
+			t.Errorf("设置单元格后，得到的字符为 %c, 期望 A", got.Rune)
 		}
 	})
 
-	t.Run("clear operations", func(t *testing.T) {
+	t.Run("清除操作", func(t *testing.T) {
 		b := NewBuffer(2, 2)
 		b.SetCell(0, 0, NewCell('A'))
 		b.SetCell(1, 0, NewCell('B'))
 		b.Clear()
 
 		// if b.Cell(0, 0) != nil {
-		// TODO: Should we return nil instead of BlankCell? Nil indicates the
-		// default cell.
+		// TODO: 我们应该返回 nil 而不是 BlankCell 吗？nil 表示默认单元格。
 
 		if !b.Cell(0, 0).Equal(&BlankCell) {
-			t.Error("After Clear, cell should be nil")
+			t.Error("清除后，单元格应为 nil")
 		}
 	})
 
-	t.Run("insert line", func(t *testing.T) {
+	t.Run("插入行", func(t *testing.T) {
 		b := NewBuffer(3, 3)
 		b.SetCell(0, 0, NewCell('A'))
 		b.SetCell(0, 1, NewCell('B'))
@@ -197,11 +193,11 @@ func TestBuffer(t *testing.T) {
 		b.InsertLine(1, 1, nil)
 		got := b.Cell(0, 1)
 		if !got.Equal(&BlankCell) {
-			t.Error("After InsertLine, inserted line should be empty")
+			t.Error("插入行后，插入的行应为空")
 		}
 	})
 
-	t.Run("delete line", func(t *testing.T) {
+	t.Run("删除行", func(t *testing.T) {
 		b := NewBuffer(3, 3)
 		b.SetCell(0, 0, NewCell('A'))
 		b.SetCell(0, 1, NewCell('B'))
@@ -209,7 +205,7 @@ func TestBuffer(t *testing.T) {
 		b.DeleteLine(0, 1, nil)
 		got := b.Cell(0, 0)
 		if !got.Equal(NewCell('B')) {
-			t.Error("After DeleteLine, first line should be empty")
+			t.Error("删除行后，第一行应为空")
 		}
 	})
 }

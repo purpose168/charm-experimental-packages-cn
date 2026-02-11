@@ -6,8 +6,8 @@ import (
 	"os"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/term"
-	"github.com/charmbracelet/x/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/pony"
+	"github.com/purpose168/charm-experimental-packages-cn/term"
 )
 
 func getSize() (int, int) {
@@ -43,7 +43,7 @@ func NewCard(props pony.Props, children []pony.Element) pony.Element {
 // Draw renders the card - we compose from other pony elements!
 func (c *Card) Draw(scr uv.Screen, area uv.Rectangle) {
 	c.SetBounds(area)
-	
+
 	// Get color from name
 	var themeColor color.Color
 	switch c.Color {

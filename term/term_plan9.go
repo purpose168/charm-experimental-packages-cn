@@ -13,7 +13,7 @@ type state struct {
 	ctl      *os.File
 }
 
-// termName returns the name of the terminal or os.ErrNotExist if there is no terminal.
+// termName 返回终端的名称，如果没有终端则返回 os.ErrNotExist。
 func termName(fd uintptr) (string, error) {
 	ctl, err := os.ReadFile(filepath.Join("/fd", fmt.Sprintf("%dctl", fd)))
 	if err != nil {
@@ -72,9 +72,8 @@ func restore(_ uintptr, state *State) error {
 	return nil
 }
 
-// getSize returns the size. This will only work if you are running
-// under a window manager in Plan 9. Else, the only option
-// is to return a reasonable default.
+// getSize 返回尺寸。这仅在 Plan 9 中的窗口管理器下运行时有效。
+// 否则，唯一的选择是返回合理的默认值。
 func getSize(fd uintptr) (int, int, error) {
 	w, h := 80, 40
 	b, err := os.ReadFile("/dev/wctl")

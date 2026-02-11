@@ -1,12 +1,12 @@
-module github.com/charmbracelet/x/vttest
+module github.com/purpose168/charm-experimental-packages-cn/vttest
 
 go 1.25.2
 
 require (
 	github.com/charmbracelet/ultraviolet v0.0.0-20251116181749-377898bcce38
-	github.com/charmbracelet/x/ansi v0.11.6
-	github.com/charmbracelet/x/vt v0.0.0-20251118172736-77d017256798
-	github.com/charmbracelet/x/xpty v0.1.3
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.6
+	github.com/purpose168/charm-experimental-packages-cn/vt v0.0.0-20251118172736-77d017256798
+	github.com/purpose168/charm-experimental-packages-cn/xpty v0.1.3
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/image v0.35.0
@@ -14,11 +14,11 @@ require (
 
 require (
 	github.com/charmbracelet/colorprofile v0.3.3 // indirect
-	github.com/charmbracelet/x/conpty v0.2.0 // indirect
-	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
-	github.com/charmbracelet/x/term v0.2.2 // indirect
-	github.com/charmbracelet/x/termios v0.1.1 // indirect
-	github.com/charmbracelet/x/windows v0.2.2 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/conpty v0.2.0 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/exp/ordered v0.1.0 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/term v0.2.2 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/termios v0.1.1 // indirect
+	github.com/purpose168/charm-experimental-packages-cn/windows v0.2.2 // indirect
 	github.com/clipperhouse/displaywidth v0.9.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.5.0 // indirect

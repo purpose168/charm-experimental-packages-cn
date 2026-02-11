@@ -4,7 +4,7 @@ import (
 	"io"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
 // KeyMod represents a key modifier.

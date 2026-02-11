@@ -2,44 +2,41 @@ package vt
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// Buffer is a terminal cell buffer.
+// Buffer 是一个终端单元格缓冲区。
 type Buffer struct {
 	uv.Buffer
 }
 
-// InsertLine inserts n lines at the given line position, with the given
-// optional cell, within the specified rectangles. If no rectangles are
-// specified, it inserts lines in the entire buffer. Only cells within the
-// rectangle's horizontal bounds are affected. Lines are pushed out of the
-// rectangle bounds and lost. This follows terminal [ansi.IL] behavior.
-// It returns the pushed out lines.
+// InsertLine 在指定的行位置插入 n 行，使用给定的可选单元格，在指定的矩形范围内。
+// 如果未指定矩形，则在整个缓冲区中插入行。只有矩形水平边界内的单元格会受到影响。
+// 行被推出矩形边界并丢失。这遵循终端 [ansi.IL] 行为。
+// 返回被推出的行。
 func (b *Buffer) InsertLine(y, n int, c *uv.Cell) {
 	b.InsertLineRect(y, n, c, b.Bounds())
 }
 
-// InsertLineRect inserts new lines at the given line position, with the
-// given optional cell, within the rectangle bounds. Only cells within the
-// rectangle's horizontal bounds are affected. Lines are pushed out of the
-// rectangle bounds and lost. This follows terminal [ansi.IL] behavior.
+// InsertLineRect 在指定的行位置插入新行，使用给定的可选单元格，在矩形边界内。
+// 只有矩形水平边界内的单元格会受到影响。行被推出矩形边界并丢失。
+// 这遵循终端 [ansi.IL] 行为。
 func (b *Buffer) InsertLineRect(y, n int, c *uv.Cell, rect uv.Rectangle) {
 	if n <= 0 || y < rect.Min.Y || y >= rect.Max.Y || y >= b.Height() {
 		return
 	}
 
-	// Limit number of lines to insert to available space
+	// 限制插入的行数为可用空间
 	if y+n > rect.Max.Y {
 		n = rect.Max.Y - y
 	}
 
-	// Move existing lines down within the bounds
+	// 在边界内将现有行向下移动
 	for i := rect.Max.Y - 1; i >= y+n; i-- {
 		for x := rect.Min.X; x < rect.Max.X; x++ {
-			// We don't need to clone c here because we're just moving lines down.
+			// 这里不需要克隆 c，因为我们只是将行向下移动。
 			b.Lines[i][x] = b.Lines[i-n][x]
 		}
 	}
 
-	// Clear the newly inserted lines within bounds
+	// 清除边界内新插入的行
 	for i := y; i < y+n; i++ {
 		for x := rect.Min.X; x < rect.Max.X; x++ {
 			b.SetCell(x, i, c)
@@ -47,31 +44,29 @@ func (b *Buffer) InsertLineRect(y, n int, c *uv.Cell, rect uv.Rectangle) {
 	}
 }
 
-// DeleteLineRect deletes lines at the given line position, with the given
-// optional cell, within the rectangle bounds. Only cells within the
-// rectangle's bounds are affected. Lines are shifted up within the bounds and
-// new blank lines are created at the bottom. This follows terminal [ansi.DL]
-// behavior.
+// DeleteLineRect 在指定的行位置删除 n 行，使用给定的可选单元格，在矩形边界内。
+// 只有矩形边界内的单元格会受到影响。行在边界内向上移动，并在底部创建新的空行。
+// 这遵循终端 [ansi.DL] 行为。
 func (b *Buffer) DeleteLineRect(y, n int, c *uv.Cell, rect uv.Rectangle) {
 	if n <= 0 || y < rect.Min.Y || y >= rect.Max.Y || y >= b.Height() {
 		return
 	}
 
-	// Limit deletion count to available space in scroll region
+	// 限制删除数量为滚动区域中的可用空间
 	if n > rect.Max.Y-y {
 		n = rect.Max.Y - y
 	}
 
-	// Shift cells up within the bounds
+	// 在边界内将单元格向上移动
 	for dst := y; dst < rect.Max.Y-n; dst++ {
 		src := dst + n
 		for x := rect.Min.X; x < rect.Max.X; x++ {
-			// We don't need to clone c here because we're just moving cells up.
+			// 这里不需要克隆 c，因为我们只是将单元格向上移动。
 			b.Lines[dst][x] = b.Lines[src][x]
 		}
 	}
 
-	// Fill the bottom n lines with blank cells
+	// 用空单元格填充底部的 n 行
 	for i := rect.Max.Y - n; i < rect.Max.Y; i++ {
 		for x := rect.Min.X; x < rect.Max.X; x++ {
 			b.SetCell(x, i, c)
@@ -79,83 +74,74 @@ func (b *Buffer) DeleteLineRect(y, n int, c *uv.Cell, rect uv.Rectangle) {
 	}
 }
 
-// DeleteLine deletes n lines at the given line position, with the given
-// optional cell, within the specified rectangles. If no rectangles are
-// specified, it deletes lines in the entire buffer.
+// DeleteLine 在指定的行位置删除 n 行，使用给定的可选单元格，在指定的矩形范围内。
+// 如果未指定矩形，则在整个缓冲区中删除行。
 func (b *Buffer) DeleteLine(y, n int, c *uv.Cell) {
 	b.DeleteLineRect(y, n, c, b.Bounds())
 }
 
-// InsertCell inserts new cells at the given position, with the given optional
-// cell, within the specified rectangles. If no rectangles are specified, it
-// inserts cells in the entire buffer. This follows terminal [ansi.ICH]
-// behavior.
+// InsertCell 在指定的位置插入新单元格，使用给定的可选单元格，在指定的矩形范围内。
+// 如果未指定矩形，则在整个缓冲区中插入单元格。这遵循终端 [ansi.ICH] 行为。
 func (b *Buffer) InsertCell(x, y, n int, c *uv.Cell) {
 	b.InsertCellRect(x, y, n, c, b.Bounds())
 }
 
-// InsertCellRect inserts new cells at the given position, with the given
-// optional cell, within the rectangle bounds. Only cells within the
-// rectangle's bounds are affected, following terminal [ansi.ICH] behavior.
+// InsertCellRect 在指定的位置插入新单元格，使用给定的可选单元格，在矩形边界内。
+// 只有矩形边界内的单元格会受到影响，遵循终端 [ansi.ICH] 行为。
 func (b *Buffer) InsertCellRect(x, y, n int, c *uv.Cell, rect uv.Rectangle) {
 	if n <= 0 || y < rect.Min.Y || y >= rect.Max.Y || y >= b.Height() ||
 		x < rect.Min.X || x >= rect.Max.X || x >= b.Width() {
 		return
 	}
 
-	// Limit number of cells to insert to available space
+	// 限制插入的单元格数量为可用空间
 	if x+n > rect.Max.X {
 		n = rect.Max.X - x
 	}
 
-	// Move existing cells within rectangle bounds to the right
+	// 在矩形边界内将现有单元格向右移动
 	for i := rect.Max.X - 1; i >= x+n && i-n >= rect.Min.X; i-- {
-		// We don't need to clone c here because we're just moving cells to the
-		// right.
+		// 这里不需要克隆 c，因为我们只是将单元格向右移动。
 		// b.lines[y][i] = b.lines[y][i-n]
 		b.Lines[y][i] = b.Lines[y][i-n]
 	}
 
-	// Clear the newly inserted cells within rectangle bounds
+	// 清除矩形边界内新插入的单元格
 	for i := x; i < x+n && i < rect.Max.X; i++ {
 		b.SetCell(i, y, c)
 	}
 }
 
-// DeleteCell deletes cells at the given position, with the given optional
-// cell, within the specified rectangles. If no rectangles are specified, it
-// deletes cells in the entire buffer. This follows terminal [ansi.DCH]
-// behavior.
+// DeleteCell 在指定的位置删除单元格，使用给定的可选单元格，在指定的矩形范围内。
+// 如果未指定矩形，则在整个缓冲区中删除单元格。这遵循终端 [ansi.DCH] 行为。
 func (b *Buffer) DeleteCell(x, y, n int, c *uv.Cell) {
 	b.DeleteCellRect(x, y, n, c, b.Bounds())
 }
 
-// DeleteCellRect deletes cells at the given position, with the given
-// optional cell, within the rectangle bounds. Only cells within the
-// rectangle's bounds are affected, following terminal [ansi.DCH] behavior.
+// DeleteCellRect 在指定的位置删除单元格，使用给定的可选单元格，在矩形边界内。
+// 只有矩形边界内的单元格会受到影响，遵循终端 [ansi.DCH] 行为。
 func (b *Buffer) DeleteCellRect(x, y, n int, c *uv.Cell, rect uv.Rectangle) {
 	if n <= 0 || y < rect.Min.Y || y >= rect.Max.Y || y >= b.Height() ||
 		x < rect.Min.X || x >= rect.Max.X || x >= b.Width() {
 		return
 	}
 
-	// Calculate how many positions we can actually delete
+	// 计算我们实际可以删除的位置数量
 	remainingCells := rect.Max.X - x
 	if n > remainingCells {
 		n = remainingCells
 	}
 
-	// Shift the remaining cells to the left
+	// 将剩余的单元格向左移动
 	for i := x; i < rect.Max.X-n; i++ {
 		if i+n < rect.Max.X {
-			// We don't need to clone c here because we're just moving cells to
-			// the left.
+			// 这里不需要克隆 c，因为我们只是将单元格向左移动。
 			// b.lines[y][i] = b.lines[y][i+n]
 			b.Lines[y][i] = b.Lines[y][i+n]
 		}
 	}
 
-	// Fill the vacated positions with the given cell
+	// 用给定的单元格填充空出的位置
 	for i := rect.Max.X - n; i < rect.Max.X; i++ {
 		b.SetCell(i, y, c)
 	}

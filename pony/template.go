@@ -12,27 +12,27 @@ import (
 	"golang.org/x/text/language"
 )
 
-// Template is a type-safe pony template that can be rendered with data of type T.
+// Template 是一个类型安全的 pony 模板，可以使用类型 T 的数据进行渲染。
 type Template[T any] struct {
 	markup   string
 	goTmpl   *template.Template
 	cacheKey string
 }
 
-// Parse parses pony markup into a type-safe template.
-// The markup can contain Go template syntax like {{ .Variable }}.
+// Parse 将 pony 标记解析为类型安全的模板。
+// 标记可以包含 Go 模板语法，如 {{ .Variable }}。
 func Parse[T any](markup string) (*Template[T], error) {
 	return ParseWithFuncs[T](markup, nil)
 }
 
-// ParseWithFuncs parses pony markup with custom template functions.
+// ParseWithFuncs 使用自定义模板函数解析 pony 标记。
 func ParseWithFuncs[T any](markup string, funcs template.FuncMap) (*Template[T], error) {
 	t := &Template[T]{
 		markup:   markup,
 		cacheKey: markup,
 	}
 
-	// Create Go template with builtin functions
+	// 创建带有内置函数的 Go 模板
 	tmplFuncs := defaultTemplateFuncs()
 	maps.Copy(tmplFuncs, funcs)
 
@@ -45,7 +45,7 @@ func ParseWithFuncs[T any](markup string, funcs template.FuncMap) (*Template[T],
 	return t, nil
 }
 
-// MustParse parses pony markup and panics on error.
+// MustParse 解析 pony 标记，出错时会 panic。
 func MustParse[T any](markup string) *Template[T] {
 	t, err := Parse[T](markup)
 	if err != nil {
@@ -54,7 +54,7 @@ func MustParse[T any](markup string) *Template[T] {
 	return t
 }
 
-// MustParseWithFuncs parses pony markup with custom functions and panics on error.
+// MustParseWithFuncs 使用自定义函数解析 pony 标记，出错时会 panic。
 func MustParseWithFuncs[T any](markup string, funcs template.FuncMap) *Template[T] {
 	t, err := ParseWithFuncs[T](markup, funcs)
 	if err != nil {
@@ -63,17 +63,17 @@ func MustParseWithFuncs[T any](markup string, funcs template.FuncMap) *Template[
 	return t
 }
 
-// Render renders the template with the given data to the specified viewport size.
+// Render 使用给定的数据将模板渲染到指定的视口大小。
 func (t *Template[T]) Render(data T, width, height int) string {
 	scr, _ := t.RenderWithBounds(data, nil, width, height)
 	str := scr.Render()
 	return strings.ReplaceAll(str, "\r\n", "\n")
 }
 
-// RenderWithBounds renders the template and returns both the screen buffer and bounds map.
-// The bounds map can be used for mouse hit testing in event handlers.
+// RenderWithBounds 渲染模板并返回屏幕缓冲区和边界映射。
+// 边界映射可用于事件处理程序中的鼠标点击测试。
 func (t *Template[T]) RenderWithBounds(data T, slots map[string]Element, width, height int) (uv.ScreenBuffer, *BoundsMap) {
-	// Execute Go template first
+	// 首先执行 Go 模板
 	var buf bytes.Buffer
 	if err := t.goTmpl.Execute(&buf, data); err != nil {
 		errScreen := uv.NewScreenBuffer(width, 1)
@@ -82,26 +82,26 @@ func (t *Template[T]) RenderWithBounds(data T, slots map[string]Element, width, 
 
 	processedMarkup := buf.String()
 
-	// Parse the processed markup
+	// 解析处理后的标记
 	root, err := parse(processedMarkup)
 	if err != nil {
 		errScreen := uv.NewScreenBuffer(width, 1)
 		return errScreen, NewBoundsMap()
 	}
 
-	// Convert to element tree
+	// 转换为元素树
 	elem := root.toElement()
 	if elem == nil {
 		emptyScreen := uv.NewScreenBuffer(width, height)
 		return emptyScreen, NewBoundsMap()
 	}
 
-	// Fill slots with provided elements
+	// 用提供的元素填充插槽
 	if slots != nil {
 		fillSlots(elem, slots)
 	}
 
-	// Layout the element
+	// 布局元素
 	constraints := Constraints{
 		MinWidth:  0,
 		MaxWidth:  width,
@@ -110,7 +110,7 @@ func (t *Template[T]) RenderWithBounds(data T, slots map[string]Element, width, 
 	}
 	size := elem.Layout(constraints)
 
-	// Use the smaller of calculated vs requested size
+	// 使用计算大小和请求大小中的较小值
 	if size.Width > width {
 		size.Width = width
 	}
@@ -118,27 +118,27 @@ func (t *Template[T]) RenderWithBounds(data T, slots map[string]Element, width, 
 		size.Height = height
 	}
 
-	// Create buffer and render
+	// 创建缓冲区并渲染
 	uvBuf := uv.NewScreenBuffer(size.Width, size.Height)
 	area := uv.Rect(0, 0, size.Width, size.Height)
 	elem.Draw(uvBuf, area)
 
-	// Build bounds map
+	// 构建边界映射
 	boundsMap := NewBoundsMap()
 	walkAndRegister(elem, boundsMap)
 
 	return uvBuf, boundsMap
 }
 
-// RenderWithSlots renders the template with data and slot elements.
-// Slots allow injecting stateful components into the template.
+// RenderWithSlots 使用数据和插槽元素渲染模板。
+// 插槽允许将有状态组件注入到模板中。
 func (t *Template[T]) RenderWithSlots(data T, slots map[string]Element, width, height int) string {
 	scr, _ := t.RenderWithBounds(data, slots, width, height)
 	str := scr.Render()
 	return strings.ReplaceAll(str, "\r\n", "\n")
 }
 
-// fillSlots recursively fills slot elements with their corresponding elements.
+// fillSlots 递归地用对应的元素填充插槽元素。
 func fillSlots(elem Element, slots map[string]Element) {
 	if slot, ok := elem.(*Slot); ok {
 		if slotElem, found := slots[slot.Name]; found {
@@ -147,24 +147,24 @@ func fillSlots(elem Element, slots map[string]Element) {
 		return
 	}
 
-	// Recursively fill slots in children
+	// 递归地填充子元素中的插槽
 	for _, child := range elem.Children() {
 		fillSlots(child, slots)
 	}
 }
 
-// defaultTemplateFuncs returns the default template functions.
+// defaultTemplateFuncs 返回默认的模板函数。
 func defaultTemplateFuncs() template.FuncMap {
 	titleCaser := cases.Title(language.English)
 	return template.FuncMap{
-		// String functions
+		// 字符串函数
 		"upper": strings.ToUpper,
 		"lower": strings.ToLower,
 		"title": titleCaser.String,
 		"trim":  strings.TrimSpace,
 		"join":  strings.Join,
 
-		// Math functions
+		// 数学函数
 		"add": func(a, b int) int { return a + b },
 		"sub": func(a, b int) int { return a - b },
 		"mul": func(a, b int) int { return a * b },
@@ -175,11 +175,11 @@ func defaultTemplateFuncs() template.FuncMap {
 			return a / b
 		},
 
-		// Formatting
+		// 格式化
 		"printf": fmt.Sprintf,
 		"repeat": strings.Repeat,
 
-		// Color helpers
+		// 颜色辅助函数
 		"colorHex": func(hex string) string {
 			return fmt.Sprintf("fg:%s", hex)
 		},

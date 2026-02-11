@@ -3,15 +3,14 @@ package ansi
 import (
 	"unicode/utf8"
 
-	"github.com/charmbracelet/x/ansi/parser"
 	"github.com/clipperhouse/uax29/v2/graphemes"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 )
 
-// State represents the state of the ANSI escape sequence parser used by
-// [DecodeSequence].
+// State 表示 ANSI 转义序列解析器的状态，由 [DecodeSequence] 使用。
 type State = byte
 
-// ANSI escape sequence states used by [DecodeSequence].
+// ANSI 转义序列状态，由 [DecodeSequence] 使用。
 const (
 	NormalState State = iota
 	PrefixState
@@ -21,43 +20,26 @@ const (
 	StringState
 )
 
-// DecodeSequence decodes the first ANSI escape sequence or a printable
-// grapheme from the given data. It returns the sequence slice, the number of
-// bytes read, the cell width for each sequence, and the new state.
+// DecodeSequence 从给定数据中解码第一个 ANSI 转义序列或可打印的字形。它返回序列切片、读取的字节数、每个序列的单元格宽度以及新状态。
 //
-// The cell width will always be 0 for control and escape sequences, 1 for
-// ASCII printable characters, and the number of cells other Unicode characters
-// occupy. It uses the uniseg package to calculate the width of Unicode
-// graphemes and characters. This means it will always do grapheme clustering
-// (mode 2027).
+// 对于控制和转义序列，单元格宽度始终为 0；对于 ASCII 可打印字符，宽度为 1；对于其他 Unicode 字符，则为其占用的单元格数。
+// 它使用 uniseg 包计算 Unicode 字形和字符的宽度，这意味着它始终会进行字形聚类（模式 2027）。
 //
-// Passing a non-nil [*Parser] as the last argument will allow the decoder to
-// collect sequence parameters, data, and commands. The parser cmd will have
-// the packed command value that contains intermediate and prefix characters.
-// In the case of a OSC sequence, the cmd will be the OSC command number. Use
-// [Cmd] and [Param] types to unpack command intermediates and prefixes as well
-// as parameters.
+// 传递非 nil 的 [*Parser] 作为最后一个参数将允许解码器收集序列参数、数据和命令。解析器 cmd 将包含打包的命令值，其中包含中间和前缀字符。
+// 在 OSC 序列的情况下，cmd 将是 OSC 命令编号。使用 [Cmd] 和 [Param] 类型来解包命令中间值和前缀以及参数。
 //
-// Zero [Cmd] means the CSI, DCS, or ESC sequence is invalid. Moreover, checking the
-// validity of other data sequences, OSC, DCS, etc, will require checking for
-// the returned sequence terminator bytes such as ST (ESC \\) and BEL).
+// 零值 [Cmd] 表示 CSI、DCS 或 ESC 序列无效。此外，检查其他数据序列（如 OSC、DCS 等）的有效性需要检查返回的序列终止字节，如 ST (ESC \\) 和 BEL)。
 //
-// We store the command byte in [Cmd] in the most significant byte, the
-// prefix byte in the next byte, and the intermediate byte in the least
-// significant byte. This is done to avoid using a struct to store the command
-// and its intermediates and prefixes. The command byte is always the least
-// significant byte i.e. [Cmd & 0xff]. Use the [Cmd] type to unpack the
-// command, intermediate, and prefix bytes. Note that we only collect the last
-// prefix character and intermediate byte.
+// 我们在 [Cmd] 中按以下方式存储字节：最高有效字节存储命令字节，次高字节存储前缀字节，最低有效字节存储中间字节。
+// 这样做是为了避免使用结构体来存储命令及其中间值和前缀。命令字节始终是最低有效字节，即 [Cmd & 0xff]。
+// 使用 [Cmd] 类型来解包命令、中间值和前缀字节。请注意，我们只收集最后一个前缀字符和中间字节。
 //
-// The [p.Params] slice will contain the parameters of the sequence. Any
-// sub-parameter will have the [parser.HasMoreFlag] set. Use the [Param] type
-// to unpack the parameters.
+// [p.Params] 切片将包含序列的参数。任何子参数都会设置 [parser.HasMoreFlag]。使用 [Param] 类型来解包参数。
 //
-// Example:
+// 示例：
 //
-//	var state byte // the initial state is always zero [NormalState]
-//	p := NewParser(32, 1024) // create a new parser with a 32 params buffer and 1024 data buffer (optional)
+//	var state byte // 初始状态始终为零 [NormalState]
+//	p := NewParser(32, 1024) // 创建一个新的解析器，带有 32 个参数缓冲区和 1024 个数据缓冲区（可选）
 //	input := []byte("\x1b[31mHello, World!\x1b[0m")
 //	for len(input) > 0 {
 //		seq, width, n, newState := DecodeSequence(input, state, p)
@@ -66,48 +48,31 @@ const (
 //		input = input[n:]
 //	}
 //
-// This function treats the text as a sequence of grapheme clusters.
+// 此函数将文本视为字形聚类的序列。
 func DecodeSequence[T string | []byte](b T, state byte, p *Parser) (seq T, width int, n int, newState byte) {
 	return decodeSequence(GraphemeWidth, b, state, p)
 }
 
-// DecodeSequenceWc decodes the first ANSI escape sequence or a printable
-// grapheme from the given data. It returns the sequence slice, the number of
-// bytes read, the cell width for each sequence, and the new state.
+// DecodeSequenceWc 从给定数据中解码第一个 ANSI 转义序列或可打印的字形。它返回序列切片、读取的字节数、每个序列的单元格宽度以及新状态。
 //
-// The cell width will always be 0 for control and escape sequences, 1 for
-// ASCII printable characters, and the number of cells other Unicode characters
-// occupy. It uses the uniseg package to calculate the width of Unicode
-// graphemes and characters. This means it will always do grapheme clustering
-// (mode 2027).
+// 对于控制和转义序列，单元格宽度始终为 0；对于 ASCII 可打印字符，宽度为 1；对于其他 Unicode 字符，则为其占用的单元格数。
+// 它使用 uniseg 包计算 Unicode 字形和字符的宽度，这意味着它始终会进行字形聚类（模式 2027）。
 //
-// Passing a non-nil [*Parser] as the last argument will allow the decoder to
-// collect sequence parameters, data, and commands. The parser cmd will have
-// the packed command value that contains intermediate and prefix characters.
-// In the case of a OSC sequence, the cmd will be the OSC command number. Use
-// [Cmd] and [Param] types to unpack command intermediates and prefixes as well
-// as parameters.
+// 传递非 nil 的 [*Parser] 作为最后一个参数将允许解码器收集序列参数、数据和命令。解析器 cmd 将包含打包的命令值，其中包含中间和前缀字符。
+// 在 OSC 序列的情况下，cmd 将是 OSC 命令编号。使用 [Cmd] 和 [Param] 类型来解包命令中间值和前缀以及参数。
 //
-// Zero [Cmd] means the CSI, DCS, or ESC sequence is invalid. Moreover, checking the
-// validity of other data sequences, OSC, DCS, etc, will require checking for
-// the returned sequence terminator bytes such as ST (ESC \\) and BEL).
+// 零值 [Cmd] 表示 CSI、DCS 或 ESC 序列无效。此外，检查其他数据序列（如 OSC、DCS 等）的有效性需要检查返回的序列终止字节，如 ST (ESC \\) 和 BEL)。
 //
-// We store the command byte in [Cmd] in the most significant byte, the
-// prefix byte in the next byte, and the intermediate byte in the least
-// significant byte. This is done to avoid using a struct to store the command
-// and its intermediates and prefixes. The command byte is always the least
-// significant byte i.e. [Cmd & 0xff]. Use the [Cmd] type to unpack the
-// command, intermediate, and prefix bytes. Note that we only collect the last
-// prefix character and intermediate byte.
+// 我们在 [Cmd] 中按以下方式存储字节：最高有效字节存储命令字节，次高字节存储前缀字节，最低有效字节存储中间字节。
+// 这样做是为了避免使用结构体来存储命令及其中间值和前缀。命令字节始终是最低有效字节，即 [Cmd & 0xff]。
+// 使用 [Cmd] 类型来解包命令、中间值和前缀字节。请注意，我们只收集最后一个前缀字符和中间字节。
 //
-// The [p.Params] slice will contain the parameters of the sequence. Any
-// sub-parameter will have the [parser.HasMoreFlag] set. Use the [Param] type
-// to unpack the parameters.
+// [p.Params] 切片将包含序列的参数。任何子参数都会设置 [parser.HasMoreFlag]。使用 [Param] 类型来解包参数。
 //
-// Example:
+// 示例：
 //
-//	var state byte // the initial state is always zero [NormalState]
-//	p := NewParser(32, 1024) // create a new parser with a 32 params buffer and 1024 data buffer (optional)
+//	var state byte // 初始状态始终为零 [NormalState]
+//	p := NewParser(32, 1024) // 创建一个新的解析器，带有 32 个参数缓冲区和 1024 个数据缓冲区（可选）
 //	input := []byte("\x1b[31mHello, World!\x1b[0m")
 //	for len(input) > 0 {
 //		seq, width, n, newState := DecodeSequenceWc(input, state, p)
@@ -116,7 +81,7 @@ func DecodeSequence[T string | []byte](b T, state byte, p *Parser) (seq T, width
 //		input = input[n:]
 //	}
 //
-// This function treats the text as a sequence of wide characters and runes.
+// 此函数将文本视为宽字符和运行符的序列。
 func DecodeSequenceWc[T string | []byte](b T, state byte, p *Parser) (seq T, width int, n int, newState byte) {
 	return decodeSequence(WcWidth, b, state, p)
 }
@@ -368,70 +333,69 @@ func parseOscCmd(p *Parser) {
 	}
 }
 
-// Equal returns true if the given byte slices are equal.
+// Equal 如果给定的字节切片相等，则返回 true。
 func Equal[T string | []byte](a, b T) bool {
 	return string(a) == string(b)
 }
 
-// HasPrefix returns true if the given byte slice has prefix.
+// HasPrefix 如果给定的字节切片有前缀，则返回 true。
 func HasPrefix[T string | []byte](b, prefix T) bool {
 	return len(b) >= len(prefix) && Equal(b[0:len(prefix)], prefix)
 }
 
-// HasSuffix returns true if the given byte slice has suffix.
+// HasSuffix 如果给定的字节切片有后缀，则返回 true。
 func HasSuffix[T string | []byte](b, suffix T) bool {
 	return len(b) >= len(suffix) && Equal(b[len(b)-len(suffix):], suffix)
 }
 
-// HasCsiPrefix returns true if the given byte slice has a CSI prefix.
+// HasCsiPrefix 如果给定的字节切片有 CSI 前缀，则返回 true。
 func HasCsiPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == CSI) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == '[')
 }
 
-// HasOscPrefix returns true if the given byte slice has an OSC prefix.
+// HasOscPrefix 如果给定的字节切片有 OSC 前缀，则返回 true。
 func HasOscPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == OSC) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == ']')
 }
 
-// HasApcPrefix returns true if the given byte slice has an APC prefix.
+// HasApcPrefix 如果给定的字节切片有 APC 前缀，则返回 true。
 func HasApcPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == APC) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == '_')
 }
 
-// HasDcsPrefix returns true if the given byte slice has a DCS prefix.
+// HasDcsPrefix 如果给定的字节切片有 DCS 前缀，则返回 true。
 func HasDcsPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == DCS) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == 'P')
 }
 
-// HasSosPrefix returns true if the given byte slice has a SOS prefix.
+// HasSosPrefix 如果给定的字节切片有 SOS 前缀，则返回 true。
 func HasSosPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == SOS) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == 'X')
 }
 
-// HasPmPrefix returns true if the given byte slice has a PM prefix.
+// HasPmPrefix 如果给定的字节切片有 PM 前缀，则返回 true。
 func HasPmPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == PM) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == '^')
 }
 
-// HasStPrefix returns true if the given byte slice has a ST prefix.
+// HasStPrefix 如果给定的字节切片有 ST 前缀，则返回 true。
 func HasStPrefix[T string | []byte](b T) bool {
 	return (len(b) > 0 && b[0] == ST) ||
 		(len(b) > 1 && b[0] == ESC && b[1] == '\\')
 }
 
-// HasEscPrefix returns true if the given byte slice has an ESC prefix.
+// HasEscPrefix 如果给定的字节切片有 ESC 前缀，则返回 true。
 func HasEscPrefix[T string | []byte](b T) bool {
 	return len(b) > 0 && b[0] == ESC
 }
 
-// FirstGraphemeCluster returns the first grapheme cluster in the given string
-// or byte slice, and its monospace display width.
+// FirstGraphemeCluster 返回给定字符串或字节切片中的第一个字形聚类及其等宽显示宽度。
 func FirstGraphemeCluster[T string | []byte](b T, m Method) (T, int) {
 	switch b := any(b).(type) {
 	case string:
@@ -450,43 +414,35 @@ func FirstGraphemeCluster[T string | []byte](b T, m Method) (T, int) {
 	panic("unreachable")
 }
 
-// Cmd represents a sequence command. This is used to pack/unpack a sequence
-// command with its intermediate and prefix characters. Those are commonly
-// found in CSI and DCS sequences.
+// Cmd 表示序列命令。这用于打包/解包带有中间和前缀字符的序列命令。这些通常出现在 CSI 和 DCS 序列中。
 type Cmd int
 
-// Prefix returns the unpacked prefix byte of the CSI sequence.
-// This is always gonna be one of the following '<' '=' '>' '?' and in the
-// range of 0x3C-0x3F.
-// Zero is returned if the sequence does not have a prefix.
+// Prefix 返回 CSI 序列的解包前缀字节。
+// 这始终是以下字符之一：'<' '=' '>' '?'，范围在 0x3C-0x3F 之间。
+// 如果序列没有前缀，则返回零。
 func (c Cmd) Prefix() byte {
 	return byte(parser.Prefix(int(c)))
 }
 
-// Intermediate returns the unpacked intermediate byte of the CSI sequence.
-// An intermediate byte is in the range of 0x20-0x2F. This includes these
-// characters from ' ', '!', '"', '#', '$', '%', '&', ”', '(', ')', '*', '+',
-// ',', '-', '.', '/'.
-// Zero is returned if the sequence does not have an intermediate byte.
+// Intermediate 返回 CSI 序列的解包中间字节。
+// 中间字节的范围是 0x20-0x2F，包括以下字符：' ', '!', '"', '#', '$', '%', '&', '\”, '(', ')', '*', '+', ',', '-', '.', '/'.
+// 如果序列没有中间字节，则返回零。
 func (c Cmd) Intermediate() byte {
 	return byte(parser.Intermediate(int(c)))
 }
 
-// Final returns the unpacked command byte of the CSI sequence.
+// Final 返回 CSI 序列的解包命令字节。
 func (c Cmd) Final() byte {
 	return byte(parser.Command(int(c)))
 }
 
-// Command packs a command with the given prefix, intermediate, and final. A
-// zero byte means the sequence does not have a prefix or intermediate.
+// Command 使用给定的前缀、中间值和最终值打包命令。零字节表示序列没有前缀或中间值。
 //
-// Prefixes are in the range of 0x3C-0x3F that is one of `<=>?`.
+// 前缀的范围是 0x3C-0x3F，即 `<=>?` 之一。
 //
-// Intermediates are in the range of 0x20-0x2F that is anything in
-// `!"#$%&'()*+,-./`.
+// 中间值的范围是 0x20-0x2F，即 `!"#$%&'()*+,-./` 中的任何字符。
 //
-// Final bytes are in the range of 0x40-0x7E that is anything in the range
-// `@A–Z[\]^_`a–z{|}~`.
+// 最终字节的范围是 0x40-0x7E，即 `@A–Z[\]^_`a–z{|}~` 范围内的任何字符。
 func Command(prefix, inter, final byte) (c int) {
 	c = int(final)
 	c |= int(prefix) << parser.PrefixShift
@@ -494,13 +450,11 @@ func Command(prefix, inter, final byte) (c int) {
 	return c
 }
 
-// Param represents a sequence parameter. Sequence parameters with
-// sub-parameters are packed with the HasMoreFlag set. This is used to unpack
-// the parameters from a CSI and DCS sequences.
+// Param 表示序列参数。带有子参数的序列参数会设置 HasMoreFlag。这用于从 CSI 和 DCS 序列中解包参数。
 type Param int
 
-// Param returns the unpacked parameter at the given index.
-// It returns the default value if the parameter is missing.
+// Param 返回给定索引处的解包参数。
+// 如果参数缺失，则返回默认值。
 func (s Param) Param(def int) int {
 	p := int(s) & parser.ParamMask
 	if p == parser.MissingParam {
@@ -509,13 +463,12 @@ func (s Param) Param(def int) int {
 	return p
 }
 
-// HasMore unpacks the HasMoreFlag from the parameter.
+// HasMore 从参数中解包 HasMoreFlag。
 func (s Param) HasMore() bool {
 	return s&parser.HasMoreFlag != 0
 }
 
-// Parameter packs an escape code parameter with the given parameter and
-// whether this parameter has following sub-parameters.
+// Parameter 使用给定的参数和该参数是否有后续子参数来打包转义码参数。
 func Parameter(p int, hasMore bool) (s int) {
 	s = p & parser.ParamMask
 	if hasMore {

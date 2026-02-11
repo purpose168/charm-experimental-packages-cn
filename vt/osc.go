@@ -1,5 +1,5 @@
-// Package vt provides a virtual terminal implementation.
-// SKIP: Fix typecheck errors - function signature mismatches and undefined types
+// Package vt 提供了一个虚拟终端实现。
+// SKIP: 修复类型检查错误 - 函数签名不匹配和未定义类型
 package vt
 
 import (
@@ -7,14 +7,14 @@ import (
 	"image/color"
 	"io"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// handleOsc handles an OSC escape sequence.
+// handleOsc 处理 OSC（操作系统命令）转义序列。
 func (e *Emulator) handleOsc(cmd int, data []byte) {
-	e.flushGrapheme() // Flush any pending grapheme before handling OSC sequences.
+	e.flushGrapheme() // 在处理 OSC 序列之前，先刷新任何待处理的字形。
 	if !e.handlers.handleOsc(cmd, data) {
-		e.logf("unhandled sequence: OSC %q", data)
+		e.logf("未处理的序列: OSC %q", data)
 	}
 }
 

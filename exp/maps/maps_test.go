@@ -14,7 +14,7 @@ func TestSortedKeys(t *testing.T) {
 
 	keys := SortedKeys(m)
 	if slices.Compare(keys, []string{"aaaaa", "bar", "foo"}) != 0 {
-		t.Fatalf("unexpected keys order: %v", keys)
+		t.Fatalf("键顺序不符合预期: %v", keys)
 	}
 }
 
@@ -28,7 +28,7 @@ func TestKeys(t *testing.T) {
 	keys := Keys(m)
 	for _, s := range []string{"aaaaa", "bar", "foo"} {
 		if !slices.Contains(keys, s) {
-			t.Fatalf("unexpected keys: %v", keys)
+			t.Fatalf("键不符合预期: %v", keys)
 		}
 	}
 }

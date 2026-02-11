@@ -3,7 +3,7 @@ package pony
 import (
 	"testing"
 
-	"github.com/charmbracelet/x/exp/golden"
+	"github.com/purpose168/charm-experimental-packages-cn/exp/golden"
 )
 
 func TestTextAlignment(t *testing.T) {

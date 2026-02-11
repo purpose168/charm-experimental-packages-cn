@@ -1,15 +1,10 @@
-// Package pony provides a declarative, type-safe markup language for building
-// terminal user interfaces using Ultraviolet as the rendering engine.
+// Package pony 提供一种声明式、类型安全的标记语言，用于构建终端用户界面，使用 Ultraviolet 作为渲染引擎。
 //
-// ⚠️ EXPERIMENTAL: This is an experimental project, primarily AI-generated as
-// an exploration of declarative TUI frameworks. Use at your own risk.
+// ⚠️ 实验性：这是一个实验性项目，主要由 AI 生成，用于探索声明式 TUI 框架。使用风险自负。
 //
-// pony allows you to define TUI layouts using familiar XML-like markup syntax
-// combined with Go templates for dynamic content. It integrates seamlessly with
-// Bubble Tea for application lifecycle management while leveraging Ultraviolet's
-// efficient cell-based rendering.
+// pony 允许您使用熟悉的类似 XML 的标记语法定义 TUI 布局，并结合 Go 模板处理动态内容。它与 Bubble Tea 无缝集成，用于应用程序生命周期管理，同时利用 Ultraviolet 的高效基于单元格的渲染。
 //
-// # Basic Example
+// # 基本示例
 //
 //	type ViewData struct {
 //	    Title   string
@@ -32,33 +27,33 @@
 //	}
 //	output := t.Render(data, 80, 24)
 //
-// # Elements
+// # 元素
 //
-//   - vstack: Vertical stack container with spacing and alignment
-//   - hstack: Horizontal stack container with spacing and alignment
-//   - text: Text content with styling and alignment
-//   - box: Container with borders and padding
-//   - scrollview: Scrollable viewport with scrollbars
-//   - divider: Horizontal or vertical separator line
-//   - spacer: Flexible or fixed empty space
-//   - slot: Placeholder for dynamic content
+//   - vstack: 垂直堆叠容器，带有间距和对齐方式
+//   - hstack: 水平堆叠容器，带有间距和对齐方式
+//   - text: 文本内容，带有样式和对齐方式
+//   - box: 带有边框和内边距的容器
+//   - scrollview: 带有滚动条的可滚动视口
+//   - divider: 水平或垂直分隔线
+//   - spacer: 灵活或固定的空白空间
+//   - slot: 动态内容的占位符
 //
-// # Styling
+// # 样式
 //
-// Text elements support granular styling attributes:
+// 文本元素支持精细的样式属性：
 //
 //	<text foreground-color="cyan" background-color="#1a1b26" font-weight="bold" font-style="italic">Styled text</text>
 //
-// For programmatic styling, use Text methods:
+// 对于编程式样式设置，使用 Text 方法：
 //
 //	text := pony.NewText("Hello").
 //	    ForegroundColor(pony.Hex("#FF5555")).
 //	    Bold().
 //	    Italic()
 //
-// # Custom Components
+// # 自定义组件
 //
-// Register custom components with the component registry:
+// 向组件注册表注册自定义组件：
 //
 //	pony.Register("card", func(props Props, children []Element) Element {
 //	    return pony.NewBox(
@@ -66,13 +61,13 @@
 //	    ).Border("rounded").Padding(1)
 //	})
 //
-// Use in markup:
+// 在标记中使用：
 //
 //	<card><text>Content</text></card>
 //
-// # Stateful Components
+// # 有状态组件
 //
-// Use slots for stateful components that manage their own state:
+// 对管理自己状态的有状态组件使用插槽：
 //
 //	type Input struct {
 //	    value string
@@ -84,21 +79,21 @@
 //	    return pony.NewBox(pony.NewText(i.value)).Border("rounded")
 //	}
 //
-// Template with slot:
+// 带插槽的模板：
 //
 //	<vstack>
 //	  <text>Enter name:</text>
 //	  <slot name="input" />
 //	</vstack>
 //
-// Render with slots:
+// 使用插槽渲染：
 //
 //	slots := map[string]pony.Element{
 //	    "input": m.inputComp.Render(),
 //	}
 //	output := tmpl.RenderWithSlots(data, slots, width, height)
 //
-// # Bubble Tea Integration
+// # Bubble Tea 集成
 //
 //	type model struct {
 //	    template *pony.Template[ViewData]

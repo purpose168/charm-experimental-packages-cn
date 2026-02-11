@@ -1,8 +1,7 @@
 //go:build darwin || netbsd || freebsd || openbsd || linux || dragonfly || solaris
 // +build darwin netbsd freebsd openbsd linux dragonfly solaris
 
-// Package termios provides a unified interface for getting and setting Termios
-// settings for Unix and Unix-like systems.
+// Package termios 为 Unix 和类 Unix 系统提供获取和设置 Termios 设置的统一接口。
 package termios
 
 import (
@@ -11,22 +10,22 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-// SetWinsize sets window size for an fd from a Winsize.
+// SetWinsize 从 Winsize 设置文件描述符的窗口大小。
 func SetWinsize(fd int, w *unix.Winsize) error {
 	return unix.IoctlSetWinsize(fd, ioctlSetWinSize, w) //nolint:wrapcheck
 }
 
-// GetWinsize gets window size for an fd.
+// GetWinsize 获取文件描述符的窗口大小。
 func GetWinsize(fd int) (*unix.Winsize, error) {
 	return unix.IoctlGetWinsize(fd, ioctlGetWinSize) //nolint:wrapcheck
 }
 
-// GetTermios gets the termios of the given fd.
+// GetTermios 获取给定文件描述符的 termios 设置。
 func GetTermios(fd int) (*unix.Termios, error) {
 	return unix.IoctlGetTermios(fd, ioctlGets) //nolint:wrapcheck
 }
 
-// SetTermios sets the given termios over the given fd's current termios.
+// SetTermios 在给定文件描述符的当前 termios 设置上设置给定的 termios。
 func SetTermios(
 	fd int,
 	ispeed uint32,
@@ -94,31 +93,31 @@ func SetTermios(
 	return unix.IoctlSetTermios(fd, ioctlSets, term) //nolint:wrapcheck
 }
 
-// CC is the termios cc field.
+// CC 是 termios 的 cc 字段。
 //
-// It stores an array of special characters related to terminal I/O.
+// 它存储与终端 I/O 相关的特殊字符数组。
 type CC uint8
 
-// CC possible values.
+// CC 可能的值。
 const (
-	INTR CC = iota
-	QUIT
-	ERASE
-	KILL
-	EOF
-	EOL
-	EOL2
-	START
-	STOP
-	SUSP
-	WERASE
-	RPRNT
-	LNEXT
-	DISCARD
-	STATUS
-	SWTCH
-	DSUSP
-	FLUSH
+	INTR CC = iota // 中断字符
+	QUIT          // 退出字符
+	ERASE         // 擦除字符
+	KILL          // 杀死字符
+	EOF           // 文件结束字符
+	EOL           // 行结束字符
+	EOL2          // 备用行结束字符
+	START         // 开始字符
+	STOP          // 停止字符
+	SUSP          // 挂起字符
+	WERASE        // 字擦除字符
+	RPRNT         // 重印字符
+	LNEXT         // 字面下一个字符
+	DISCARD       // 丢弃字符
+	STATUS        // 状态字符
+	SWTCH         // 切换字符
+	DSUSP         // 延迟挂起字符
+	FLUSH         // 刷新字符
 )
 
 // https://www.man7.org/linux/man-pages/man3/termios.3.html
@@ -142,23 +141,23 @@ var allCcOpts = map[CC]int{
 	// FLUSH:  syscall.VFLUSH,
 }
 
-// I stands for Input Controls.
+// I 代表输入控制。
 type I uint8
 
-// Input possible values.
+// 输入可能的值。
 const (
-	IGNPAR I = iota
-	PARMRK
-	INPCK
-	ISTRIP
-	INLCR
-	IGNCR
-	ICRNL
-	IXON
-	IXANY
-	IXOFF
-	IMAXBEL
-	IUCLC
+	IGNPAR I = iota // 忽略奇偶校验错误
+	PARMRK          // 标记奇偶校验错误
+	INPCK           // 启用奇偶校验
+	ISTRIP          // 剥离第八位
+	INLCR           // 将 NL 转换为 CR
+	IGNCR           // 忽略 CR
+	ICRNL           // 将 CR 转换为 NL
+	IXON            // 启用输出流控制
+	IXANY           // 允许任何字符重启输出
+	IXOFF           // 启用输入流控制
+	IMAXBEL         // 当输入队列满时响铃
+	IUCLC           // 将大写字母转换为小写字母
 )
 
 var allInputOpts = map[I]uint32{
@@ -175,17 +174,17 @@ var allInputOpts = map[I]uint32{
 	IMAXBEL: syscall.IMAXBEL,
 }
 
-// O stands for Output Controls.
+// O 代表输出控制。
 type O uint8
 
-// Output possible values.
+// 输出可能的值。
 const (
-	OPOST O = iota
-	ONLCR
-	OCRNL
-	ONOCR
-	ONLRET
-	OLCUC
+	OPOST O = iota // 启用输出处理
+	ONLCR          // 将 NL 转换为 CR-NL
+	OCRNL          // 将 CR 转换为 NL
+	ONOCR          // 在第 0 列不输出 CR
+	ONLRET         // NL 执行 CR 功能
+	OLCUC          // 将小写字母转换为大写字母
 )
 
 var allOutputOpts = map[O]uint32{
@@ -196,15 +195,15 @@ var allOutputOpts = map[O]uint32{
 	ONLRET: syscall.ONLRET,
 }
 
-// C stands for Control.
+// C 代表控制。
 type C uint8
 
-// Control possible values.
+// 控制可能的值。
 const (
-	CS7 C = iota
-	CS8
-	PARENB
-	PARODD
+	CS7 C = iota   // 7 位字符大小
+	CS8            // 8 位字符大小
+	PARENB         // 启用奇偶校验
+	PARODD         // 使用奇校验而不是偶校验
 )
 
 var allControlOpts = map[C]uint32{
@@ -214,25 +213,25 @@ var allControlOpts = map[C]uint32{
 	PARODD: syscall.PARODD,
 }
 
-// L stands for Line Controls.
+// L 代表行控制。
 type L uint8
 
-// Line possible values.
+// 行可能的值。
 const (
-	ISIG L = iota
-	ICANON
-	ECHO
-	ECHOE
-	ECHOK
-	ECHONL
-	NOFLSH
-	TOSTOP
-	IEXTEN
-	ECHOCTL
-	ECHOKE
-	PENDIN
-	IUTF8
-	XCASE
+	ISIG L = iota // 启用信号
+	ICANON        // 启用规范模式
+	ECHO          // 启用回显
+	ECHOE         // 擦除时回显
+	ECHOK         // 杀死时回显
+	ECHONL        // 回显 NL
+	NOFLSH        // 不刷新
+	TOSTOP        // 停止后台进程
+	IEXTEN        // 启用扩展输入处理
+	ECHOCTL       // 回显控制字符
+	ECHOKE        // 杀死时回显
+	PENDIN        // 挂起输入
+	IUTF8         // 启用 UTF-8 输入
+	XCASE         // 大小写映射
 )
 
 var allLineOpts = map[L]uint32{

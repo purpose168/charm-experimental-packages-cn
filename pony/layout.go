@@ -6,20 +6,20 @@ import (
 	"strings"
 )
 
-// SizeConstraint represents a size constraint with units.
+// SizeConstraint 表示带有单位的尺寸约束。
 type SizeConstraint struct {
 	value int
 	unit  string // "", "%", "auto", "min", "max"
 }
 
-// parseSizeConstraint parses a size string like "50%", "20", "auto".
+// parseSizeConstraint 解析尺寸字符串，如 "50%", "20", "auto"。
 func parseSizeConstraint(s string) SizeConstraint {
 	s = strings.TrimSpace(s)
 	if s == "" {
 		return SizeConstraint{unit: UnitAuto}
 	}
 
-	// Check for special keywords
+	// 检查特殊关键字
 	switch s {
 	case UnitAuto:
 		return SizeConstraint{unit: UnitAuto}
@@ -29,7 +29,7 @@ func parseSizeConstraint(s string) SizeConstraint {
 		return SizeConstraint{unit: UnitMax}
 	}
 
-	// Check for percentage
+	// 检查百分比
 	if strings.HasSuffix(s, UnitPercent) {
 		valStr := strings.TrimSuffix(s, UnitPercent)
 		if val, err := strconv.Atoi(valStr); err == nil {
@@ -37,18 +37,18 @@ func parseSizeConstraint(s string) SizeConstraint {
 		}
 	}
 
-	// Fixed size
+	// 固定尺寸
 	if val, err := strconv.Atoi(s); err == nil {
 		return SizeConstraint{value: val, unit: ""}
 	}
 
-	// Invalid, default to auto
+	// 无效，默认为自动
 	return SizeConstraint{unit: UnitAuto}
 }
 
-// Apply applies the size constraint to get an actual size.
+// Apply 应用尺寸约束以获取实际尺寸。
 func (sc SizeConstraint) Apply(available, content int) int {
-	// Zero value (unit="" and value=0) is treated as auto
+	// 零值（unit="" 且 value=0）被视为自动
 	if sc.unit == "" && sc.value == 0 {
 		if content > available {
 			return available
@@ -58,7 +58,7 @@ func (sc SizeConstraint) Apply(available, content int) int {
 
 	switch sc.unit {
 	case "%":
-		// Percentage of available space
+		// 可用空间的百分比
 		result := available * sc.value / 100
 		if result < 0 {
 			return 0
@@ -69,25 +69,25 @@ func (sc SizeConstraint) Apply(available, content int) int {
 		return result
 
 	case UnitAuto:
-		// Content-based sizing
+		// 基于内容的尺寸
 		if content > available {
 			return available
 		}
 		return content
 
 	case UnitMin:
-		// Minimum size (content or 0)
+		// 最小尺寸（内容或 0）
 		if content < 0 {
 			return 0
 		}
 		return content
 
 	case UnitMax:
-		// Maximum available size
+		// 最大可用尺寸
 		return available
 
 	default:
-		// Fixed size
+		// 固定尺寸
 		if sc.value < 0 {
 			return 0
 		}
@@ -98,7 +98,7 @@ func (sc SizeConstraint) Apply(available, content int) int {
 	}
 }
 
-// String returns a string representation.
+// String 返回字符串表示形式。
 func (sc SizeConstraint) String() string {
 	switch sc.unit {
 	case UnitPercent:
@@ -110,29 +110,29 @@ func (sc SizeConstraint) String() string {
 	}
 }
 
-// IsAuto returns true if this is an auto constraint.
+// IsAuto 如果这是自动约束，则返回 true。
 func (sc SizeConstraint) IsAuto() bool {
-	// Zero value (unit="" and value=0) is auto
-	// Otherwise unit must explicitly be "auto"
+	// 零值（unit="" 且 value=0）是自动
+	// 否则 unit 必须明确为 "auto"
 	return (sc.unit == "" && sc.value == 0) || sc.unit == UnitAuto
 }
 
-// IsFixed returns true if this is a fixed size constraint.
+// IsFixed 如果这是固定尺寸约束，则返回 true。
 func (sc SizeConstraint) IsFixed() bool {
 	return sc.unit == ""
 }
 
-// IsPercent returns true if this is a percentage constraint.
+// IsPercent 如果这是百分比约束，则返回 true。
 func (sc SizeConstraint) IsPercent() bool {
 	return sc.unit == UnitPercent
 }
 
-// NewFixedConstraint creates a fixed size constraint.
+// NewFixedConstraint 创建固定尺寸约束。
 func NewFixedConstraint(size int) SizeConstraint {
 	return SizeConstraint{value: size, unit: ""}
 }
 
-// NewPercentConstraint creates a percentage constraint.
+// NewPercentConstraint 创建百分比约束。
 func NewPercentConstraint(percent int) SizeConstraint {
 	return SizeConstraint{value: percent, unit: UnitPercent}
 }

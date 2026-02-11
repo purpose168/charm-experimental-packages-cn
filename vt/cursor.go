@@ -2,24 +2,24 @@ package vt
 
 import uv "github.com/charmbracelet/ultraviolet"
 
-// CursorStyle represents a cursor style.
+// CursorStyle 表示光标样式。
 type CursorStyle int
 
-// Cursor styles.
+// 光标样式。
 const (
-	CursorBlock CursorStyle = iota
-	CursorUnderline
-	CursorBar
+	CursorBlock CursorStyle = iota     // 块光标
+	CursorUnderline                     // 下划线光标
+	CursorBar                           // 竖线光标
 )
 
-// Cursor represents a cursor in a terminal.
+// Cursor 表示终端中的光标。
 type Cursor struct {
-	Pen  uv.Style
-	Link uv.Link
+	Pen  uv.Style  // 光标样式
+	Link uv.Link   // 光标链接
 
-	uv.Position
+	uv.Position    // 光标位置
 
-	Style  CursorStyle
-	Steady bool // Not blinking
-	Hidden bool
+	Style  CursorStyle // 光标样式类型
+	Steady bool        // 不闪烁
+	Hidden bool        // 隐藏
 }

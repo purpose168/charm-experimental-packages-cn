@@ -1,11 +1,11 @@
 package vt
 
-import "github.com/charmbracelet/x/ansi"
+import "github.com/purpose168/charm-experimental-packages-cn/ansi"
 
-// resetModes resets all modes to their default values.
+// resetModes 将所有模式重置为其默认值。
 func (e *Emulator) resetModes() {
 	e.modes = ansi.Modes{
-		// Recognized modes and their default values.
+		// 已识别的模式及其默认值。
 		ansi.ModeCursorKeys:          ansi.ModeReset, // ?1
 		ansi.ModeOrigin:              ansi.ModeReset, // ?6
 		ansi.ModeAutoWrap:            ansi.ModeSet,   // ?7
@@ -26,7 +26,7 @@ func (e *Emulator) resetModes() {
 		ansi.ModeBracketedPaste:      ansi.ModeReset, // ?2004
 	}
 
-	// Set mode effects.
+	// 设置模式效果。
 	for mode, setting := range e.modes {
 		e.setMode(mode, setting)
 	}

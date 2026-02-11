@@ -10,17 +10,14 @@ import (
 	"slices"
 )
 
-// Decoder is a Sixel image decoder. It reads Sixel image data from an
-// io.Reader and decodes it into an image.Image.
+// Decoder 是一个 Sixel 图像解码器。它从 io.Reader 读取 Sixel 图像数据，
+// 并将其解码为 image.Image。
 type Decoder struct{}
 
-// Decode will parse sixel image data into an image or return an error.  Because
-// the sixel image format does not have a predictable size, the end of the sixel
-// image data can only be identified when ST, ESC, or BEL has been read from a reader.
-// In order to avoid reading bytes from a reader one at a time to avoid missing
-// the end, this method simply accepts a byte slice instead of a reader. Callers
-// should read the entire escape sequence and pass the Ps..Ps portion of the sequence
-// to this method.
+// Decode 将 Sixel 图像数据解析为图像或返回错误。由于
+// Sixel 图像格式没有可预测的大小，Sixel 图像数据的结尾只能在从读取器读取 ST、ESC 或 BEL 时识别。
+// 为了避免逐字节读取读取器而错过结尾，此方法直接接受字节切片而不是读取器。调用者
+// 应读取整个转义序列，并将序列的 Ps..Ps 部分传递给此方法。
 func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	rd := bufio.NewReader(r)
 	peeked, err := rd.Peek(1)
@@ -34,7 +31,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 		var read int
 		n := 16
 		for {
-			peeked, err = rd.Peek(n) // random number, just need to read a few bytes
+			peeked, err = rd.Peek(n) // 随机数字，只需要读取几个字节
 			if err != nil {
 				return nil, err //nolint:wrapcheck
 			}
@@ -44,7 +41,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 				return nil, ErrInvalidRaster
 			}
 			if read >= n {
-				// We need to read more bytes to get the full raster
+				// 我们需要读取更多字节以获取完整的光栅
 				n *= 2
 				continue
 			}
@@ -57,12 +54,10 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	}
 
 	if bounds.Max.X == 0 || bounds.Max.Y == 0 {
-		// We're parsing the image with no pixel metrics so unread the byte for the
-		// main read loop
-		// Peek the whole buffer to get the size of the image before we start
-		// decoding it.
+		// 我们正在解析没有像素指标的图像，所以为主读取循环取消读取该字节
+		// 在开始解码之前，窥视整个缓冲区以获取图像大小
 		var data []byte
-		toPeak := 64 // arbitrary number of bytes to peak
+		toPeak := 64 // 窥视的任意字节数
 		for {
 			data, err = rd.Peek(toPeak)
 			if err != nil || len(data) < toPeak {
@@ -79,16 +74,16 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	palette := DefaultPalette()
 	var currentX, currentBandY, currentPaletteIndex int
 
-	// data buffer used to decode Sixel commands
-	data := make([]byte, 0, 6) // arbitrary number of bytes to read
-	// i := 0                     // keeps track of the data buffer index
+	// 用于解码 Sixel 命令的数据缓冲区
+	data := make([]byte, 0, 6) // 要读取的任意字节数
+	// i := 0                     // 跟踪数据缓冲区索引
 	for {
 		b, err := rd.ReadByte()
 		if err != nil {
 			return img, d.readError(err)
 		}
 
-		count := 1 // default count for Sixel commands
+		count := 1 // Sixel 命令的默认计数
 		switch {
 		case b == LineBreak: // LF
 			currentBandY++
@@ -103,8 +98,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 				if err != nil {
 					return img, d.readError(err)
 				}
-				// Read bytes until we hit a non-color byte i.e. non-numeric
-				// and non-;
+				// 读取字节直到遇到非颜色字节，即非数字和非分号
 				if (b < '0' || b > '9') && b != ';' {
 					rd.UnreadByte() //nolint:errcheck,gosec
 					break
@@ -113,7 +107,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 				data = append(data, b)
 			}
 
-			// Palette operation
+			// 调色板操作
 			c, n := DecodeColor(data)
 			if n == 0 {
 				return img, ErrInvalidColor
@@ -121,7 +115,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 
 			currentPaletteIndex = c.Pc
 			if c.Pu > 0 {
-				// Non-zero Pu means we have a color definition to set.
+				// 非零的 Pu 表示我们需要设置颜色定义。
 				palette[currentPaletteIndex] = c
 			}
 		case b == RepeatIntroducer: // !
@@ -132,7 +126,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 				if err != nil {
 					return img, d.readError(err)
 				}
-				// Read bytes until we hit a non-numeric and non-repeat byte.
+				// 读取字节直到遇到非数字和非重复字节。
 				if (b < '0' || b > '9') && (b < '?' || b > '~') {
 					rd.UnreadByte() //nolint:errcheck,gosec
 					break
@@ -141,7 +135,7 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 				data = append(data, b)
 			}
 
-			// RLE operation
+			// RLE 操作
 			r, n := DecodeRepeat(data)
 			if n == 0 {
 				return img, ErrInvalidRepeat
@@ -160,8 +154,8 @@ func (d *Decoder) Decode(r io.Reader) (image.Image, error) {
 	}
 }
 
-// writePixel will accept a sixel byte (from ? to ~) that defines 6 vertical pixels
-// and write any filled pixels to the image.
+// writePixel 接受一个六像素字节（从 ? 到 ~），定义 6 个垂直像素，
+// 并将任何填充的像素写入图像。
 func (d *Decoder) writePixel(x int, bandY int, sixel byte, color color.Color, img *image.RGBA) {
 	maskedSixel := (sixel - '?') & 63
 	yOffset := 0
@@ -175,29 +169,25 @@ func (d *Decoder) writePixel(x int, bandY int, sixel byte, color color.Color, im
 	}
 }
 
-// scanSize is only used for legacy sixel images that do not define pixel metrics
-// near the header (technically permitted). In this case, we need to quickly scan
-// the image to figure out what the height and width are. Different terminals
-// treat unfilled pixels around the border of the image diffently, but in our case
-// we will treat all pixels, even empty ones, as part of the image.  However,
-// we will allow the image to end with an LF code without increasing the size
-// of the image.
+// scanSize 仅用于没有在标题附近定义像素指标的传统六像素图像（技术上是允许的）。
+// 在这种情况下，我们需要快速扫描图像以确定高度和宽度。不同的终端
+// 对图像边框周围未填充像素的处理方式不同，但在我们的情况下，
+// 我们会将所有像素（包括空像素）视为图像的一部分。但是，
+// 我们允许图像以 LF 码结尾而不增加图像大小。
 //
-// In the interest of speed, this method doesn't really parse the image in any
-// meaningful way: pixel codes (? to ~), and the RLE, CR, and LF indicators
-// (!, $, -) cannot appear within a sixel image except as themselves, so we
-// just ignore everything else.  The only thing we actually take the time to parse
-// is the number after the RLE indicator to know how much width to add to the current
-// line.
+// 为了速度起见，此方法不会以任何有意义的方式真正解析图像：像素码（? 到 ~），
+// 以及 RLE、CR 和 LF 指示符（!、$, -）在六像素图像中不能以其他方式出现，
+// 因此我们忽略所有其他内容。我们唯一花时间解析的是 RLE 指示符之后的数字，
+// 以确定当前行要增加多少宽度。
 func (d *Decoder) scanSize(data []byte) (int, int) {
 	var maxWidth, bandCount int
 
-	// Pixel values are ? to ~. Each one of these encountered increases the max width.
-	// a - is a LF and increases the max band count by one.  a $ is a CR and resets
-	// current width.  (char - '?') will get a 6-bit number and the highest bit is
-	// the lowest y value, which we should use to increment maxBandPixels.
+	// 像素值从 ? 到 ~。遇到的每一个都会增加最大宽度。
+	// - 表示 LF，并将最大波段数增加一。$ 表示 CR 并重置
+	// 当前宽度。(char - '?') 将获得一个 6 位数，最高位是
+	// 最低的 y 值，我们应该用它来增加 maxBandPixels。
 	//
-	// a ! is a RLE indicator, and we should add the numeral to the current width
+	// ! 是 RLE 指示符，我们应该将数字加到当前宽度
 	var currentWidth int
 	newBand := true
 	for i := 0; i < len(data); i++ {
@@ -206,8 +196,7 @@ func (d *Decoder) scanSize(data []byte) (int, int) {
 		case b == LineBreak:
 			// LF
 			currentWidth = 0
-			// The image may end with an LF, so we shouldn't increment the band
-			// count until we encounter a pixel
+			// 图像可能以 LF 结尾，因此我们在遇到像素之前不应增加波段数
 			newBand = true
 		case b == CarriageReturn:
 			// CR
@@ -215,13 +204,13 @@ func (d *Decoder) scanSize(data []byte) (int, int) {
 		case b == RepeatIntroducer || (b <= '~' && b >= '?'):
 			count := 1
 			if b == RepeatIntroducer {
-				// Get the run length for the RLE operation
+				// 获取 RLE 操作的运行长度
 				r, n := DecodeRepeat(data[i:])
 				if n == 0 {
 					return maxWidth, bandCount * 6
 				}
 
-				// 1 is added in the loop
+				// 在循环中添加 1
 				i += n - 1
 				count = r.Count
 			}
@@ -239,20 +228,18 @@ func (d *Decoder) scanSize(data []byte) (int, int) {
 	return maxWidth, bandCount * 6
 }
 
-// readError will take any error returned from a read method (ReadByte,
-// FScanF, etc.) and either wrap or ignore the error. An encountered EOF
-// indicates that it's time to return the completed image so we just
-// return it.
+// readError 接受从读取方法（ReadByte、FScanF 等）返回的任何错误，
+// 并包装或忽略该错误。遇到的 EOF 表明是时候返回完成的图像了，
+// 因此我们直接返回它。
 func (d *Decoder) readError(err error) error {
 	if errors.Is(err, io.EOF) {
 		return nil
 	}
 
-	return fmt.Errorf("failed to read sixel data: %w", err)
+	return fmt.Errorf("读取六像素数据失败: %w", err)
 }
 
-// The default palette for Sixel images. This is a combination of the Sixel
-// default colors and the xterm colors.
+// 六像素图像的默认调色板。这是六像素默认颜色和 xterm 颜色的组合。
 var colorPalette = [256]color.Color{
 	// Sixel-specific default colors
 	0:  color.RGBA{0, 0, 0, 255},

@@ -1,7 +1,4 @@
-// Package vttest provides a virtual terminal implementation for testing
-// terminal applications. It allows you to create a terminal instance with a
-// pseudo-terminal (PTY) and capture its state at any moment, enabling you to
-// write tests that verify the behavior of terminal applications.
+// Package vttest 提供了一个用于测试终端应用程序的虚拟终端实现。它允许你创建一个带有伪终端（PTY）的终端实例，并在任何时刻捕获其状态，使你能够编写测试来验证终端应用程序的行为。
 package vttest
 
 import (
@@ -17,12 +14,12 @@ import (
 	"testing"
 
 	uv "github.com/charmbracelet/ultraviolet"
-	"github.com/charmbracelet/x/ansi"
-	"github.com/charmbracelet/x/vt"
-	"github.com/charmbracelet/x/xpty"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/vt"
+	"github.com/purpose168/charm-experimental-packages-cn/xpty"
 )
 
-// Terminal represents a virtual terminal with it's PTY and state.
+// Terminal 表示一个带有 PTY 和状态的虚拟终端。
 type Terminal struct {
 	Emulator *vt.SafeEmulator
 	tb       testing.TB
@@ -47,9 +44,7 @@ type Terminal struct {
 	mu sync.Mutex
 }
 
-// NewTerminal creates a new virtual terminal with the given size for testing
-// purposes. At any moment, you can take a snapshot of the terminal state by
-// calling the [Terminal.Snapshot] method on the returned Terminal instance.
+// NewTerminal 创建一个具有给定大小的新虚拟终端，用于测试目的。在任何时刻，你可以通过在返回的 Terminal 实例上调用 [Terminal.Snapshot] 方法来拍摄终端状态的快照。
 func NewTerminal(tb testing.TB, cols, rows int) (*Terminal, error) {
 	pty, err := xpty.NewPty(cols, rows)
 	if err != nil {
@@ -150,7 +145,7 @@ func NewTerminal(tb testing.TB, cols, rows int) (*Terminal, error) {
 	return term, nil
 }
 
-// Start starts a process attached to the terminal's PTY.
+// Start 启动一个附加到终端 PTY 的进程。
 func (t *Terminal) Start(cmd *exec.Cmd) error {
 	if err := t.pty.Start(cmd); err != nil {
 		return fmt.Errorf("failed to start process: %w", err)
@@ -158,7 +153,7 @@ func (t *Terminal) Start(cmd *exec.Cmd) error {
 	return nil
 }
 
-// Wait waits for the process attached to the terminal's PTY to exit.
+// Wait 等待附加到终端 PTY 的进程退出。
 func (t *Terminal) Wait(cmd *exec.Cmd) error {
 	if err := xpty.WaitProcess(t.tb.Context(), cmd); err != nil {
 		return fmt.Errorf("process exited with error: %w", err)
@@ -166,7 +161,7 @@ func (t *Terminal) Wait(cmd *exec.Cmd) error {
 	return nil
 }
 
-// Close closes the terminal and its PTY.
+// Close 关闭终端及其 PTY。
 func (t *Terminal) Close() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -182,7 +177,7 @@ func (t *Terminal) Close() error {
 	return nil
 }
 
-// Resize resizes the terminal and its PTY.
+// Resize 调整终端及其 PTY 的大小。
 func (t *Terminal) Resize(cols, rows int) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
@@ -197,51 +192,46 @@ func (t *Terminal) Resize(cols, rows int) error {
 	return nil
 }
 
-// SendText sends the given raw text to the terminal emulator as if typed by a
-// user.
+// SendText 将给定的原始文本发送到终端模拟器，就像用户输入的一样。
 func (t *Terminal) SendText(text string) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.Emulator.SendText(text)
 }
 
-// SendKey sends the given key event to the terminal emulator as if typed by a
-// user.
+// SendKey 将给定的按键事件发送到终端模拟器，就像用户输入的一样。
 func (t *Terminal) SendKey(k uv.KeyEvent) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.Emulator.SendKey(k)
 }
 
-// SendMouse sends the given mouse event to the terminal emulator as if performed
-// by a user.
+// SendMouse 将给定的鼠标事件发送到终端模拟器，就像用户执行的一样。
 func (t *Terminal) SendMouse(m uv.MouseEvent) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.Emulator.SendMouse(m)
 }
 
-// Paste sends the given text to the terminal emulator as if pasted by a user.
+// Paste 将给定的文本发送到终端模拟器，就像用户粘贴的一样。
 func (t *Terminal) Paste(text string) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.Emulator.Paste(text)
 }
 
-// Input returns the input side of the terminal's PTY.
+// Input 返回终端 PTY 的输入端。
 func (t *Terminal) Input() io.Reader {
 	return t.ptyIn
 }
 
-// Output returns the output side of the terminal's PTY.
+// Output 返回终端 PTY 的输出端。
 func (t *Terminal) Output() io.Writer {
 	return t.ptyOut
 }
 
-// Snapshot takes a snapshot of the current terminal state.
-// The returned [Snapshot] can be used to inspect the terminal state at the
-// moment the snapshot was taken. It can also be serialized to JSON or YAML for
-// further analysis or testing purposes.
+// Snapshot 拍摄当前终端状态的快照。
+// 返回的 [Snapshot] 可用于检查拍摄快照时的终端状态。它还可以序列化为 JSON 或 YAML，用于进一步分析或测试目的。
 func (t *Terminal) Snapshot() Snapshot {
 	t.mu.Lock()
 	defer t.mu.Unlock()

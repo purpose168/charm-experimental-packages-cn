@@ -7,14 +7,14 @@ import (
 	"github.com/creack/pty"
 )
 
-// UnixPty represents a classic Unix PTY (pseudo-terminal).
+// UnixPty 表示一个经典的 Unix PTY（伪终端）。
 type UnixPty struct {
 	master, slave *os.File
 }
 
 var _ Pty = &UnixPty{}
 
-// NewUnixPty creates a new Unix PTY.
+// NewUnixPty 创建一个新的 Unix PTY。
 func NewUnixPty(width, height int, _ ...PtyOption) (*UnixPty, error) {
 	ptm, pts, err := pty.Open()
 	if err != nil {
@@ -35,7 +35,7 @@ func NewUnixPty(width, height int, _ ...PtyOption) (*UnixPty, error) {
 	return p, nil
 }
 
-// Close implements XPTY.
+// Close 实现 XPTY 接口。
 func (p *UnixPty) Close() (err error) {
 	defer func() {
 		serr := p.slave.Close()
@@ -49,44 +49,43 @@ func (p *UnixPty) Close() (err error) {
 	return err
 }
 
-// Fd implements XPTY.
+// Fd 实现 XPTY 接口。
 func (p *UnixPty) Fd() uintptr {
 	return p.master.Fd()
 }
 
-// Name implements XPTY.
+// Name 实现 XPTY 接口。
 func (p *UnixPty) Name() string {
 	return p.master.Name()
 }
 
-// SlaveName returns the name of the slave PTY.
-// This is usually used for remote sessions to identify the running TTY. You
-// can find this in SSH sessions defined as $SSH_TTY.
+// SlaveName 返回从 PTY 的名称。
+// 这通常用于远程会话中识别正在运行的 TTY。您可以在 SSH 会话中找到它，定义为 $SSH_TTY。
 func (p *UnixPty) SlaveName() string {
 	return p.slave.Name()
 }
 
-// Read implements XPTY.
+// Read 实现 XPTY 接口。
 func (p *UnixPty) Read(b []byte) (n int, err error) {
 	return p.master.Read(b) //nolint:wrapcheck
 }
 
-// Resize implements XPTY.
+// Resize 实现 XPTY 接口。
 func (p *UnixPty) Resize(width int, height int) (err error) {
 	return p.setWinsize(width, height, 0, 0)
 }
 
-// SetWinsize sets window size for the PTY.
+// SetWinsize 设置 PTY 的窗口大小。
 func (p *UnixPty) SetWinsize(width, height, x, y int) error {
 	return p.setWinsize(width, height, x, y)
 }
 
-// Size returns the size of the PTY.
+// Size 返回 PTY 的大小。
 func (p *UnixPty) Size() (width, height int, err error) {
 	return p.size()
 }
 
-// Start implements XPTY.
+// Start 实现 XPTY 接口。
 func (p *UnixPty) Start(c *exec.Cmd) error {
 	if c.Stdout == nil {
 		c.Stdout = p.slave
@@ -103,22 +102,22 @@ func (p *UnixPty) Start(c *exec.Cmd) error {
 	return nil
 }
 
-// Write implements XPTY.
+// Write 实现 XPTY 接口。
 func (p *UnixPty) Write(b []byte) (n int, err error) {
 	return p.master.Write(b) //nolint:wrapcheck
 }
 
-// Master returns the master end of the PTY.
+// Master 返回 PTY 的主端。
 func (p *UnixPty) Master() *os.File {
 	return p.master
 }
 
-// Slave returns the slave end of the PTY.
+// Slave 返回 PTY 的从端。
 func (p *UnixPty) Slave() *os.File {
 	return p.slave
 }
 
-// Control runs the given function with the file descriptor of the master PTY.
+// Control 使用主 PTY 的文件描述符运行给定的函数。
 func (p *UnixPty) Control(fn func(fd uintptr)) error {
 	conn, err := p.master.SyscallConn()
 	if err != nil {

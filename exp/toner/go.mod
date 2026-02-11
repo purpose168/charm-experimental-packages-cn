@@ -1,10 +1,10 @@
-module github.com/charmbracelet/x/exp/toner
+module github.com/purpose168/charm-experimental-packages-cn/exp/toner
 
 go 1.24.2
 
 require (
-	github.com/charmbracelet/x/ansi v0.11.6
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20250602192518-9e722df69bbb
+	github.com/purpose168/charm-experimental-packages-cn/ansi v0.11.6
+	github.com/purpose168/charm-experimental-packages-cn/exp/charmtone v0.0.0-20250602192518-9e722df69bbb
 )
 
 require (

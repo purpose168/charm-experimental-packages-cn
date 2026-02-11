@@ -3,7 +3,7 @@ package ansi
 import (
 	"sync"
 
-	"github.com/charmbracelet/x/ansi/parser"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi/parser"
 )
 
 var parserPool = sync.Pool{
@@ -15,13 +15,12 @@ var parserPool = sync.Pool{
 	},
 }
 
-// GetParser returns a parser from a sync pool.
+// GetParser 从同步池中获取一个解析器。
 func GetParser() *Parser {
 	return parserPool.Get().(*Parser)
 }
 
-// PutParser returns a parser to a sync pool. The parser is reset
-// automatically.
+// PutParser 将解析器返回给同步池。解析器会自动重置。
 func PutParser(p *Parser) {
 	p.Reset()
 	p.dataLen = 0

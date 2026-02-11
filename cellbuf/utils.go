@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-// Height returns the height of a string.
+// Height 返回字符串的高度。
 func Height(s string) int {
 	return strings.Count(s, "\n") + 1
 }

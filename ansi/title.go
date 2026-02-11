@@ -1,48 +1,47 @@
 package ansi
 
-// SetIconNameWindowTitle returns a sequence for setting the icon name and
-// window title.
+// SetIconNameWindowTitle 返回用于设置图标名称和窗口标题的序列。
 //
 //	OSC 0 ; title ST
 //	OSC 0 ; title BEL
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
 func SetIconNameWindowTitle(s string) string {
 	return "\x1b]0;" + s + "\x07"
 }
 
-// SetIconName returns a sequence for setting the icon name.
+// SetIconName 返回用于设置图标名称的序列。
 //
 //	OSC 1 ; title ST
 //	OSC 1 ; title BEL
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
 func SetIconName(s string) string {
 	return "\x1b]1;" + s + "\x07"
 }
 
-// SetWindowTitle returns a sequence for setting the window title.
+// SetWindowTitle 返回用于设置窗口标题的序列。
 //
 //	OSC 2 ; title ST
 //	OSC 2 ; title BEL
 //
-// See: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
+// 请参阅：https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
 func SetWindowTitle(s string) string {
 	return "\x1b]2;" + s + "\x07"
 }
 
-// DECSWT is a sequence for setting the window title.
+// DECSWT 是用于设置窗口标题的序列。
 //
-// This is an alias for [SetWindowTitle]("1;<name>").
-// See: EK-VT520-RM 5–156 https://vt100.net/dec/ek-vt520-rm.pdf
+// 这是 [SetWindowTitle]("1;<name>") 的别名。
+// 请参阅：EK-VT520-RM 5–156 https://vt100.net/dec/ek-vt520-rm.pdf
 func DECSWT(name string) string {
 	return SetWindowTitle("1;" + name)
 }
 
-// DECSIN is a sequence for setting the icon name.
+// DECSIN 是用于设置图标名称的序列。
 //
-// This is an alias for [SetWindowTitle]("L;<name>").
-// See: EK-VT520-RM 5–134 https://vt100.net/dec/ek-vt520-rm.pdf
+// 这是 [SetWindowTitle]("L;<name>") 的别名。
+// 请参阅：EK-VT520-RM 5–134 https://vt100.net/dec/ek-vt520-rm.pdf
 func DECSIN(name string) string {
 	return SetWindowTitle("L;" + name)
 }

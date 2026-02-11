@@ -6,106 +6,106 @@ import (
 	uv "github.com/charmbracelet/ultraviolet"
 )
 
-// ScrollView represents a scrollable container.
-// Content can be larger than the viewport and will be clipped.
+// ScrollView 表示一个可滚动容器。
+// 内容可以大于视口，超出部分将被裁剪。
 type ScrollView struct {
 	BaseElement
 	child Element
 
-	// Scroll position
+	// 滚动位置
 	offsetX int
 	offsetY int
 
-	// Viewport size constraints
+	// 视口大小约束
 	width  SizeConstraint
 	height SizeConstraint
 
-	// Scrollbar options
+	// 滚动条选项
 	showScrollbar  bool
 	scrollbarColor color.Color
 
-	// Scroll direction
-	horizontal bool // If true, scrolls horizontally
-	vertical   bool // If true, scrolls vertically (default)
+	// 滚动方向
+	horizontal bool // 如果为 true，则水平滚动
+	vertical   bool // 如果为 true，则垂直滚动（默认）
 }
 
 var _ Element = (*ScrollView)(nil)
 
-// NewScrollView creates a new scrollable view.
+// NewScrollView 创建一个新的可滚动视图。
 func NewScrollView(child Element) *ScrollView {
 	return &ScrollView{
 		child:         child,
-		vertical:      true, // Default to vertical scrolling
+		vertical:      true, // 默认垂直滚动
 		showScrollbar: true,
 	}
 }
 
-// Offset sets the scroll offset and returns the scroll view for chaining.
+// Offset 设置滚动偏移量并返回滚动视图以支持链式调用。
 func (s *ScrollView) Offset(x, y int) *ScrollView {
 	s.offsetX = x
 	s.offsetY = y
 	return s
 }
 
-// Vertical enables/disables vertical scrolling.
+// Vertical 启用/禁用垂直滚动。
 func (s *ScrollView) Vertical(enabled bool) *ScrollView {
 	s.vertical = enabled
 	return s
 }
 
-// Horizontal enables/disables horizontal scrolling.
+// Horizontal 启用/禁用水平滚动。
 func (s *ScrollView) Horizontal(enabled bool) *ScrollView {
 	s.horizontal = enabled
 	return s
 }
 
-// Scrollbar enables/disables scrollbar.
+// Scrollbar 启用/禁用滚动条。
 func (s *ScrollView) Scrollbar(show bool) *ScrollView {
 	s.showScrollbar = show
 	return s
 }
 
-// ScrollbarColor sets the scrollbar color.
+// ScrollbarColor 设置滚动条颜色。
 func (s *ScrollView) ScrollbarColor(c color.Color) *ScrollView {
 	s.scrollbarColor = c
 	return s
 }
 
-// Width sets the width constraint.
+// Width 设置宽度约束。
 func (s *ScrollView) Width(width SizeConstraint) *ScrollView {
 	s.width = width
 	return s
 }
 
-// Height sets the height constraint.
+// Height 设置高度约束。
 func (s *ScrollView) Height(height SizeConstraint) *ScrollView {
 	s.height = height
 	return s
 }
 
-// ScrollUp scrolls up by the given amount.
+// ScrollUp 向上滚动指定的量。
 func (s *ScrollView) ScrollUp(amount int) {
 	s.offsetY = max(0, s.offsetY-amount)
 }
 
-// ScrollDown scrolls down by the given amount.
+// ScrollDown 向下滚动指定的量。
 func (s *ScrollView) ScrollDown(amount int, contentHeight, viewportHeight int) {
 	maxOffset := max(0, contentHeight-viewportHeight)
 	s.offsetY = min(maxOffset, s.offsetY+amount)
 }
 
-// ScrollLeft scrolls left by the given amount.
+// ScrollLeft 向左滚动指定的量。
 func (s *ScrollView) ScrollLeft(amount int) {
 	s.offsetX = max(0, s.offsetX-amount)
 }
 
-// ScrollRight scrolls right by the given amount.
+// ScrollRight 向右滚动指定的量。
 func (s *ScrollView) ScrollRight(amount int, contentWidth, viewportWidth int) {
 	maxOffset := max(0, contentWidth-viewportWidth)
 	s.offsetX = min(maxOffset, s.offsetX+amount)
 }
 
-// Draw renders the scrollable view.
+// Draw 渲染可滚动视图。
 func (s *ScrollView) Draw(scr uv.Screen, area uv.Rectangle) {
 	s.SetBounds(area)
 
@@ -113,11 +113,11 @@ func (s *ScrollView) Draw(scr uv.Screen, area uv.Rectangle) {
 		return
 	}
 
-	// Calculate viewport size
+	// 计算视口大小
 	viewportWidth := area.Dx()
 	viewportHeight := area.Dy()
 
-	// Reserve space for scrollbar if shown
+	// 如果显示滚动条，预留空间
 	scrollbarWidth := 0
 	scrollbarHeight := 0
 	if s.showScrollbar {
@@ -137,35 +137,35 @@ func (s *ScrollView) Draw(scr uv.Screen, area uv.Rectangle) {
 		}
 	}
 
-	// Layout child with unbounded constraints to get full content size
+	// 使用无界约束布局子元素以获取完整内容大小
 	contentConstraints := Constraints{
 		MinWidth:  0,
-		MaxWidth:  1 << 30, // Very large number
+		MaxWidth:  1 << 30, // 非常大的数字
 		MinHeight: 0,
 		MaxHeight: 1 << 30,
 	}
 	contentSize := s.child.Layout(contentConstraints)
 
-	// Create a buffer for the full content
+	// 为完整内容创建缓冲区
 	contentBuffer := uv.NewScreenBuffer(contentSize.Width, contentSize.Height)
 	contentArea := uv.Rect(0, 0, contentSize.Width, contentSize.Height)
 	s.child.Draw(contentBuffer, contentArea)
 
-	// Adjust child bounds to screen coordinates (accounting for viewport position and scroll offset)
+	// 调整子元素边界到屏幕坐标（考虑视口位置和滚动偏移）
 	s.adjustChildBounds(s.child, area.Min.X-s.offsetX, area.Min.Y-s.offsetY)
 
-	// Copy visible portion to screen (with offset)
+	// 将可见部分复制到屏幕（带偏移）
 	for y := 0; y < viewportHeight; y++ {
 		for x := 0; x < viewportWidth; x++ {
-			// Source position in content buffer (with offset)
+			// 内容缓冲区中的源位置（带偏移）
 			srcX := x + s.offsetX
 			srcY := y + s.offsetY
 
-			// Destination position on screen
+			// 屏幕上的目标位置
 			dstX := area.Min.X + x
 			dstY := area.Min.Y + y
 
-			// Copy cell if in bounds
+			// 如果在边界内，复制单元格
 			if srcY < contentSize.Height && srcX < contentSize.Width {
 				cell := contentBuffer.CellAt(srcX, srcY)
 				scr.SetCell(dstX, dstY, cell)
@@ -173,7 +173,7 @@ func (s *ScrollView) Draw(scr uv.Screen, area uv.Rectangle) {
 		}
 	}
 
-	// Draw scrollbar if enabled
+	// 如果启用，绘制滚动条
 	if s.showScrollbar {
 		if s.vertical {
 			s.drawVerticalScrollbar(scr, area, contentSize.Height, viewportHeight, scrollbarWidth)
@@ -184,10 +184,10 @@ func (s *ScrollView) Draw(scr uv.Screen, area uv.Rectangle) {
 	}
 }
 
-// drawVerticalScrollbar draws a vertical scrollbar.
+// drawVerticalScrollbar 绘制垂直滚动条。
 func (s *ScrollView) drawVerticalScrollbar(scr uv.Screen, area uv.Rectangle, contentHeight, viewportHeight, scrollbarWidth int) {
 	if contentHeight <= viewportHeight {
-		return // No need for scrollbar
+		return // 不需要滚动条
 	}
 
 	scrollbarX := area.Max.X - scrollbarWidth
@@ -195,22 +195,22 @@ func (s *ScrollView) drawVerticalScrollbar(scr uv.Screen, area uv.Rectangle, con
 	scrollbarEnd := area.Max.Y
 	trackHeight := scrollbarEnd - scrollbarStart
 
-	// Calculate scrollbar thumb size
+	// 计算滚动条滑块大小
 	thumbHeight := max(1, (viewportHeight*trackHeight)/contentHeight)
 
-	// Calculate scrollbar thumb position
-	// scrollableRange is how far we can scroll
+	// 计算滚动条滑块位置
+	// scrollableRange 是我们可以滚动的距离
 	scrollableRange := contentHeight - viewportHeight
-	// trackRange is how far the thumb can move
+	// trackRange 是滑块可以移动的距离
 	trackRange := trackHeight - thumbHeight
 
-	// Position the thumb proportionally
+	// 按比例定位滑块
 	thumbPos := scrollbarStart
 	if scrollableRange > 0 {
 		thumbPos = scrollbarStart + (s.offsetY*trackRange)/scrollableRange
 	}
 
-	// Ensure thumb stays within bounds (handle rounding edge cases)
+	// 确保滑块保持在边界内（处理舍入边缘情况）
 	if thumbPos+thumbHeight > scrollbarEnd {
 		thumbPos = scrollbarEnd - thumbHeight
 	}
@@ -218,14 +218,14 @@ func (s *ScrollView) drawVerticalScrollbar(scr uv.Screen, area uv.Rectangle, con
 		thumbPos = scrollbarStart
 	}
 
-	// Create scrollbar cells
+	// 创建滚动条单元格
 	trackCell := uv.NewCell(scr.WidthMethod(), "░")
 	thumbCell := uv.NewCell(scr.WidthMethod(), "█")
 	if thumbCell != nil && s.scrollbarColor != nil {
 		thumbCell.Style = uv.Style{Fg: s.scrollbarColor}
 	}
 
-	// Draw scrollbar
+	// 绘制滚动条
 	for y := scrollbarStart; y < scrollbarEnd; y++ {
 		if y >= thumbPos && y < thumbPos+thumbHeight {
 			scr.SetCell(scrollbarX, y, thumbCell)
@@ -235,7 +235,7 @@ func (s *ScrollView) drawVerticalScrollbar(scr uv.Screen, area uv.Rectangle, con
 	}
 }
 
-// drawHorizontalScrollbar draws a horizontal scrollbar.
+// drawHorizontalScrollbar 绘制水平滚动条。
 func (s *ScrollView) drawHorizontalScrollbar(scr uv.Screen, area uv.Rectangle, contentWidth, viewportWidth, scrollbarHeight int) {
 	if contentWidth <= viewportWidth {
 		return
@@ -246,10 +246,10 @@ func (s *ScrollView) drawHorizontalScrollbar(scr uv.Screen, area uv.Rectangle, c
 	scrollbarEnd := area.Max.X
 	trackWidth := scrollbarEnd - scrollbarStart
 
-	// Calculate scrollbar thumb size
+	// 计算滚动条滑块大小
 	thumbWidth := max(1, (viewportWidth*trackWidth)/contentWidth)
 
-	// Calculate scrollbar thumb position
+	// 计算滚动条滑块位置
 	scrollableRange := contentWidth - viewportWidth
 	trackRange := trackWidth - thumbWidth
 
@@ -258,7 +258,7 @@ func (s *ScrollView) drawHorizontalScrollbar(scr uv.Screen, area uv.Rectangle, c
 		thumbPos = scrollbarStart + (s.offsetX*trackRange)/scrollableRange
 	}
 
-	// Ensure thumb stays within bounds (handle rounding edge cases)
+	// 确保滑块保持在边界内（处理舍入边缘情况）
 	if thumbPos+thumbWidth > scrollbarEnd {
 		thumbPos = scrollbarEnd - thumbWidth
 	}
@@ -281,13 +281,13 @@ func (s *ScrollView) drawHorizontalScrollbar(scr uv.Screen, area uv.Rectangle, c
 	}
 }
 
-// Layout calculates the scroll view size.
+// Layout 计算滚动视图大小。
 func (s *ScrollView) Layout(constraints Constraints) Size {
-	// Start with max available
+	// 从最大可用空间开始
 	viewportWidth := constraints.MaxWidth
 	viewportHeight := constraints.MaxHeight
 
-	// Apply width/height constraints if specified
+	// 如果指定了宽度/高度约束，则应用
 	if !s.width.IsAuto() {
 		viewportWidth = s.width.Apply(constraints.MaxWidth, constraints.MaxWidth)
 	}
@@ -296,14 +296,14 @@ func (s *ScrollView) Layout(constraints Constraints) Size {
 		viewportHeight = s.height.Apply(constraints.MaxHeight, constraints.MaxHeight)
 	}
 
-	// Constrain final size
+	// 约束最终大小
 	return Size{
 		Width:  min(viewportWidth, constraints.MaxWidth),
 		Height: min(viewportHeight, constraints.MaxHeight),
 	}
 }
 
-// Children returns the child element.
+// Children 返回子元素。
 func (s *ScrollView) Children() []Element {
 	if s.child == nil {
 		return nil
@@ -311,13 +311,13 @@ func (s *ScrollView) Children() []Element {
 	return []Element{s.child}
 }
 
-// ContentSize returns the full size of the content.
+// ContentSize 返回内容的完整大小。
 func (s *ScrollView) ContentSize() Size {
 	if s.child == nil {
 		return Size{Width: 0, Height: 0}
 	}
 
-	// Layout with unbounded constraints to get full size
+	// 使用无界约束布局以获取完整大小
 	unbounded := Constraints{
 		MinWidth:  0,
 		MaxWidth:  1 << 30,
@@ -328,18 +328,18 @@ func (s *ScrollView) ContentSize() Size {
 	return s.child.Layout(unbounded)
 }
 
-// adjustChildBounds recursively adjusts the bounds of all child elements
-// to account for the scroll view's viewport position and scroll offset.
-// This ensures hit testing works correctly for elements inside scroll views.
+// adjustChildBounds 递归调整所有子元素的边界
+// 以考虑滚动视图的视口位置和滚动偏移。
+// 这确保了滚动视图内元素的点击测试能够正确工作。
 func (s *ScrollView) adjustChildBounds(elem Element, offsetX, offsetY int) {
 	if elem == nil {
 		return
 	}
 
-	// Get current bounds (relative to content buffer at 0,0)
+	// 获取当前边界（相对于内容缓冲区的 0,0）
 	bounds := elem.Bounds()
 
-	// Translate to screen coordinates
+	// 转换为屏幕坐标
 	newBounds := uv.Rect(
 		bounds.Min.X+offsetX,
 		bounds.Min.Y+offsetY,
@@ -347,10 +347,10 @@ func (s *ScrollView) adjustChildBounds(elem Element, offsetX, offsetY int) {
 		bounds.Dy(),
 	)
 
-	// Update the element's bounds
+	// 更新元素的边界
 	elem.SetBounds(newBounds)
 
-	// Recursively adjust children
+	// 递归调整子元素
 	for _, child := range elem.Children() {
 		if child != nil {
 			s.adjustChildBounds(child, offsetX, offsetY)

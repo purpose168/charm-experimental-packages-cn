@@ -1,4 +1,4 @@
-// Package charmtone contains an API for the CharmTone color palette.
+// Package charmtone 包含 CharmTone 调色板的 API。
 package charmtone
 
 import (
@@ -10,10 +10,10 @@ import (
 
 var _ color.Color = Key(0)
 
-// Key is a type for color keys.
+// Key 是颜色键的类型。
 type Key int
 
-// Available colors.
+// 可用的颜色。
 const (
 	Cumin Key = iota
 	Tang
@@ -91,8 +91,8 @@ const (
 	NeueZinc
 )
 
-// RGBA returns the red, green, blue, and alpha values of the color. It
-// satisfies the color.Color interface.
+// RGBA 返回颜色的红、绿、蓝和 alpha 值。它
+// 满足 color.Color 接口。
 func (k Key) RGBA() (r, g, b, a uint32) {
 	c, ok := colors[k]
 	if !ok {
@@ -176,8 +176,8 @@ var names = map[Key]string{
 	NeueZinc: "Neue Zinc",
 }
 
-// String returns the official CharmTone name of the color. It satisfies the
-// fmt.Stringer interface.
+// String 返回颜色的官方 CharmTone 名称。它满足
+// fmt.Stringer 接口。
 func (k Key) String() string {
 	name, ok := names[k]
 	if !ok {
@@ -261,7 +261,7 @@ var colors = map[Key]color.RGBA{
 	NeueZinc: {R: 0x0e, G: 0x99, B: 0x96, A: 0xFF}, // "#0e9996"
 }
 
-// Hex returns the hex value of the color.
+// Hex 返回颜色的十六进制值。
 func (k Key) Hex() string {
 	c, ok := colors[k]
 	if !ok {
@@ -270,7 +270,7 @@ func (k Key) Hex() string {
 	return fmt.Sprintf("#%02X%02X%02X", c.R, c.G, c.B)
 }
 
-// Keys returns a slice of all CharmTone color keys.
+// Keys 返回所有 CharmTone 颜色键的切片。
 func Keys() []Key {
 	return []Key{
 		Cumin,
@@ -332,11 +332,11 @@ func Keys() []Key {
 		Salt,
 		Butter,
 
-		// XXX: additions and deletions are not included, yet.
+		// XXX: 尚未包含添加和删除的颜色。
 	}
 }
 
-// IsPrimary indicates which colors are part of the core palette.
+// IsPrimary 指示哪些颜色是核心调色板的一部分。
 func (k Key) IsPrimary() bool {
 	return slices.Contains([]Key{
 		Charple,
@@ -347,7 +347,7 @@ func (k Key) IsPrimary() bool {
 	}, k)
 }
 
-// IsSecondary indicates which colors are part of the secondary palette.
+// IsSecondary 指示哪些颜色是次要调色板的一部分。
 func (k Key) IsSecondary() bool {
 	return slices.Contains([]Key{
 		Hazy,
@@ -356,7 +356,7 @@ func (k Key) IsSecondary() bool {
 	}, k)
 }
 
-// IsTertiary indicates which colors are part of the tertiary palette.
+// IsTertiary 指示哪些颜色是第三调色板的一部分。
 func (k Key) IsTertiary() bool {
 	return slices.Contains([]Key{
 		Turtle,

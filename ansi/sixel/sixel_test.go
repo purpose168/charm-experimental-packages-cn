@@ -41,12 +41,12 @@ func TestScanSize(t *testing.T) {
 			decoder := &Decoder{}
 			width, height := decoder.scanSize([]byte(testCase.data))
 			if width != testCase.expectedWidth {
-				t.Errorf("expected width of %d, but received width of %d", testCase.expectedWidth, width)
+				t.Errorf("期望宽度为 %d，但接收到宽度为 %d", testCase.expectedWidth, width)
 				return
 			}
 
 			if height != testCase.expectedHeight {
-				t.Errorf("expected height of %d, but received height of %d", testCase.expectedHeight, height)
+				t.Errorf("期望高度为 %d，但接收到高度为 %d", testCase.expectedHeight, height)
 				return
 			}
 		})
@@ -58,9 +58,8 @@ func TestFullImage(t *testing.T) {
 		imageWidth  int
 		imageHeight int
 		bandCount   int
-		// When filling the image, we'll use a map of indices to colors and change colors every
-		// time the current index is in the map- this will prevent dozens of lines with the same color
-		// in a row and make this slightly more legible
+		// 填充图像时，我们将使用索引到颜色的映射，并在当前索引在映射中时更改颜色
+		// 这将防止连续出现多行相同颜色，使此测试稍微更易读
 		colors map[int]color.RGBA
 	}{
 		"3x12 single color filled": {
@@ -72,7 +71,7 @@ func TestFullImage(t *testing.T) {
 		"3x12 two color filled": {
 			3, 12, 2,
 			map[int]color.RGBA{
-				// 3-pixel high alternating bands
+				// 3 像素高的交替带
 				0:  {0, 0, 255, 255},
 				9:  {0, 255, 0, 255},
 				18: {0, 0, 255, 255},
@@ -166,13 +165,13 @@ func TestFullImage(t *testing.T) {
 
 			err := encoder.Encode(buffer, img)
 			if err != nil {
-				t.Errorf("Unexpected error: %+v", err)
+				t.Errorf("意外错误: %+v", err)
 				return
 			}
 
 			compareImg, err := decoder.Decode(buffer)
 			if err != nil {
-				t.Errorf("Unexpected error: %+v", err)
+				t.Errorf("意外错误: %+v", err)
 				return
 			}
 
@@ -182,11 +181,11 @@ func TestFullImage(t *testing.T) {
 			actualHeight := compareImg.Bounds().Dy()
 
 			if actualHeight != expectedHeight {
-				t.Errorf("SixelImage had a height of %d, but a height of %d was expected", actualHeight, expectedHeight)
+				t.Errorf("SixelImage 高度为 %d，但期望高度为 %d", actualHeight, expectedHeight)
 				return
 			}
 			if actualWidth != expectedWidth {
-				t.Errorf("SixelImage had a width of %d, but a width of %d was expected", actualWidth, expectedWidth)
+				t.Errorf("SixelImage 宽度为 %d，但期望宽度为 %d", actualWidth, expectedWidth)
 				return
 			}
 
@@ -196,7 +195,7 @@ func TestFullImage(t *testing.T) {
 					expectedR, expectedG, expectedB, expectedA := img.At(x, y).RGBA()
 
 					if r != expectedR || g != expectedG || b != expectedB || a != expectedA {
-						t.Errorf("SixelImage had color (%d,%d,%d,%d) at coordinates (%d,%d), but color (%d,%d,%d,%d) was expected",
+						t.Errorf("SixelImage 在坐标 (%d,%d) 处的颜色为 (%d,%d,%d,%d)，但期望颜色为 (%d,%d,%d,%d)",
 							r, g, b, a, x, y, expectedR, expectedG, expectedB, expectedA)
 						return
 					}

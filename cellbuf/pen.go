@@ -3,11 +3,10 @@ package cellbuf
 import (
 	"io"
 
-	"github.com/charmbracelet/x/ansi"
+	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 )
 
-// PenWriter is a writer that writes to a buffer and keeps track of the current
-// pen style and link state for the purpose of wrapping with newlines.
+// PenWriter 是一个写入器，用于写入缓冲区并跟踪当前的画笔样式和链接状态，以便使用换行符进行包装。
 type PenWriter struct {
 	w     io.Writer
 	p     *ansi.Parser
@@ -15,7 +14,7 @@ type PenWriter struct {
 	link  Link
 }
 
-// NewPenWriter returns a new PenWriter.
+// NewPenWriter 返回一个新的 PenWriter。
 func NewPenWriter(w io.Writer) *PenWriter {
 	pw := &PenWriter{w: w}
 	pw.p = ansi.GetParser()
@@ -36,17 +35,17 @@ func NewPenWriter(w io.Writer) *PenWriter {
 	return pw
 }
 
-// Style returns the current pen style.
+// Style 返回当前的画笔样式。
 func (w *PenWriter) Style() Style {
 	return w.style
 }
 
-// Link returns the current pen link.
+// Link 返回当前的画笔链接。
 func (w *PenWriter) Link() Link {
 	return w.link
 }
 
-// Write writes to the buffer.
+// Write 写入到缓冲区。
 func (w *PenWriter) Write(p []byte) (int, error) {
 	for i := range p {
 		b := p[i]
@@ -74,9 +73,7 @@ func (w *PenWriter) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
-// Close closes the writer, resets the style and link if necessary, and releases
-// its parser. Calling it is performance critical, but forgetting it does not
-// cause safety issues or leaks.
+// Close 关闭写入器，必要时重置样式和链接，并释放其解析器。调用它对性能至关重要，但忘记调用不会导致安全问题或内存泄漏。
 func (w *PenWriter) Close() error {
 	if !w.style.Empty() {
 		_, _ = w.w.Write([]byte(ansi.ResetStyle))
