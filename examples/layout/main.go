@@ -10,13 +10,13 @@ import (
 	"os"
 	"strings"
 
-	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/colorprofile"
 	"github.com/lucasb-eyer/go-colorful"
 	"github.com/purpose168/charm-experimental-packages-cn/ansi"
 	"github.com/purpose168/charm-experimental-packages-cn/cellbuf"
 	"github.com/purpose168/charm-experimental-packages-cn/input"
 	"github.com/purpose168/charm-experimental-packages-cn/term"
+	lipgloss "github.com/purpose168/lipgloss-cn/v2"
 	"github.com/rivo/uniseg"
 )
 

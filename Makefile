@@ -90,7 +90,7 @@ help:
 # 构建所有包
 .PHONY: all
 all:
-	@echo "构建所有包..."
+	@echo "\n\n构建所有包..."
 	@for pkg in $(PACKAGES); do \
 		$(MAKE) build $$pkg; \
 	done
@@ -102,7 +102,7 @@ build:
 		$(MAKE) all; \
 	else \
 		for pkg in $(filter-out build,$(MAKECMDGOALS)); do \
-			echo "构建 $$pkg 包..."; \
+			echo "\n\n构建 $$pkg 包..."; \
 			cd $(ROOT_DIR)/$$pkg && $(GO) build ./...; \
 			done; \
 	fi

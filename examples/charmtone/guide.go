@@ -8,8 +8,8 @@ import (
 	"os"
 	"strings"
 
-	"charm.land/lipgloss/v2"
 	"github.com/purpose168/charm-experimental-packages-cn/exp/charmtone"
+	lipgloss "github.com/purpose168/lipgloss-cn/v2"
 )
 
 func renderGuide() {
