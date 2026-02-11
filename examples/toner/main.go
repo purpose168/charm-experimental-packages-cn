@@ -12,11 +12,11 @@ import (
 func main() {
 	bts, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		log.Fatalf("failed to read from stdin: %v", err)
+		log.Fatalf("从标准输入读取失败: %v", err)
 	}
 
 	w := toner.Writer{Writer: os.Stdout}
 	if _, err := w.Write(bts); err != nil {
-		log.Fatalf("failed to write to stdout: %v", err)
+		log.Fatalf("写入标准输出失败: %v", err)
 	}
 }

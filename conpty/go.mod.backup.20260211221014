@@ -1,5 +1,5 @@
 module github.com/purpose168/charm-experimental-packages-cn/conpty
 
-go 1.24.2
+go 1.24.0
 
 require golang.org/x/sys v0.41.0

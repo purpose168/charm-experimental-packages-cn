@@ -34,31 +34,31 @@ vars:
 
 tasks:
   fmt:
-    desc: Run gofumpt for all packages
+    desc: 为所有包运行 gofumpt 格式化
     cmds:
       - for: { var: PACKAGES }
         cmd: cd {{.ITEM}} && gofmt -s -w .
 
   modernize:
-    desc: Run modernize for all packages
+    desc: 为所有包运行 modernize 现代化
     cmds:
       - for: { var: PACKAGES }
         cmd: cd {{.ITEM}} && modernize -fix ./...
 
   lint:
-    desc: Run base linters for all packages
+    desc: 为所有包运行基础代码检查
     cmds:
       - for: { var: PACKAGES }
         cmd: cd {{.ITEM}} && golangci-lint run
 
   test:
-    desc: Run tests for all packages
+    desc: 为所有包运行测试
     cmds:
       - for: { var: PACKAGES }
         cmd: cd {{.ITEM}} && go test ./... {{.CLI_ARGS}}
 
   tidy:
-    desc: Run `go mod tidy` for all packages
+    desc: 为所有包运行 `go mod tidy` 清理依赖
     cmds:
       - for: { var: PACKAGES }
         cmd: cd {{.ITEM}} && go mod tidy

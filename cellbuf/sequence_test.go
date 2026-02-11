@@ -11,11 +11,11 @@ import (
 // TestReadStyleColor 测试读取样式颜色的功能
 func TestReadStyleColor(t *testing.T) {
 	tests := []struct {
-		name      string        // 测试用例名称
-		params    []ansi.Param  // ANSI 参数
-		wantN     int           // 期望读取的参数数量
-		wantColor color.Color   // 期望的颜色
-		wantNil   bool          // 期望颜色为 nil
+		name      string       // 测试用例名称
+		params    []ansi.Param // ANSI 参数
+		wantN     int          // 期望读取的参数数量
+		wantColor color.Color  // 期望的颜色
+		wantNil   bool         // 期望颜色为 nil
 	}{
 		{
 			name:    "无效 - 参数太少",

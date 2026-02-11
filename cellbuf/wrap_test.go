@@ -7,10 +7,10 @@ import (
 
 // wrapCases 包含了各种文本换行测试用例
 var wrapCases = []struct {
-	name     string        // 测试用例名称
-	input    string        // 输入文本
-	expected string        // 期望的输出文本
-	width    int           // 换行宽度
+	name     string // 测试用例名称
+	input    string // 输入文本
+	expected string // 期望的输出文本
+	width    int    // 换行宽度
 }{
 	{
 		name:     "简单文本",

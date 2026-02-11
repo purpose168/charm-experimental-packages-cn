@@ -156,7 +156,7 @@ func (s *Screen) scrollOldhash(n, top, bot int) {
 func (s *Screen) growHunks() {
 	var (
 		backLimit    int // 要填充的单元格的限制
-	backRefLimit int // 引用的限制
+		backRefLimit int // 引用的限制
 		i            int
 		nextHunk     int
 	)

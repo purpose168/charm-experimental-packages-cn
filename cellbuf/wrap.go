@@ -36,13 +36,13 @@ func Wrap(s string, limit int, breakpoints string) string {
 	defer ansi.PutParser(p)
 
 	var (
-		buf             bytes.Buffer    // 结果缓冲区
-		word            bytes.Buffer    // 当前单词缓冲区
-		space           bytes.Buffer    // 当前空格缓冲区
-		style, curStyle Style           // 当前样式和累积样式
-		link, curLink   Link            // 当前链接和累积链接
-		curWidth        int             // 当前行宽度
-		wordLen         int             // 当前单词长度
+		buf             bytes.Buffer // 结果缓冲区
+		word            bytes.Buffer // 当前单词缓冲区
+		space           bytes.Buffer // 当前空格缓冲区
+		style, curStyle Style        // 当前样式和累积样式
+		link, curLink   Link         // 当前链接和累积链接
+		curWidth        int          // 当前行宽度
+		wordLen         int          // 当前单词长度
 	)
 
 	// hasBlankStyle 检查当前样式是否为空白样式（仅考虑反向属性、背景色和下划线样式）
